@@ -1,0 +1,61 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:run_job' %}" method="POST">
+      {% csrf_token %}
+      <div class="row">
+      <input type="hidden" name="json" value="{{ json }}">
+        <div class="col-md-12">
+          <h1>Confirm Job and Run</h1>
+       </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="lead">
+            <li>Study Name
+              <ul class="lead" draggable="true">
+                <li>Study 1</li>
+              </ul>
+            </li>
+            <li>Model Name
+              <ul class="lead" draggable="true">
+                <li>Model 1</li>
+              </ul>
+            </li>
+            <li>Isotherm Name
+              <ul class="lead" draggable="true">
+                <li>Steric Mass Action</li>
+              </ul>
+            </li>
+            <li>Steps
+              <ul class="lead" draggable="true">
+                <li>Load</li>
+                <li>Wash</li>
+                <li>Elute</li>
+                <li>Strip</li>
+              </ul>
+            </li>
+            <li>Components
+              <ul class="lead" draggable="true">
+                <li>Salt</li>
+                <li>Main</li>
+                <li>Basic</li>
+                <li>Dimer</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
+                <button type="submit" class="btn btn-success">Run Job</button>
+              </div>
+            </div>
+        </div>
+      </div>
+      </form>
+
+{% endblock %}

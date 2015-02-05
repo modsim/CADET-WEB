@@ -1,0 +1,216 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+<form class="form-horizontal" role="form" style="">
+      {% csrf_token %}
+      <div class="row">
+      <input type="hidden" name="json" value="{{ json }}">
+        <div class="col-md-6">
+          <h1>Job #:</h1>
+        </div>
+        <div class="col-md-6">
+          <h1>Job Status: &nbsp;Complete</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <h1>Star Rating System</h1>
+        </div>
+        <div class="col-md-6">
+          <input type="number" name="rating" class="star_rating" min=0 max=5 step=0.5 value=0>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+              <div class="col-sm-2">
+                <label for="inputEmail3" class="control-label">Notes</label>
+              </div>
+              <div class="col-sm-10">
+                <textarea class="form-control" id="inputEmail3" placeholder="Simulation Notes"></textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default">Save</button>
+              </div>
+            </div>
+        </div>
+      </div>
+
+    {% for id, name, url in graphs %}
+
+       <div class="jumbotron">
+           <h3>{{ name }}</h3>
+        <div>
+            <p></p><a href="{{ url }}">Download {{ name }} image</a></p>
+            <div class="row">
+                <div class="col-md-9 tall" id="{{ id }}"></div>
+                <div class="col-md-3 tall" id="{{ id }}choice"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-9 small" id="{{ id }}overview"></div>
+            </div>
+        </div>
+      </div>
+
+    {% endfor %}
+
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="btn-toolbar" role="toolbar">
+            <div class="btn-group">
+              <a type="button" class="btn btn-default" href="{{ download_url}}">Download Simulation</a>
+              <a type="button" class="btn btn-default" href="{{ new_simulation }}">Create New Simulation From This Simulation</a>
+              <a type="button" class="btn btn-default">Create Batch Job Based on this Simulation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+          </form>
+
+
+<script type="text/javascript">
+
+function start_plot(datasets, element, choices, overview_id) {
+		// hard-code color indices to prevent them from shifting as
+		// countries are turned on/off
+        var datasets = datasets;
+		var i = 0;
+		$.each(datasets, function(key, val) {
+			val.color = i;
+			++i;
+		});
+
+		// insert checkboxes
+		var choiceContainer = $(choices);
+
+		for (var key in datasets) {
+		    choiceContainer.append("<br/><input type='checkbox' name='" + key +
+				"' checked='checked' id='id" + key + "'></input>" +
+				"<label for='id" + key + "'>"
+				+ datasets[key].label + "</label>");
+		};
+
+
+		choiceContainer.find("input").click(plotAccordingToChoices);
+
+		function plotAccordingToChoices() {
+
+			var data = [];
+
+			choiceContainer.find("input:checked").each(function () {
+				var key = $(this).attr("name");
+				if (key && datasets[key]) {
+					data.push(datasets[key]);
+				}
+			});
+
+            var plot = $.plot(element, data, {
+                yaxis: {
+                    min: 0,
+                    zoomRange: null,
+                    //panRange: [0, maxY]
+                },
+                xaxis: {
+                    tickDecimals: 0,
+                    zoomRange: null,
+                    //panRange: [0, maxX]
+                },
+                zoom: {
+                    interactive: true
+                },
+                pan: {
+                    interactive: true
+                },
+                selection: {
+                    mode: "xy"
+                },
+                yaxes: [ {}, {position:"right"}]
+            });
+
+            var overview = $.plot(overview_id, data, {
+                xaxis: {
+                    ticks: [],
+                },
+                yaxis: {
+                    ticks: [],
+                    autoscaleMargin: 0.1
+                },
+                selection: {
+                    mode: "x"
+                }
+            });
+
+            // now connect the two
+
+            $(element).bind("plotselected", function (event, ranges) {
+
+                // do the zooming
+                $.each(plot.getXAxes(), function(_, axis) {
+                    var opts = axis.options;
+                    opts.min = ranges.xaxis.from;
+                    opts.max = ranges.xaxis.to;
+                });
+                plot.setupGrid();
+                plot.draw();
+                plot.clearSelection();
+
+                // don't fire event on the overview to prevent eternal loop
+
+                overview.setSelection(ranges, true);
+            });
+
+            $(overview_id).bind("plotselected", function (event, ranges) {
+                plot.setSelection(ranges);
+            });
+
+        }
+
+		plotAccordingToChoices();
+	}
+
+$( document ).ready(function() {
+    var data;
+
+    function fetchData() {
+
+        function onDataReceived(json_data) {
+
+            // Load all the data in one pass; if we only got partial
+            // data we could merge it with what we already have.
+            data = json_data;
+
+            if (0 == json_data['success']) {
+                setTimeout(fetchData, 1000);
+            } else {
+
+                for (var key in json_data['data']) {
+                    if (json_data['data'].hasOwnProperty(key)) {
+                        //$.plot("#" + key, json_data['data'][key]);
+                        start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview');
+                    }
+                }
+
+            }
+        }
+
+        // Normally we call the same URL - a script connected to a
+        // database - but in this case we only have static example
+        // files, so we need to modify the URL.
+
+        $.ajax({
+            url: "{{ json_url }}",
+            type: "GET",
+            dataType: "json",
+            cache: false,
+            data: { 'path': '{{ path }}', 'chunk_size': '{{ chunk_size }}' },
+            success: onDataReceived
+        });
+    }
+
+    setTimeout(fetchData, 1000);
+});
+</script>
+{% endblock %}

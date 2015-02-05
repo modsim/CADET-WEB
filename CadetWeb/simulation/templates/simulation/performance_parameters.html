@@ -1,0 +1,51 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:sensitivity_setup' %}" method="POST">
+      {% csrf_token %}
+      <div class="row">
+      <input type="hidden" name="json" value="{{ json }}">
+        <div class="col-md-12"><h2>Performance parameters per simulation</h2></div>
+        <div class="col-md-12">
+           {% for perf, checked_yes, checked_no in perf_single %}
+	            <div class="form-group">
+	              <div class="col-sm-offset-2 col-sm-10">
+                    <div class="radio">
+                        <div class="col-sm-4">{{ perf }}</div>
+    				    <input type="radio" id="{{ perf }}1" name="perf_single:{{ perf }}" {{ checked_yes|safe }} value="1"><label for="{{ perf }}1">Yes</label>
+    				    <input type="radio" id="{{ perf }}2" name="perf_single:{{ perf }}" {{ checked_no|safe }} value="0"><label for="{{ perf }}2">No</label>
+     			    </div>
+	              </div>
+	            </div> 
+	       {% endfor %}
+		</div>
+
+       {% if job_type == "batch" and perf_group %}
+        <div class="col-md-12"><h2>Batch Performance Parameters</h2></div>
+        <div class="col-md-12">
+           {% for perf, checked_yes, checked_no in perf_group %}
+	            <div class="form-group">
+	              <div class="col-sm-offset-2 col-sm-10">
+                    <div class="radio">
+                        <div class="col-sm-4">{{ perf }}</div>
+    				    <input type="radio" id="{{ perf }}1" name="perf_group:{{ perf }}" {{ checked_yes|safe }} value="1"><label for="{{ perf }}1">Yes</label>
+    				    <input type="radio" id="{{ perf }}2" name="perf_group:{{ perf }}" {{ checked_no|safe }} value="0"><label for="{{ perf }}2">No</label>
+     			    </div>
+	              </div>
+	            </div> 
+	       {% endfor %}
+		</div>		
+       {% endif %}
+		
+		<div class="col-md-12">
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
+                <button type="submit" class="btn btn-success">Continue to Sensitivity Selection</button>
+              </div>
+            </div>
+        </div>
+</div>
+ </form>
+
+{% endblock %}

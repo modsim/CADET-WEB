@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  
+{% load staticfiles %}
+
+  <head>
+    <meta charset="utf-8">
+    <title>Bootstrap, from Twitter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="{% static "simulation/bootstrap-3.3.2-dist/css/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static "simulation/star_rating/css/star-rating.css" %}" rel="stylesheet">
+    <link href="{% static "simulation/smoothness/jquery-ui.min.css" %}" rel="stylesheet">
+    <link href="{% static "simulation/dataTables.jqueryui.css" %}" rel="stylesheet">
+    <style>
+    .ui-state-active {color:black; font-weight:bold;}
+
+    .tabs-hide {
+    /*display: none;*/
+        position: absolute;
+        left: -10000px;
+    }
+        .tall {height: 600px;}
+        .small {height: 150px;}
+        .wide {width: 100%;}
+        .medium {height: 300px;}
+
+    </style>
+    <script type="text/javascript" src="{% static "simulation/jquery-2.1.3.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "simulation/bootstrap-3.3.2-dist/js/bootstrap.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "simulation/jquery-ui-1.11.3/jquery-ui.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "simulation/star_rating/js/star-rating.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "simulation/jquery.validate.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "simulation/additional-methods.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "simulation/DataTables-1.10.5/media/js/jquery.dataTables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "simulation/dataTables.jqueryui.js" %}"></script>
+    <script type="text/javascript" src="{% static "simulation/flot/jquery.flot.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "simulation/flot/jquery.flot.time.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "simulation/flot/jquery.flot.selection.min.js" %}"></script>
+
+
+  </head>
+  
+  <body class="visible-lg visible-md">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="navbar navbar-default navbar-inverse">
+            <div class="navbar-header">
+              <a type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"></a>
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <a class="navbar-brand" href="{% url 'simulation:single_start' %}">Create Single Simulation</a>
+              <a class="navbar-brand" href="{% url 'simulation:create_batch_simulation' %}">Create Batch Simulation</a>
+              <a class="navbar-brand" href="{% url 'simulation:choose_search_query' %}">Find Simulation</a>
+              <a class="navbar-brand" href="#">Manage Account</a>
+
+              {% if request.user.is_authenticated %}
+                    <a href="{% url 'account_logout' %}" class="navbar-brand">Logout</a>
+              {% else %}
+                    <a href="{% url 'account_login' %}" class="navbar-brand">Login</a>
+                    <a href="{% url 'account_signup' %}" class="navbar-brand">Sign-Up</a>
+              {% endif %}
+
+            </div>
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+              <ul class="nav navbar-nav navbar-right">
+                <li class="active">
+                  <a href="{% url 'simulation:index' %}">Home</a>
+                </li>
+                <li>
+                  <a href="#">Contacts</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% block body %}{% endblock %}
+
+    </div>
+
+  <script type="text/javascript">
+$.fn.serializeObject = function()
+{
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
+
+
+  $(".star_rating").rating();
+  $( ".checkbox" ).button();
+  $(".form-horizontal").validate();
+  $( ".radio" ).buttonset();
+  $( ".accordion" ).accordion({collapsible: true});
+  $( ".tabs" ).tabs();
+
+  $( ".back" ).click(function() {
+     var post = $(this).data( "post" );
+     var form = $(this).closest('form');
+     form.attr("action", post);
+     form.submit()
+     return False
+});
+
+$(document).ready(function() {
+    var table = $('.DataTable').DataTable();
+
+    $('#submit_button').click(function() {
+        var data = table.$('input').serializeObject();
+        $("#table").val(JSON.stringify(data));
+        this.submit();
+        return false
+    } );
+} );
+
+
+  $(function() {
+   var $images = $('img.imageClassUpdateAtInterval:not([src="/static/simulation/spiffygif_138x138.gif"])');
+
+  // Now, no such image with
+   // a spinner
+   if($images.length === 0 && window.imageLocator)
+     clearInterval(window.imageLocator);
+
+   function fixImage() {
+        $images.each(function() {
+            $this = $(this);
+            if (!$this.data('src')) {
+                $this.data('src', $this.prop('src'));
+            }
+
+            $this.prop('src', $this.data('src') + '?timestamp=' + new Date().getTime());
+        });
+    }  
+
+   window.imageLocator = fixImage();
+
+   $('img.imageClassUpdateAtInterval').error(
+          function () { 
+                 $(this).prop("src", "/static/simulation/spiffygif_138x138.gif");
+                 setTimeout(fixImage, 10000);
+   });
+
+});
+
+
+  </script>
+  </body>
+</html>

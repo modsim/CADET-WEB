@@ -1,0 +1,255 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:graph_setup' %}" method="POST">
+      {% csrf_token %}
+      <div class="row">
+      <input type="hidden" name="json" value="{{ json }}">
+        <div class="col-md-12">
+        	<h1>Simulation&nbsp;Setup</h1>
+        </div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+		          <div class="col-sm-2">
+		            <label class="control-label">Chromatography Type</label>
+		          </div>
+		          <div class="col-sm-10">
+		            <select class="form-control required" name="CHROMATOGRAPHY_TYPE">
+		           
+		           {% for model_name, model_value, selected in rate_models %}
+		                <option value="{{ model_value }}" {{ selected }}>{{ model_name }}</option>
+		           {% endfor %}
+		
+		            </select>
+		          </div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<h1>Discretization</h1>
+		</div>
+		
+		<div class="col-md-12">
+		    <div class="form-group">
+		      <div class="col-sm-2">
+		        <label for="NCOL" class="control-label">NCOL</label>
+		      </div>
+		      <div class="col-sm-10">
+		        <input type="text" class="form-control required" id="NCOL" name="NCOL" value="{{ NCOL }}">
+		      </div>
+		    </div>
+		    <div class="form-group">
+		      <div class="col-sm-2">
+		        <label for="NPAR" class="control-label">NPAR</label>
+		      </div>
+		      <div class="col-sm-10">
+		        <input type="text" class="form-control required" id="NPAR" name="NPAR" value="{{ NPAR }}">
+		      </div>
+		    </div>
+		    <div class="form-group">
+		      <div class="col-sm-2">
+		        <label class="control-label">Particle Discretization Type</label>
+		      </div>
+		      <div class="col-sm-10">
+		        <select class="form-control required" name="PAR_DISC_TYPE">
+		        
+		           {% for name, value, selected in discretizations %}
+		                <option value="{{ value }}" {{ selected }}>{{ name }}</option>
+		           {% endfor %}
+		        </select>
+		      </div>
+	        </div>
+
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="PAR_DISC_VECTOR" class="control-label">PAR_DISC_VECTOR</label>
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control required" id="PAR_DISC_VECTOR_1" name="PAR_DISC_VECTOR_1" value="{{ PAR_DISC_VECTOR_1 }}">
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control required" id="PAR_DISC_VECTOR_2" name="PAR_DISC_VECTOR_2" value="{{ PAR_DISC_VECTOR_2 }}">
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control required" id="PAR_DISC_VECTOR_2" name="PAR_DISC_VECTOR_3" value="{{ PAR_DISC_VECTOR_3 }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label class="control-label">Reconstruction</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <select class="form-control required" name="RECONSTRUCTION">
+		               
+		               {% for name, value, selected in reconstructions %}
+		                    <option value="{{ value }}" {{ selected }}>{{ name }}</option>
+		               {% endfor %}
+                    </select>
+                  </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+              <h2>Weno</h2>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="weno_boundary_model" class="control-label">Boundary Model</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="BOUNDARY_MODEL" name="BOUNDARY_MODEL" value="{{ BOUNDARY_MODEL }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="weno_EPS" class="control-label">EPS</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="WENO_EPS" name="WENO_EPS" value="{{ WENO_EPS }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="weno_order" class="control-label">Order</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="WENO_ORDER" name="WENO_ORDER" value="{{ WENO_ORDER }}">
+                  </div>
+                </div>
+                <div class="form-group"></div>
+            </div>
+            <div class="col-md-12">
+              <h2>Solver</h2>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label class="control-label">Log Level</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <select class="form-control required" name="LOG_LEVEL">
+		               {% for name, value, selected in log_levels %}
+		                    <option value="{{ value }}" {{ selected }}>{{ name }}</option>
+		               {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label class="control-label">Number of &nbsp;Threads</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" name="NTHREADS" value="{{ NTHREADS }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label class="control-label">User Solution Times (comma seperated)</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <textarea class="form-control" name="USER_SOLUTION_TIMES"></textarea>
+                  </div>
+                </div>
+                
+                {% for radio_text, radio_form, checked_yes, checked_no in radios %}
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-10">
+                  <div class="radio">
+                   <div class="col-sm-3">{{ radio_text }}</div>
+    				<input type="radio" id="{{ radio_form }}1" name="{{ radio_form }}" {{ checked_yes|safe }} value="1"><label for="{{ radio_form }}1">Yes</label>
+    				<input type="radio" id="{{ radio_form }}2" name="{{ radio_form }}" {{ checked_no|safe }} value="0"><label for="{{ radio_form }}2">No</label>
+     			  </div>
+                  </div>
+                </div>
+                {% endfor %}
+                
+              
+            <div class="col-md-12">
+              <h2>Schur Solver</h2>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="GS_TYPE" class="control-label">GS_TYPE</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="GS_TYPE" name="GS_TYPE" value="{{ GS_TYPE }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="MAX_KRYLOV" class="control-label">MAX_KRYLOV</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="MAX_KRYLOV" name="MAX_KRYLOV" value="{{ MAX_KRYLOV }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="MAX_RESTARTS" class="control-label">MAX_RESTARTS</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="MAX_RESTARTS" name="MAX_RESTARTS" value="{{ MAX_RESTARTS }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="SCHUR_SAFETY" class="control-label">SCHUR_SAFETY</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="SCHUR_SAFETY" name="SCHUR_SAFETY" value="{{ SCHUR_SAFETY }}">
+                  </div>
+                </div>
+              <h2>Time Integrator</h2>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="time_ABSTOL" class="control-label">ABSTOL</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="ABSTOL" name="ABSTOL" value="{{ ABSTOL }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="time_INIT_STEP_SIZE" class="control-label">INIT_STEP_SIZE</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="INIT_STEP_SIZE" name="INIT_STEP_SIZE" value="{{ INIT_STEP_SIZE }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="time_MAX_STEPS" class="control-label">MAX_STEPS</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="MAX_STEPS" name="MAX_STEPS" value="{{ MAX_STEPS }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="time_REL_TOL" class="control-label">RELTOL</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="time_RELTOL" name="RELTOL" value="{{ RELTOL }}">
+                  </div>
+                </div>
+ 
+            </div>
+ 
+          
+		<div class="col-md-12">
+          <h2>Sensitivity Setup</h2>
+        </div>
+
+        <div class="col-md-12">
+
+          
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
+              <button type="submit" class="btn btn-success">Continue To Graph Setup</button>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      </form>
+
+{% endblock %}

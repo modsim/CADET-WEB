@@ -1,0 +1,68 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:job_setup' %}" method="POST">
+      {% csrf_token %}
+      <div class="row">
+      <input type="hidden" name="json" value="{{ json }}">
+<input type="hidden" name="table" id="table" value="" >
+         <div class="col-md-12"><h2>Sensitivity parameters</h2></div>
+
+		<div class="col-md-12">
+		<div class="form-group">
+
+		<table class="DataTable" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Choose</th>
+                <th>Name</th>
+                <th>Component</th>
+                <th>Section</th>
+                <th>Description</th>
+                <th>Absolute Tolerance</th>
+                <th>Relative Disturbance</th>
+            </tr>
+        </thead>
+
+        <tfoot>
+            <tr>
+                <th>Choose</th>
+                <th>Name</th>
+                <th>Component</th>
+                <th>Section</th>
+                <th>Description</th>
+                <th>Absolute Tolerance</th>
+                <th>Relative Disturbance</th>
+            </tr>
+        </tfoot>
+        <tbody>
+
+         {% for check, checked, name, component, section, description, abs_tol, abs_tol_val, rel_dist, rel_dist_value in entry %}
+             <tr>
+             <td><input type="checkbox" name="{{ check }}" value="1"  {{ checked }}></td>
+             <td>{{ name }}</td><td>{{ component }}</td>
+             <td>{{ section }}</td>
+             <td>{{ description }}</td>
+             <td><input type="text" name="{{ abs_tol }}" min="0" value="{{ abs_tol_val }}"></td>
+             <td><input type="text" name="{{ rel_dist }}" min="0" value="{{ rel_dist_value }}"></td></tr>
+		 {% endfor %}
+
+        </tbody>
+        </table>
+
+		</div>
+		</div>
+
+
+		<div class="col-md-12">
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
+                <button type="submit" class="btn btn-success" id="submit_button">Continue to Job Setup</button>
+              </div>
+            </div>
+        </div>
+        </div>
+      </form>
+
+{% endblock %}

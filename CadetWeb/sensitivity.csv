@@ -1,0 +1,15 @@
+Name,Per Component,Per Section,Description
+COL_DISPERSION,0,0,Axial dispersion coefficient
+COL_LENGTH,0,0,Column length
+COL_POROSITY,0,0,Column porosity
+FILM_DIFFUSION,1,0,A vector with film diffusion coefficients
+PAR_DIFFUSION,1,0,A vector with particle diffusion coefficients
+PAR_SURFDIFFUSION,1,0,"A vector with particle surface diffusion
+coefficients"
+PAR_POROSITY,0,0,Particle porosity
+PAR_RADIUS,0,0,Particle radius
+VELOCITY,0,0,Interstitial velocity of the mobile phase
+CONST_COEFF,1,1,A vector with constant coefficients for inlet concentrations
+LIN_COEFF,1,1,A vector with linear coefficients for inlet concentrations
+QUAD_COEFF,1,1,A vector with quadratic coefficients for inlet concentrations
+CUBE_COEFF,1,1,A vector with cubic coefficients for inlet concentrations

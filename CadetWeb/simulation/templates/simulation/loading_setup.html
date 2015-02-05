@@ -1,0 +1,101 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+<form id="cadet_form" class="form-horizontal" role="form" style="" action="{% url 'simulation:simulation_setup' %}" method="POST">
+      {% csrf_token %}
+      <div class="row">
+      <input type="hidden" name="json" value="{{ json }}">
+
+        <div class="col-md-12">
+          <h1>Loading&nbsp;Setup</h1>
+          <p>The equation for component concentration at each step follows the form
+              Constant+Linear*x+Quadratic*x^2+Cubic*x^3 for each component.</p>
+        </div>
+      </div>
+
+
+    <div class="jumbotron">
+           <h3>Inlet Profile</h3>
+        <div>
+            <div class="row">
+                <div class="col-md-9 medium" id="graph"></div>
+                <div class="col-md-3 medium" id="graphchoice"></div>
+            </div>
+        </div>
+      </div>
+
+    <script type="text/javascript" language="javascript">
+  $(document).ready(function() {
+    function my_plot() {
+        $.post(
+             "/simulation/inlet_graph/",
+             $("#cadet_form").serialize(),
+             function(data) {
+                $.plot('#graph', data);
+             }
+
+          );
+    };
+
+    my_plot();
+
+    $("input").bind("change paste keyup", function(event) {
+          my_plot();
+      });
+   });
+   </script>
+
+<div class="tabs">
+    <ul>
+      {% for step, value in steps %}
+          <li><a href="#{{ step }}">{{ step }}</a></li>
+      {% endfor %}
+        <li><a href="#Times">Times</a></li>
+    </ul>
+      {% for step, value in steps %}
+         <div id="{{ step }}">{{ value|safe }}</div>
+      {% endfor %}
+
+    <div id="Times">
+
+
+        <table class="wide"><tr><td>
+			{% for label, form_name, value in step_times %}
+	            <div class="form-group">
+	              <div class="col-sm-6">
+	                <label class="control-label">{{ label }} (s)</label>
+	              </div>
+	              <div class="col-sm-6">
+	                <input type="text" class="form-control required" value="{{ value }}" name={{ form_name }}>
+	              </div>
+	            </div>
+			{% endfor %}
+        </td><td>
+            {% for idx, first, second, checked_yes, checked_no in continuous %}
+
+			<div class="form-group">
+                  <div class="radio">
+                      <div class="col-sm-2"></div>
+                   <div class="col-sm-6">{{ first }} to {{ second }} Continuous</div>
+    				<input type="radio" id="continuous_{{ idx }}1" name="continuous_{{ idx }}" {{ checked_yes }} value="1"><label for="continuous_{{ idx }}1">Yes</label>
+    				<input type="radio" id="continuous_{{ idx }}2" name="continuous_{{ idx }}" {{ checked_no }} value="0"><label for="continuous_{{ idx }}2">No</label>
+                </div>
+            </div>
+
+			{% endfor %}
+        </td>
+        </tr></table>
+
+
+    </div>
+
+                <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
+                <button type="submit" class="btn btn-success">Continue To Simulation Settings Setup</button>
+              </div>
+            </div>
+
+ </form>
+
+{% endblock %}

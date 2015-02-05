@@ -1,0 +1,30 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:confirm_job' %}" method="POST">
+      {% csrf_token %}
+      <div class="row">
+      <input type="hidden" name="json" value="{{ json }}">
+        <div class="col-md-12">
+          <h1>Job Setup</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <p>This page will have our cluster settings. I don't know what those willl
+            look like yet. Just leaving this page here for now.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
+                <button type="submit" class="btn btn-success">Confirm Job</button>
+              </div>
+            </div>
+        </div>
+      </div>
+ </form>
+
+{% endblock %}

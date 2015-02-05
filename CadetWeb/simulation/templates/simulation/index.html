@@ -1,0 +1,71 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+     <section>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <h1>Welcome&nbsp;to&nbsp;the&nbsp;CADET&nbsp;Web&nbsp;Interface</h1>
+              <h3>Examples</h3>
+              <ul><li><a href="/simulation/single_start/?path=59c5a8df9861bb81d84c99e7c14295ed890d09edc568f4bc3097705978550b06&chunk_size=20">4 component SMA</a></li></ul>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
+              <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
+              <br>Ut enim ad minim veniam, quis nostrud</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
+              <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
+              <br>Ut enim ad minim veniam, quis nostrud</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
+              <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
+              <br>Ut enim ad minim veniam, quis nostrud</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-2">
+            <a class="btn btn-primary" href="{% url 'simulation:single_start' %}">Create&nbsp;Single&nbsp;Situation</a>
+          </div>
+          <div class="col-md-10">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
+              <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
+              <br>Ut enim ad minim veniam, quis nostrud</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          <a class="btn btn-primary" href="{% url 'simulation:create_batch_simulation' %}">Create&nbsp;Batch&nbsp;Simulation</a>
+        </div>
+        <div class="col-md-10">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
+            <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
+            <br>Ut enim ad minim veniam, quis nostrud</p>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          <a class="btn btn-primary" href="{% url 'simulation:choose_search_query' %}">Find&nbsp;Simulation</a>
+        </div>
+        <div class="col-md-10">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
+            <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
+            <br>Ut enim ad minim veniam, quis nostrud</p>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          <a class="btn btn-primary">Manage&nbsp;Account</a>
+        </div>
+        <div class="col-md-10">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
+            <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
+            <br>Ut enim ad minim veniam, quis nostrud</p>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:performance_parameters' %}" method="POST">
+      {% csrf_token %}
+      <div class="row">
+      <input type="hidden" name="json" value="{{ json }}">
+        <div class="col-md-12"><h2>General Graphs</h2></div>
+        <div class="col-md-12">
+           {% for graph, checked_yes, checked_no in graph_single %}
+	            <div class="form-group">
+	              <div class="col-sm-offset-2 col-sm-10">
+                    <div class="radio">
+                        <div class="col-sm-4">{{ graph }}</div>
+    				    <input type="radio" id="{{ graph }}1" name="graph_single:{{ graph }}" {{ checked_yes|safe }} value="1"><label for="{{ graph }}1">Yes</label>
+    				    <input type="radio" id="{{ graph }}2" name="graph_single:{{ graph }}" {{ checked_no|safe }} value="0"><label for="{{ graph }}2">No</label>
+     			    </div>
+	              </div>
+	            </div> 
+	       {% endfor %}
+		</div>
+
+       {% if job_type == "batch" and graph_group %}
+        <div class="col-md-12"><h2>Batch Graphs</h2></div>
+        <div class="col-md-12">
+           {% for graph, checked_yes, checked_no in graph_group %}
+	            <div class="form-group">
+	              <div class="col-sm-offset-2 col-sm-10">
+	                <div class="radio">
+                        <div class="col-sm-4">{{ graph }}</div>
+    				    <input type="radio" id="{{ graph }}1" name="graph_group:{{ graph }}" {{ checked_yes|safe }} value="1"><label for="{{ graph }}1">Yes</label>
+    				    <input type="radio" id="{{ graph }}2" name="graph_group:{{ graph }}" {{ checked_no|safe }} value="0"><label for="{{ graph }}2">No</label>
+     			    </div>
+	              </div>
+	            </div> 
+	       {% endfor %}
+		</div>		
+       {% endif %}
+		<div class="col-md-12">
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
+                <button type="submit" class="btn btn-success">Continue to Performance Parameter Selection</button>
+              </div>
+            </div>
+        </div>
+</div>
+</form>
+
+{% endblock %}
