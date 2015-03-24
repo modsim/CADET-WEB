@@ -73,7 +73,7 @@
 
 <script type="text/javascript">
 
-function start_plot(datasets, element, choices, overview_id) {
+function start_plot(datasets, element, choices, overview_id, base_id) {
 		// hard-code color indices to prevent them from shifting as
 		// countries are turned on/off
         var datasets = datasets;
@@ -92,9 +92,26 @@ function start_plot(datasets, element, choices, overview_id) {
 				"<label for='id" + key + "'>"
 				+ datasets[key].label + "</label>");
 		};
+		choiceContainer.append("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
+		choiceContainer.append("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "download'>Download Current Graph</a>");
 
 
 		choiceContainer.find("input").click(plotAccordingToChoices);
+
+		$('#' + base_id + 'zoom').click(function (e) {
+            plotAccordingToChoices();
+            e.preventDefault();
+        });
+
+        $('#' + base_id + 'download').click(function (e) {
+            var link = $('#' + base_id + 'download');
+            var search = element + ' > canvas:first';
+            console.log(search);
+            //link.href = $("'" + element + ' > canvas:first' + "'")[0].toDataURL();
+            link.attr('href', $(search)[0].toDataURL());
+            link.attr('download', base_id + '.png');
+            //e.preventDefault();
+        });
 
 		function plotAccordingToChoices() {
 
@@ -108,21 +125,27 @@ function start_plot(datasets, element, choices, overview_id) {
 			});
 
             var plot = $.plot(element, data, {
+                canvas: true,
                 yaxis: {
-                    min: 0,
-                    zoomRange: null,
+                    //min: 0,
+                    //zoomRange: null,
+                    //panRange: [0, maxY]
+                },
+                y2axis: {
+                    //min: 0,
+                    //zoomRange: null,
                     //panRange: [0, maxY]
                 },
                 xaxis: {
-                    tickDecimals: 0,
-                    zoomRange: null,
+                    //tickDecimals: 0,
+                    //zoomRange: null,
                     //panRange: [0, maxX]
                 },
                 zoom: {
                     interactive: true
                 },
                 pan: {
-                    interactive: true
+                    interactive: false
                 },
                 selection: {
                     mode: "xy"
@@ -131,6 +154,7 @@ function start_plot(datasets, element, choices, overview_id) {
             });
 
             var overview = $.plot(overview_id, data, {
+                canvas: true,
                 xaxis: {
                     ticks: [],
                 },
@@ -189,7 +213,7 @@ $( document ).ready(function() {
                 for (var key in json_data['data']) {
                     if (json_data['data'].hasOwnProperty(key)) {
                         //$.plot("#" + key, json_data['data'][key]);
-                        start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview');
+                        start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
                     }
                 }
 

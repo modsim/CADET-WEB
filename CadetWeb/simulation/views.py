@@ -454,6 +454,8 @@ def run_job_get(request):
 
     data = {}
     data['graphs'] = graphs
+
+    #FIXME: need to change the path so that this works. Needs to be path to /static/simulations/sims/...
     data['download_url'] = hdf5_path
     data['new_simulation'] = url_new
     data['path'] = path

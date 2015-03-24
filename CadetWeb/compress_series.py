@@ -11,7 +11,7 @@ def compress_time_series(values, epsilon):
 
     #filter any value below 0.1% of the smallest components peak max to zero
     filter_level = min(np.max(temp_values,0)) * .0001
-    temp_values[(temp_values < filter_level)] = 0
+    temp_values[(np.absolute(temp_values) < filter_level)] = 0
 
     maximums = set()
     for i in range(0, temp_values.shape[1]):
@@ -47,8 +47,8 @@ def compress_time_series(values, epsilon):
 
     #convert back to the time series format for flot
     for idx, value in enumerate(values):
-        value['data'] = (new_time[:,0].tolist(), new_values[:,idx].tolist())
-
+        #value['data'] = (new_time[:,0].tolist(), new_values[:,idx].tolist())
+        value['data'] = (np.char.mod('%.6g', new_time[:,0]).tolist(), np.char.mod('%.6g', new_values[:,idx]).tolist())
 
     return values
 
