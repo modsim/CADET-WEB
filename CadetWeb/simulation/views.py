@@ -559,34 +559,38 @@ def get_data(request):
             if key.startswith('graph_single') and value == '1':
                 _, name = key.split(':')
                 id, title, data_sets = utils.call_plugin_by_name(name, 'graphing/single', 'get_data', hdf5_path)
-                json_data['data'][id] = data_sets
+                if data_sets:
+                    json_data['data'][id] = data_sets
 
             if key.startswith('graph_group') and value == '1':
                 _, name = key.split(':')
                 id, title, data_sets = utils.call_plugin_by_name(name, 'graphing/group', 'get_data', hdf5_path)
-                json_data['data'][id] = data_sets
+                if data_sets:
+                    json_data['data'][id] = data_sets
 
         for sensitivity_number in range(len(data.get("sensitivities", []))):
             id, title, data_sets = plot_sensitivity.get_data(hdf5_path, sensitivity_number)
-            json_data['data'][id] = data_sets
+            if data_sets:
+                json_data['data'][id] = data_sets
 
-    #hand off to subprocess
-    json_string = get_json_string(json_data)
-    #open('/tmp/data.json', 'w').write(json_string)
-    compress = os.path.join(parent_path, 'compress_series.py')
-    p = subprocess.Popen(['python', compress], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-    (stdout, stderr) = p.communicate(input=json_string)
-    #open('/tmp/data3.json', 'w').write(stdout)
+        if json_data['data']:
+            #hand off to subprocess
+            json_string = get_json_string(json_data)
+            #open('/tmp/data.json', 'w').write(json_string)
+            compress = os.path.join(parent_path, 'compress_series.py')
+            p = subprocess.Popen(['python', compress], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+            (stdout, stderr) = p.communicate(input=json_string)
+            #open('/tmp/data3.json', 'w').write(stdout)
 
-    #get data back from subprocess and turn it into a dictionary again
-    json_data = json.loads(stdout.replace("'", '"'))
+            #get data back from subprocess and turn it into a dictionary again
+            json_data = json.loads(stdout.replace("'", '"'))
 
-    #process the dictionary into the interleaved format needed
-    for id, data_sets in json_data['data'].items():
-        for data_set in data_sets:
-            time = list(data_set['data'][0])
-            values = list(data_set['data'][1])
-            data_set['data'] = zip(time, values)
+            #process the dictionary into the interleaved format needed
+            for id, data_sets in json_data['data'].items():
+                for data_set in data_sets:
+                    time = list(data_set['data'][0])
+                    values = list(data_set['data'][1])
+                    data_set['data'] = zip(time, values)
 
     return JsonResponse(json_data, safe=False)
 

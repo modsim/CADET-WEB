@@ -183,7 +183,7 @@ $( document ).ready(function() {
             data = json_data;
 
             if (0 == json_data['success']) {
-                setTimeout(fetchData, 1000);
+                setTimeout(fetchData, 5000);
             } else {
 
                 for (var key in json_data['data']) {
@@ -210,7 +210,7 @@ $( document ).ready(function() {
         });
     }
 
-    setTimeout(fetchData, 1000);
+    setTimeout(fetchData, 5000);
 });
 </script>
 {% endblock %}
