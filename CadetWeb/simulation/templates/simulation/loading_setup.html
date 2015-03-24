@@ -47,16 +47,13 @@
 
 <div class="tabs">
     <ul>
+         <li><a href="#Times">Times</a></li>
       {% for step, value in steps %}
           <li><a href="#{{ step }}">{{ step }}</a></li>
       {% endfor %}
-        <li><a href="#Times">Times</a></li>
-    </ul>
-      {% for step, value in steps %}
-         <div id="{{ step }}">{{ value|safe }}</div>
-      {% endfor %}
 
-    <div id="Times">
+    </ul>
+       <div id="Times">
 
 
         <table class="wide"><tr><td>
@@ -85,9 +82,11 @@
 			{% endfor %}
         </td>
         </tr></table>
+  </div>
 
-
-    </div>
+    {% for step, value in steps %}
+         <div id="{{ step }}">{{ value|safe }}</div>
+      {% endfor %}
 
                 <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">

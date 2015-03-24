@@ -620,8 +620,9 @@ def inlet_graph(request):
                 temp_data.extend(zip(times.tolist(), values.tolist()))
 
             else:
-                times = np.array([start, stop])
+                times = np.array([0, stop-start])
                 values = constant + linear*times
+                times = times + start
                 temp_data.extend(zip(times.tolist(), values.tolist()))
         temp['data'] = temp_data
         json_data.append(temp)
