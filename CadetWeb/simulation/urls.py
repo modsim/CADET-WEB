@@ -26,4 +26,5 @@ urlpatterns = patterns('',
     url(r'^query_options/$', views.query_options, name='query_options'),
     url(r'^query_results/$', views.query_results, name='query_results'),
     url(r'^get_data/$', views.get_data, name='get_data'),
+    url(r'^sync_db/$', views.sync_db, name='sync_db'),
 )

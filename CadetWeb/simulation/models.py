@@ -101,6 +101,13 @@ class Simulation(models.Model):
     class Meta:
         ordering = ['id']
 
+class Isotherms(models.Model):
+    Name = models.CharField(max_length=80)
+    Isotherm = models.CharField(max_length=80)
+
+    class Meta:
+        ordering = ['id']
+
 class Sim_String(models.Model):
     Step_ID = models.ForeignKey('Steps')
     Parameter_ID = models.ForeignKey('Parameters')

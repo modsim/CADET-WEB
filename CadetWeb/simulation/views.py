@@ -554,9 +554,31 @@ def write_job_to_db(data, json_data, check_sum):
 
 
 
+@login_required
+def sync_db(request):
+    with open(os.path.join(parent_path,'iso.csv'), 'rb') as csvfile:
+        reader = csv.reader(csvfile)
+        #read the header and discard it
+        reader.next()
+        for name, isotherm in reader:
+            #create isotherm line if it dies not exist
+            try:
+                models.Isotherms.objects.get(Name = name, Isotherm=isotherm)
+            except ObjectDoesNotExist:
+                models.Isotherms.objects.create(Name = name, Isotherm=isotherm)
 
 
-
+    with open(os.path.join(parent_path,'parms.csv'), 'rb') as csvfile:
+        reader = csv.reader(csvfile)
+        #read the header and discard it
+        reader.next()
+        for name, units, type, per_component, per_section, sensitive, description  in reader:
+            #create isotherm line if it dies not exist
+            try:
+                models.Parameters.objects.get(name=name, units=units, description=description)
+            except ObjectDoesNotExist:
+                models.Parameters.objects.create(name=name, units=units, description=description)
+    return render(request, 'simulation/sync_db.html', {})
 
 @login_required
 @gzip.gzip_page
