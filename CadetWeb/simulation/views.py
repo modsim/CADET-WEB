@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators import gzip
+from django.core.exceptions import ObjectDoesNotExist
 
 import models
 
@@ -488,28 +489,7 @@ def run_job(request):
     err = open(os.path.join(relative_path, 'stderr'), 'w')
     simulation_path = cadet_runner.create_simulation_file(relative_path, data)
 
-    for name in ('Product1', 'Product2', "Product3"):
-        product = models.Products(product=name)
-        product.save()
-        print product.id
-        print dir(product)
-        print product.pk
-
-    #create jobtype
-    job_type = models.Job_Type.objects.create(type='single')
-    #create product
-    product = models.Products.objects.create(product='Product1')
-    #create model
-    model = models.Models.objects.create(model='Basic SMA')
-
-    #create job
-    job = models.Job.objects.create(Product_ID = product,
-    Job_Type_ID = job_type,
-    Model_ID = model,
-    study_name = 'example',
-    json = json_data,
-    uid = check_sum)
-
+    write_job_to_db(data, json_data, check_sum)
 
     subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
 
@@ -519,6 +499,58 @@ def run_job(request):
     query = urllib.urlencode(query)
     base = reverse('simulation:run_job_get', None, None)
     return redirect('%s?%s' % (base, query))
+
+def write_job_to_db(data, json_data, check_sum):
+    #first check if we already have this entry
+    try:
+        job = models.Job.objects.get(uid=check_sum)
+    except ObjectDoesNotExist:
+        #create job type if it dies not exist
+        try:
+            job_type = models.Job_Type.objects.get(type=data['job_type'])
+        except ObjectDoesNotExist:
+            job_type = models.Job_Type.objects.create(type=data['job_type'])
+
+        #create product type if it does not exist
+        try:
+            product = models.Products.objects.get(product=data['product'])
+        except ObjectDoesNotExist:
+            product = models.Products.objects.create(product=data['product'])
+
+
+        #create model type if it dies not exist
+        try:
+            model = models.Models.objects.get(model=data['model_name'])
+        except ObjectDoesNotExist:
+             model = models.Models.objects.create(model=data['model_name'])
+
+
+        list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+        list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
+
+        #create job
+        job = models.Job.objects.create(Product_ID = product,
+            Job_Type_ID = job_type,
+            Model_ID = model,
+            study_name = data['study_name'],
+            json = json_data,
+            uid = check_sum)
+
+        #create components
+        comps = [models.Components.objects.create(Job_ID=job, Component=comp) for comp in list_of_names]
+        #virtual component that has all column properties
+        comps.insert(0, models.Components.objects.create(Job_ID=job, Component='Column'))
+
+
+        #create steps
+        steps = [models.Steps.objects.create(Job_ID=job, Step=step) for step in list_of_steps]
+        #virtual step that contains all the Setup stuff and simulation settings
+        steps.insert(0, models.Steps.objects.create(Job_ID=job, Step='Setup'))
+
+        #create settings at each step
+
+
+
 
 @login_required
 @gzip.gzip_page

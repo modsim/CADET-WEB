@@ -84,6 +84,16 @@ class Job_Double(models.Model):
     class Meta:
         ordering = ['id']
 
+class Job_Blob(models.Model):
+    Step_ID = models.ForeignKey('Steps')
+    Parameter_ID = models.ForeignKey('Parameters')
+    Component_ID = models.ForeignKey('Components')
+    Job_ID = models.ForeignKey('Job')
+    Data = models.TextField()
+
+    class Meta:
+        ordering = ['id']
+
 class Simulation(models.Model):
     Job_ID = models.ForeignKey('Job')
     Rel_Path = models.CharField(max_length=80)
@@ -117,6 +127,16 @@ class Sim_Double(models.Model):
     Component_ID = models.ForeignKey('Components')
     Simulation_ID = models.ForeignKey('Simulation')
     Data = models.FloatField()
+
+    class Meta:
+        ordering = ['id']
+
+class Sim_Blob(models.Model):
+    Step_ID = models.ForeignKey('Steps')
+    Parameter_ID = models.ForeignKey('Parameters')
+    Component_ID = models.ForeignKey('Components')
+    Simulation_ID = models.ForeignKey('Simulation')
+    Data = models.TextField()
 
     class Meta:
         ordering = ['id']
