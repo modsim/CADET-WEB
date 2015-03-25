@@ -574,7 +574,6 @@ def write_job_to_db(data, json_data, check_sum):
             reader = csv.reader(csvfile)
             #read the header and discard it
             reader.next()
-            print data.keys()
             for name, units, type, per_component, per_section, sensitive, description  in reader:
                 per_component = int(per_component)
                 per_section = int(per_section)
@@ -602,28 +601,31 @@ def db_add_comp_and_section(name, type, data, steps, comps, job):
     pass
 
 def db_add_comp(name, type, data, steps, comps, job):
-    try:
-        model_args = {}
-        model_args['Step_ID'] = steps[0]
-        model_args['Parameter_ID'] = models.Parameters.objects.get(name=name)
-        model_args['Component_ID'] = comps[0]
-        model_args['Job_ID'] = job
+    #skip the first component since it is the column
+    for comp in comps[1:]:
+        lookup = '%s:%s' % (comp.Component, name)
+        try:
+            model_args = {}
+            model_args['Step_ID'] = steps[0]
+            model_args['Parameter_ID'] = models.Parameters.objects.get(name=name)
+            model_args['Component_ID'] = comp
+            model_args['Job_ID'] = job
 
 
-        if type == 'int':
-            model_args['Data'] = int(data[name])
-            models.Job_Int.objects.create(**model_args)
+            if type == 'int':
+                model_args['Data'] = int(data[lookup])
+                models.Job_Int.objects.create(**model_args)
 
-        elif type == 'string':
-            model_args['Data'] = data[name]
-            models.Job_String.objects.create(**model_args)
+            elif type == 'string':
+                model_args['Data'] = data[lookup]
+                models.Job_String.objects.create(**model_args)
 
-        elif type == 'double':
-            model_args['Data'] = float(data[name])
-            models.Job_Double.objects.create(**model_args)
-
-    except KeyError:
-        print name, name in data
+            elif type == 'double':
+                model_args['Data'] = float(data[lookup])
+                models.Job_Double.objects.create(**model_args)
+            print 'Found', lookup, lookup in data
+        except KeyError:
+            print 'Missing', lookup, lookup in data
 
 def db_add_var(name, type, data, steps, comps, job):
     try:
@@ -645,9 +647,9 @@ def db_add_var(name, type, data, steps, comps, job):
         elif type == 'double':
             model_args['Data'] = float(data[name])
             models.Job_Double.objects.create(**model_args)
-
+        print 'Found', name, name in data
     except KeyError:
-        print name, name in data
+        print 'Missing', name, name in data
 
 @login_required
 def sync_db(request):
