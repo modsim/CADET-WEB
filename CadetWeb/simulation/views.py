@@ -511,9 +511,18 @@ def run_job(request):
 
 def write_job_to_db(data, json_data, check_sum):
     #first check if we already have this entry
+
+    #FIXME: ONLY FOR TESTING WIPES THE DB ENTRY EACH TIME
     try:
         job = models.Job.objects.get(uid=check_sum)
         job.delete()
+        #[job.delete() for job in models.Job.objects.all()]
+    except ObjectDoesNotExist:
+        #create job type if it dies not exist
+        pass
+
+    try:
+        job = models.Job.objects.get(uid=check_sum)
     except ObjectDoesNotExist:
         #create job type if it dies not exist
         try:
@@ -565,8 +574,9 @@ def write_job_to_db(data, json_data, check_sum):
             reader = csv.reader(csvfile)
             #read the header and discard it
             reader.next()
+            print data.keys()
             for name, units, type, per_component, per_section, sensitive, description  in reader:
-                par_component = int(per_component)
+                per_component = int(per_component)
                 per_section = int(per_section)
                 sensitive = int(sensitive)
 
@@ -592,26 +602,52 @@ def db_add_comp_and_section(name, type, data, steps, comps, job):
     pass
 
 def db_add_comp(name, type, data, steps, comps, job):
-    pass
-
-def db_add_var(name, type, data, steps, comps, job):
     try:
-        model_args = []
+        model_args = {}
         model_args['Step_ID'] = steps[0]
         model_args['Parameter_ID'] = models.Parameters.objects.get(name=name)
         model_args['Component_ID'] = comps[0]
         model_args['Job_ID'] = job
-        model_args['Data'] = data[name]
+
 
         if type == 'int':
+            model_args['Data'] = int(data[name])
             models.Job_Int.objects.create(**model_args)
+
         elif type == 'string':
+            model_args['Data'] = data[name]
             models.Job_String.objects.create(**model_args)
-        elif type =='double':
+
+        elif type == 'double':
+            model_args['Data'] = float(data[name])
             models.Job_Double.objects.create(**model_args)
 
     except KeyError:
-        print name
+        print name, name in data
+
+def db_add_var(name, type, data, steps, comps, job):
+    try:
+        model_args = {}
+        model_args['Step_ID'] = steps[0]
+        model_args['Parameter_ID'] = models.Parameters.objects.get(name=name)
+        model_args['Component_ID'] = comps[0]
+        model_args['Job_ID'] = job
+
+
+        if type == 'int':
+            model_args['Data'] = int(data[name])
+            models.Job_Int.objects.create(**model_args)
+
+        elif type == 'string':
+            model_args['Data'] = data[name]
+            models.Job_String.objects.create(**model_args)
+
+        elif type == 'double':
+            model_args['Data'] = float(data[name])
+            models.Job_Double.objects.create(**model_args)
+
+    except KeyError:
+        print name, name in data
 
 @login_required
 def sync_db(request):

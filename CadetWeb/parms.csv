@@ -6,7 +6,7 @@ INIT_C,mol/m^3,double,1,0,0,A vector with initial concentrations for each comp. 
 INIT_Q,mol/m^3,double,1,0,0,Same as INIT_C but for the bound phase
 COL_DISPERSION,m^2/s,double,0,0,1,Axial dispersion coefficient
 COL_LENGTH,m,double,0,0,1,Column length
-COL_PORORSITY,,double,0,0,1,Column porosity
+COL_POROSITY,,double,0,0,1,Column porosity
 FILM_DIFFUSION,m/s,double,1,0,1,A vector with film diffusion coefficients
 PAR_DIFFUSION,m^2/s,double,1,0,1,A vector with particle diffusion coefficients
 PAR_POROSITY,,double,0,0,1,Particle porosity
