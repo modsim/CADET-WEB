@@ -583,11 +583,11 @@ def write_job_to_db(data, json_data, check_sum):
                     if per_component and per_section:
                         db_add_comp_and_section(name, type, data, steps, comps, job)
                     elif per_component and not per_section:
-                        db_add_comp(name, type, data, steps, comps, job)
+                        db_add_comp(name, type, data, steps[0], comps, job)
                     elif per_section and not per_component:
                         pass #we don't have any of these but leave this here in case it happens later
                     else:
-                        db_add_var(name, type, data, steps, comps, job)
+                        db_add_var(name, name, type, data, steps[0], comps[0], job)
 
 
                 #create isotherm line if it dies not exist
@@ -598,58 +598,43 @@ def write_job_to_db(data, json_data, check_sum):
 
 
 def db_add_comp_and_section(name, type, data, steps, comps, job):
-    pass
+    #skip the first component since it is the column
+    #spip the first step since it is for setup
+    for step in steps[1:]:
+        for comp in comps[1:]:
+            lookup = '%s:%s:%s' % (step.Step, comp.Component, name)
+            db_add_var(lookup, name, type, data, step, comp, job)
 
-def db_add_comp(name, type, data, steps, comps, job):
+def db_add_comp(name, type, data, step, comps, job):
     #skip the first component since it is the column
     for comp in comps[1:]:
         lookup = '%s:%s' % (comp.Component, name)
-        try:
-            model_args = {}
-            model_args['Step_ID'] = steps[0]
-            model_args['Parameter_ID'] = models.Parameters.objects.get(name=name)
-            model_args['Component_ID'] = comp
-            model_args['Job_ID'] = job
+        db_add_var(lookup, name, type, data, step, comp, job)
 
-
-            if type == 'int':
-                model_args['Data'] = int(data[lookup])
-                models.Job_Int.objects.create(**model_args)
-
-            elif type == 'string':
-                model_args['Data'] = data[lookup]
-                models.Job_String.objects.create(**model_args)
-
-            elif type == 'double':
-                model_args['Data'] = float(data[lookup])
-                models.Job_Double.objects.create(**model_args)
-            print 'Found', lookup, lookup in data
-        except KeyError:
-            print 'Missing', lookup, lookup in data
-
-def db_add_var(name, type, data, steps, comps, job):
+def db_add_var(lookup, name, type, data, step, comp, job):
     try:
         model_args = {}
-        model_args['Step_ID'] = steps[0]
+        model_args['Step_ID'] = step
         model_args['Parameter_ID'] = models.Parameters.objects.get(name=name)
-        model_args['Component_ID'] = comps[0]
+        model_args['Component_ID'] = comp
         model_args['Job_ID'] = job
 
 
         if type == 'int':
-            model_args['Data'] = int(data[name])
+            model_args['Data'] = int(data[lookup])
             models.Job_Int.objects.create(**model_args)
 
         elif type == 'string':
-            model_args['Data'] = data[name]
+            model_args['Data'] = data[lookup]
             models.Job_String.objects.create(**model_args)
 
         elif type == 'double':
-            model_args['Data'] = float(data[name])
+            model_args['Data'] = float(data[lookup])
             models.Job_Double.objects.create(**model_args)
-        print 'Found', name, name in data
+        #print 'Found', lookup, lookup in data
     except KeyError:
-        print 'Missing', name, name in data
+        #print 'Missing', lookup, lookup in data
+        pass
 
 @login_required
 def sync_db(request):
