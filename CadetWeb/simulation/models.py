@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 class Parameters(models.Model):
-    name = models.CharField(max_length=80)
+    name = models.CharField(max_length=80, unique=True)
     units = models.CharField(max_length=80)
     description = models.CharField(max_length=2000)
 
@@ -102,7 +102,7 @@ class Simulation(models.Model):
         ordering = ['id']
 
 class Isotherms(models.Model):
-    Name = models.CharField(max_length=80)
+    Name = models.CharField(max_length=80, unique=True)
     Isotherm = models.CharField(max_length=80)
 
     class Meta:

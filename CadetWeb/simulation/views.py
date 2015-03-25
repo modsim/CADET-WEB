@@ -551,8 +551,57 @@ def write_job_to_db(data, json_data, check_sum):
         #only writing parameters that could remotely make sense to search. This means the vector fields, sensitivities,
         # and similar things are not stored separately
 
+        with open(os.path.join(parent_path,'parms.csv'), 'rb') as csvfile:
+            reader = csv.reader(csvfile)
+            #read the header and discard it
+            reader.next()
+            for name, units, type, per_component, per_section, sensitive, description  in reader:
+                par_component = int(per_component)
+                per_section = int(per_section)
+                sensitive = int(sensitive)
+
+                if type in ('int', 'string', 'double'):
+                    if per_component and per_section:
+                        db_add_comp_and_section(name, type, data, steps, comps, job)
+                    elif per_component and not per_section:
+                        db_add_comp(name, type, data, steps, comps, job)
+                    elif per_section and not per_component:
+                        pass #we don't have any of these but leave this here in case it happens later
+                    else:
+                        db_add_var(name, type, data, steps, comps, job)
 
 
+                #create isotherm line if it dies not exist
+                try:
+                    models.Parameters.objects.get(name=name)
+                except ObjectDoesNotExist:
+                    models.Parameters.objects.create(name=name, units=units, description=description)
+
+
+def db_add_comp_and_section(name, type, data, steps, comps, job):
+    pass
+
+def db_add_comp(name, type, data, steps, comps, job):
+    pass
+
+def db_add_var(name, type, data, steps, comps, job):
+    try:
+        model_args = []
+        model_args['Step_ID'] = steps[0]
+        model_args['Parameter_ID'] = models.Parameters.objects.get(name=name)
+        model_args['Component_ID'] = comps[0]
+        model_args['Job_ID'] = job
+        model_args['Data'] = data[name]
+
+        if type == 'int':
+            models.Job_Int.objects.create(**model_args)
+        elif type == 'string':
+            models.Job_String.objects.create(**model_args)
+        elif type =='double':
+            models.Job_Double.objects.create(**model_args)
+
+    except KeyError:
+        pass
 
 @login_required
 def sync_db(request):

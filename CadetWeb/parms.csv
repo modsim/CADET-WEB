@@ -89,7 +89,7 @@ EXTMPM_BETA_T,1/[T],double,1,0,1,All vectors with parameters describing the ion-
 EXTMPM_BETA_TT,1/[T]^2,double,1,0,1,All vectors with parameters describing the ion-exchange characteristics (IEX)
 EXTMPM_BETA_TTT,1/[T]^3,double,1,0,1,All vectors with parameters describing the ion-exchange characteristics (IEX)
 EXTMPM_GAMMA,m^3/(mol),double,1,0,1,All vectors with parameters describing the hydrophobicity (HIC)
-EXTMPM_GAMMA,m^3/(mol [T]),double,1,0,1,All vectors with parameters describing the hydrophobicity (HIC)
+EXTMPM_GAMMA_T,m^3/(mol [T]),double,1,0,1,All vectors with parameters describing the hydrophobicity (HIC)
 EXTMPM_GAMMA_TT,m^3/(mol [T]^2),double,1,0,1,All vectors with parameters describing the hydrophobicity (HIC)
 EXTMPM_GAMMA_TTT,m^3/(mol [T]^3),double,1,0,1,All vectors with parameters describing the hydrophobicity (HIC)
 EXTL_KA,m^3/(mol s),double,1,0,1,All vectors with adsorption rate constant coefficients in the External Function Langmuir model
