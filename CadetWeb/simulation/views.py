@@ -54,8 +54,17 @@ cadet_plugin_path = '..'
 
 def get_json(post):
     temp = {}
-    temp.update(get_json_dict(post))
-    temp.update(get_json_table_dict(post))
+    json_dict = get_json_dict(post)
+    json_table = get_json_table_dict(post)
+
+    if json_table:
+        #clean out json_dict of sensitivities
+        for key in json_dict.keys():
+            if key.startswith( ('tol', 'dist', 'choice'),):
+                del json_dict[key]
+
+    temp.update(json_dict)
+    temp.update(json_table)
     temp.update(post.dict())
 
     #remove fields that should not be persisted
@@ -504,6 +513,7 @@ def write_job_to_db(data, json_data, check_sum):
     #first check if we already have this entry
     try:
         job = models.Job.objects.get(uid=check_sum)
+        job.delete()
     except ObjectDoesNotExist:
         #create job type if it dies not exist
         try:
@@ -601,7 +611,7 @@ def db_add_var(name, type, data, steps, comps, job):
             models.Job_Double.objects.create(**model_args)
 
     except KeyError:
-        pass
+        print name
 
 @login_required
 def sync_db(request):
