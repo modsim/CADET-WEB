@@ -548,6 +548,12 @@ def write_job_to_db(data, json_data, check_sum):
         steps.insert(0, models.Steps.objects.create(Job_ID=job, Step='Setup'))
 
         #create settings at each step
+        #only writing parameters that could remotely make sense to search. This means the vector fields, sensitivities,
+        # and similar things are not stored separately
+
+
+
+
 
 
 
