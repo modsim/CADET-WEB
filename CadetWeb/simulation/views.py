@@ -469,13 +469,46 @@ def run_job_get(request):
 
     hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
 
+    try:
+        job = models.Job.objects.get(uid=path)
+        notes = models.Job_Notes.objects.get(Job_ID=job)
+        rating = notes.rating
+        notes = notes.notes
+    except ObjectDoesNotExist:
+        #create job type if it dies not exist
+        rating = 0
+        notes = ''
+
     data['download_url'] = hdf5_path
     data['new_simulation'] = url_new
     #data['new_simulation_batch'] = url_new_batch
     data['path'] = path
     data['chunk_size'] = chunk_size
+    data['rating'] = '%.1f' % rating
+    data['notes'] = notes
     data['json_url'] = reverse('simulation:get_data', None, None)
     return render(request, 'simulation/run_job.html', data)
+
+@login_required
+def simulation_rate(request):
+    path = request.POST['path']
+    chunk_size = request.POST['chunk_size']
+    rating = float(request.POST['rating'])
+    notes = request.POST['notes']
+
+    try:
+        job = models.Job.objects.get(uid=path)
+        notes, created = models.Job_Notes.objects.update_or_create(Job_ID=job, defaults={'rating':rating, 'notes':notes})
+    except ObjectDoesNotExist:
+        #create job type if it dies not exist
+        pass
+
+    query = {}
+    query['path'] = path
+    query['chunk_size'] = chunk_size
+    query = urllib.urlencode(query)
+    base = reverse('simulation:run_job_get', None, None)
+    return redirect('%s?%s' % (base, query))
 
 @login_required
 def run_job(request):
