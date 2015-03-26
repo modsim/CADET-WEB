@@ -38,6 +38,19 @@
         </div>
       </div>
 
+      <div class="row">
+        <div class="col-md-12">
+          <div class="btn-toolbar" role="toolbar">
+            <div class="btn-group">
+              <a type="button" class="btn btn-default" href="{{ download_url}}">Download Simulation</a>
+              <a type="button" class="btn btn-default" href="{{ new_simulation }}">Create New Simulation From This Simulation</a>
+              <a type="button" class="btn btn-default">Create Batch Job Based on this Simulation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+          </form>
+
     {% for id, name, url in graphs %}
 
        <div class="jumbotron">
@@ -56,19 +69,6 @@
 
     {% endfor %}
 
-
-      <div class="row">
-        <div class="col-md-12">
-          <div class="btn-toolbar" role="toolbar">
-            <div class="btn-group">
-              <a type="button" class="btn btn-default" href="{{ download_url}}">Download Simulation</a>
-              <a type="button" class="btn btn-default" href="{{ new_simulation }}">Create New Simulation From This Simulation</a>
-              <a type="button" class="btn btn-default">Create Batch Job Based on this Simulation</a>
-            </div>
-          </div>
-        </div>
-      </div>
-          </form>
 
 
 <script type="text/javascript">

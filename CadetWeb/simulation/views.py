@@ -466,8 +466,12 @@ def run_job_get(request):
     data['graphs'] = graphs
 
     #FIXME: need to change the path so that this works. Needs to be path to /static/simulations/sims/...
+
+    hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
+
     data['download_url'] = hdf5_path
     data['new_simulation'] = url_new
+    #data['new_simulation_batch'] = url_new_batch
     data['path'] = path
     data['chunk_size'] = chunk_size
     data['json_url'] = reverse('simulation:get_data', None, None)
