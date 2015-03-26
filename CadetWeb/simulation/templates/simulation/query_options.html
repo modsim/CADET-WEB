@@ -1,0 +1,26 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:query_results' %}" method="POST">
+<div class="row">
+    <input type="hidden" name="search_query" value="{{ query }}">
+    {% csrf_token %}
+        <div class="col-md-12">
+          <h1>{{ query }}</h1>
+        </div>
+      </div>
+      {{ query_form|safe }}
+
+<div class="row">
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default">Run Search</button>
+    </div>
+    <br><br>
+  </div>
+</div>
+  </form>
+
+
+{% endblock %}

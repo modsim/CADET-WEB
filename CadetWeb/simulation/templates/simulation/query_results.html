@@ -1,0 +1,52 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+
+<div class="row">
+        <div class="col-md-12">
+          <h1>Query Results</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Job #</th>
+                <th>Study Name</th>
+                <th>Model Name</th>
+                <th>Isotherm</th>
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+                <th>Rating</th>
+                <th>Choose</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for search_result in search_results %}
+              <tr>
+                <td>{{ search_result.0 }}</td>
+                <td>{{ search_result.1 }}</td>
+                <td>{{ search_result.2 }}</td>
+                <td>{{ search_result.3 }}</td>
+
+                {% for additional_column in search_result.4 %}
+                    <td>{{ additional_column }}</td>
+                {% endfor %}
+
+                <td>
+                  <input type="number" name="rating" class="star_rating" min=0 max=5 step=0.5 value={{ search_result.5 }} data-readonly="True">
+                </td>
+                <td>
+                  <a class="btn btn-primary" href="/run_job">Simulation Results</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+{% endblock %}
