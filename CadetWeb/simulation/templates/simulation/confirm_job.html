@@ -11,36 +11,39 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <ul class="lead">
+          <ul>
             <li>Study Name
-              <ul class="lead" draggable="true">
-                <li>Study 1</li>
+              <ul>
+                <li>{{ study_name }}</li>
               </ul>
             </li>
             <li>Model Name
-              <ul class="lead" draggable="true">
-                <li>Model 1</li>
+              <ul>
+                <li>{{ model_name }}</li>
+              </ul>
+            </li>
+            <li>Product Name
+              <ul>
+                <li>{{ product }}</li>
               </ul>
             </li>
             <li>Isotherm Name
-              <ul class="lead" draggable="true">
-                <li>Steric Mass Action</li>
+              <ul>
+                <li>{{ ADSORPTION_TYPE }}</li>
               </ul>
             </li>
             <li>Steps
-              <ul class="lead" draggable="true">
-                <li>Load</li>
-                <li>Wash</li>
-                <li>Elute</li>
-                <li>Strip</li>
+              <ul>
+                {% for data in steps %}
+                      <li>{{ data }}</li>
+                {% endfor %}
               </ul>
             </li>
             <li>Components
-              <ul class="lead" draggable="true">
-                <li>Salt</li>
-                <li>Main</li>
-                <li>Basic</li>
-                <li>Dimer</li>
+              <ul>
+                {% for data in comps %}
+                      <li>{{ data }}</li>
+                {% endfor %}
               </ul>
             </li>
           </ul>

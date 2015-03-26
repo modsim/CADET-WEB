@@ -442,9 +442,9 @@ def confirm_job(request):
     data['json'] = get_json_string(data)
     data['back'] = reverse('simulation:job_setup', None, None)
     data['back_text'] = 'Job Setup'
+    data['steps'] = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
+    data['comps'] = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
     return render(request, 'simulation/confirm_job.html', data)
-
-
 
 @login_required
 def generate_other_graphs(request):
