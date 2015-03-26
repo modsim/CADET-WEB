@@ -461,6 +461,29 @@ def query_options(request):
     return render(request, 'simulation/query_options.html', data)
 
 @login_required
+def query_results(request):
+
+    post = request.POST
+    data = get_json(post)
+    results = utils.call_plugin_by_name(data['search_query'], 'search', 'process_search', data)
+    search_results = []
+    for result in results[1:]:
+        # (Job ID, Study Name, Model Name, Isotherm, [list of additional headers], rating
+        #will have a search function here later that gathers up all the info we need from a jobid
+        jobid = result[0]
+        study_name = 'test'
+        model_name = 'test2'
+        isotherm = 'test3'
+        additional = result[1:]
+        rating = 3.5
+        search_results.append([jobid, study_name, model_name, isotherm, additional, rating])
+    headers = results[0][1:]
+    context = {'json':get_json_string(data),
+              'search_results':search_results,
+              'headers':headers}
+    return render(request, 'simulation/query_results.html', context)
+
+@login_required
 def generate_other_graphs(request):
     context = {}
     return render(request, 'simulation/generate_other_graphs.html', context)
@@ -865,28 +888,5 @@ def modify_attributes(request):
     context['linears'] = [key.replace('choose_attributes_', '') for (key, value) in choose_attributes if value == 'linear']
     context['randoms'] = [key.replace('choose_attributes_', '') for (key, value) in choose_attributes if value == 'random']
     return render(request, 'simulation/modify_attributes.html', context)
-
-@login_required
-def query_results(request):
-
-    post = request.POST
-    data = get_json_dict(post)
-    results = utils.call_plugin_by_name(data['search_query'], 'search', 'process_search', data)
-    search_results = []
-    for result in results[1:]:
-        # (Job ID, Study Name, Model Name, Isotherm, [list of additional headers], rating
-        #will have a search function here later that gathers up all the info we need from a jobid
-        jobid = result[0]
-        study_name = 'test'
-        model_name = 'test2'
-        isotherm = 'test3'
-        additional = result[1:]
-        rating = 3.5
-        search_results.append([jobid, study_name, model_name, isotherm, additional, rating])
-    headers = results[0][1:]
-    context = {'json':get_json_string(data),
-              'search_results':search_results,
-              'headers':headers}
-    return render(request, 'simulation/query_results.html', context)
 
 

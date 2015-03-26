@@ -30,4 +30,5 @@ urlpatterns = patterns('',
     url(r'^simulation_rate/$', views.simulation_rate, name='simulation_rate'),
     url(r'^choose_search_query/$', views.choose_search_query, name='choose_search_query'),
     url(r'^query_options/$', views.query_options, name='query_options'),
+    url(r'^query_results/$', views.query_results, name='query_results'),
 )
