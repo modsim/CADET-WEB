@@ -28,4 +28,6 @@ urlpatterns = patterns('',
     url(r'^get_data/$', views.get_data, name='get_data'),
     url(r'^sync_db/$', views.sync_db, name='sync_db'),
     url(r'^simulation_rate/$', views.simulation_rate, name='simulation_rate'),
+    url(r'^choose_search_query/$', views.choose_search_query, name='choose_search_query'),
+    url(r'^query_options/$', views.query_options, name='query_options'),
 )

@@ -447,6 +447,20 @@ def confirm_job(request):
     return render(request, 'simulation/confirm_job.html', data)
 
 @login_required
+def choose_search_query(request):
+    data = {}
+    data['queries'] = utils.get_plugin_names('search')
+    return render(request, 'simulation/choose_search_query.html', data)
+
+@login_required
+def query_options(request):
+    data = {}
+    query = request.POST['search_query']
+    data['query'] = query
+    data['query_form'] = utils.call_plugin_by_name(query, 'search', 'run')
+    return render(request, 'simulation/query_options.html', data)
+
+@login_required
 def generate_other_graphs(request):
     context = {}
     return render(request, 'simulation/generate_other_graphs.html', context)
@@ -835,17 +849,6 @@ def choose_attributes_to_modify(request):
     return render(request, 'simulation/choose_attributes_to_modify.html', context)
 
 @login_required
-def choose_search_query(request):
-
-    post = request.POST
-    data = get_json_dict(post)
-
-    context = {'json':get_json_string(data),
-              'queries': utils.get_plugin_names('search')}
-
-    return render(request, 'simulation/choose_search_query.html', context)
-
-@login_required
 def create_batch_simulation(request):
 
     context = {}
@@ -862,17 +865,6 @@ def modify_attributes(request):
     context['linears'] = [key.replace('choose_attributes_', '') for (key, value) in choose_attributes if value == 'linear']
     context['randoms'] = [key.replace('choose_attributes_', '') for (key, value) in choose_attributes if value == 'random']
     return render(request, 'simulation/modify_attributes.html', context)
-
-@login_required
-def query_options(request):
-
-    post = request.POST
-    data = get_json_dict(post)
-    context = {'json':get_json_string(data),
-              'query': data['search_query'],
-              'query_form':utils.call_plugin_by_name(data['search_query'], 'search', 'run')}
-
-    return render(request, 'simulation/query_options.html', context)
 
 @login_required
 def query_results(request):

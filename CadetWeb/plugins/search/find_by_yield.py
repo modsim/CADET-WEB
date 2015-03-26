@@ -24,6 +24,7 @@ def run():
       </div>
       '''
     return html_string
+
 def process_search(search_dict):
     search_results = [('JOBID', 'Yield')]
     search_results.append( (1, '95%'))
