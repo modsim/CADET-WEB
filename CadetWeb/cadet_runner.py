@@ -5,15 +5,11 @@ import h5py
 import os
 import os.path
 import subprocess
-import sys
 import json
 import argparse
-import hashlib
 import types
-import itertools
-import imp
-import glob
 import plot_sensitivity
+import utils
 
 current_path = __file__
 parent_path, current_file_name = os.path.split(current_path)
@@ -21,38 +17,6 @@ plugins = os.path.join(parent_path, 'plugins')
 cadet_path = os.path.join('cadet-cs')
 
 storage_path = os.path.join(parent_path, 'sims')
-
-#from https://docs.python.org/2/library/itertools.html
-def grouper(iterable, n, fillvalue=None):
-    "Collect data into fixed-length chunks or blocks"
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
-    args = [iter(iterable)] * n
-    return itertools.izip_longest(fillvalue=fillvalue, *args)
-
-def load_plugin(path):
-    return imp.load_source(path.replace('.py', '').replace('/', '.'), path)
-
-def call_plugin_function(plugin_path, attribute_name, *args, **kwargs):
-    return getattr(load_plugin(plugin_path), attribute_name)(*args, **kwargs)
-
-def call_plugin_by_name(name, directory, attribute_name, *args, **kwargs):
-    for path in glob.glob(os.path.join(parent_path, 'plugins', directory, '*.py')):
-        plugin_name = get_plugin_attribute(path, 'name')
-        if plugin_name == name:
-            return call_plugin_function(path, attribute_name, *args, **kwargs)
-
-def get_attribute_by_name(name, directory, attribute_name):
-    for path in glob.glob(os.path.join(parent_path, 'plugins', directory, '*.py')):
-        plugin_name = get_plugin_attribute(path, 'name')
-        if plugin_name == name:
-            return get_plugin_attribute(path, attribute_name)
-
-def get_plugin_attribute(path, attribute_name):
-    return getattr(load_plugin(path), attribute_name)
-
-def get_plugin_names(directory):
-    return [get_plugin_attribute(path, 'name') for path in glob.glob(os.path.join(parent_path, 'plugins', directory, '*.py'))]
-
 
 def set_value(node, nameH5, dtype, value):
     "merge the values from parms into node of the hdf5 file"
@@ -449,11 +413,11 @@ if __name__ == '__main__':
     for key,value in json_data.items():
         if key.startswith('graph_single') and value == '1':
             _, name = key.split(':')
-            call_plugin_by_name(name, 'graphing/single', 'run', args.sim)
+            utils.call_plugin_by_name(name, 'graphing/single', 'run', args.sim)
 
         if key.startswith('graph_group') and value == '1':
             _, name = key.split(':')
-            call_plugin_by_name(name, 'graphing/group', 'run', args.sim)
+            utils.call_plugin_by_name(name, 'graphing/group', 'run', args.sim)
 
     for sensitivty_number in range(len(json_data.get("sensitivities", []))):
         plot_sensitivity.run(args.sim, sensitivty_number)
