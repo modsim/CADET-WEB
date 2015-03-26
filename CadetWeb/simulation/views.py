@@ -536,9 +536,13 @@ def run_job(request):
     err = open(os.path.join(relative_path, 'stderr'), 'w')
     simulation_path = cadet_runner.create_simulation_file(relative_path, data)
 
-    write_job_to_db(data, json_data, check_sum)
+    try:
+        h5 = h5py.File(simulation_path, 'a')
+        output = h5['/output']
+    except KeyError:
+        write_job_to_db(data, json_data, check_sum)
 
-    subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
+        subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
 
     query = {}
     query['path'] = check_sum

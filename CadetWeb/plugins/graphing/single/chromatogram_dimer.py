@@ -68,7 +68,7 @@ def get_data(hdf5_path):
         values = solution_values[:, idx+1]
         temp = {}
         temp['label'] = comp_name
-        if name.strip().lower() == 'dimer':
+        if comp_name.strip().lower() == 'dimer':
             mul = 10
         else:
             mul = 1
