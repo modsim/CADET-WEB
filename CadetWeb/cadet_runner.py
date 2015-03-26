@@ -14,7 +14,6 @@ import itertools
 import imp
 import glob
 import plot_sensitivity
-import compress_series
 
 current_path = __file__
 parent_path, current_file_name = os.path.split(current_path)
@@ -391,7 +390,11 @@ def inlet(model, data):
         set_value(section, 'CUBE_COEFF', 'f8', cubic)
 
 def compress_data(h5):
+    #DO NOT MOVE THIS IMPORT OR IT WILL DEADLOCK WSGI
+    #IT CAN'T BE OUTSIDE THIS FUNCTION
+    import compress_series
     #compress the data
+    web = h5["web"]
     compress = web.create_group("compress")
 
     #inlet

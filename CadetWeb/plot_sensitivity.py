@@ -97,10 +97,11 @@ def get_data(hdf5_path, sensitivity_number):
     number_of_components = h5['/input/model/NCOMP'].value
     components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
 
-    solution_times = list(h5['/output/solution/SOLUTION_TIMES'])
+    solution_values = np.array(h5['/web/compress/param_%03d' % sensitivity_number])
+    solution_times = solution_values[:,0]
 
     for idx, comp_name in enumerate(components):
-        values = list(h5['/output/sensitivity/param_%03d/SENS_COLUMN_OUTLET_COMP_%03d' % (sensitivity_number, idx)])
+        values = solution_values[:, idx+1]
 
         temp = {}
         temp['label'] = comp_name

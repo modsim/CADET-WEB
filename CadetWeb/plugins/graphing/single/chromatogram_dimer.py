@@ -60,24 +60,24 @@ def get_data(hdf5_path):
 
     components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
 
-    solution_times = list(h5['/output/solution/SOLUTION_TIMES'])
+    solution_values = np.array(h5['/web/compress/OUTLET'])
+    solution_times = solution_values[:,0]
 
     mul = 1
     for idx, comp_name in enumerate(components):
-        values = list(h5['/output/solution/SOLUTION_COLUMN_OUTLET_COMP_%03d' % idx])
+        values = solution_values[:, idx+1]
         temp = {}
         temp['label'] = comp_name
         if name.strip().lower() == 'dimer':
             mul = 10
         else:
             mul = 1
-
         temp['data'] = (solution_times, values*mul)
         temp['yaxis'] = 1 if comp_name.lower() != 'salt' else 2
         data.append(temp)
     h5.close()
     return name.replace(' ', '_').replace(':', '_'), name, data
-    
+
 #if this is called from the command line then call the run function with the first arguement handed to it as a path
 if __name__ == "__main__":
     import sys

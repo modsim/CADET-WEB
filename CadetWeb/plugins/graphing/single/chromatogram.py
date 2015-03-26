@@ -61,10 +61,12 @@ def get_data(hdf5_path):
 
     components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
 
-    solution_times = list(h5['/output/solution/SOLUTION_TIMES'])
+    solution_values = np.array(h5['/web/compress/OUTLET'])
+    print solution_values.shape
+    solution_times = solution_values[:,0]
 
     for idx, comp_name in enumerate(components):
-        values = list(h5['/output/solution/SOLUTION_COLUMN_OUTLET_COMP_%03d' % idx])
+        values = solution_values[:, idx+1]
         temp = {}
         temp['label'] = comp_name
         temp['data'] = (solution_times, values)
