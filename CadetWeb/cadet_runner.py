@@ -14,6 +14,7 @@ import itertools
 import imp
 import glob
 import plot_sensitivity
+import compress_series
 
 current_path = __file__
 parent_path, current_file_name = os.path.split(current_path)
@@ -389,6 +390,34 @@ def inlet(model, data):
         set_value(section, 'QUAD_COEFF', 'f8', quadratic)
         set_value(section, 'CUBE_COEFF', 'f8', cubic)
 
+def compress_data(h5):
+    #compress the data
+    compress = web.create_group("compress")
+
+    #inlet
+    #outlet
+    #parameters
+
+    number_of_components = h5['/input/model/NCOMP'].value
+
+    solution_times = np.array(h5['/output/solution/SOLUTION_TIMES'])
+
+    for name in ('OUTLET', 'INLET'):
+        data = [solution_times,]
+        for idx in range(number_of_components):
+            data.append(np.array(h5['/output/solution/SOLUTION_COLUMN_%s_COMP_%03d' % (name, idx)]))
+        data = np.transpose(np.vstack(data))
+        data = compress_series.compress(data)
+        set_value(compress, name, 'f8', data)
+
+    for name in h5['/output/sensitivity'].keys():
+        data = [solution_times,]
+        for idx in range(number_of_components):
+            data.append(np.array(h5['/output/sensitivity/%s/SENS_COLUMN_OUTLET_COMP_%03d' % (name, idx)]))
+        data = np.transpose(np.vstack(data))
+        data = compress_series.compress(data)
+        set_value(compress, name, 'f8', data)
+
 if __name__ == '__main__':
     args = run_args()
     json_data = open(args.json, 'rb').read()
@@ -407,10 +436,10 @@ if __name__ == '__main__':
     web = h5["web"]
     set_value_enum(web, 'STDOUT', stdout)
     set_value_enum(web, 'STDERR', stderr)
+
+    compress_data(h5)
+
     h5.close()
-
-    #compress the data
-
     #run performance parameters
     
     #run graphs
