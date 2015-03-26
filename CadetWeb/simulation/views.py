@@ -41,6 +41,7 @@ default_value['BOUNDARY_MODEL'] = '0'
 default_value['WENO_EPS'] = '1E-12'
 default_value['WENO_ORDER'] = '3'
 default_value['NTHREADS'] = '4'
+default_value['LOG_LEVEL'] = '4'
 
 current_path = __file__
 simulation_path, current_file_name = os.path.split(current_path)

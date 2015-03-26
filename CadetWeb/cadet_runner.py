@@ -396,10 +396,21 @@ if __name__ == '__main__':
     json_data = encode_to_ascii(json_data)
 
     #run simulation
-    proc = subprocess.Popen([cadet_path, args.sim], stdout=subprocess.PIPE, env=os.environ)
+    proc = subprocess.Popen([cadet_path, args.sim], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ)
     proc.wait()
-    print proc.stdout.read()
-    
+    stdout = proc.stdout.read()
+    stderr = proc.stderr.read()
+
+    print stdout
+
+    h5 = h5py.File(args.sim, 'a')
+    web = h5["web"]
+    set_value_enum(web, 'STDOUT', stdout)
+    set_value_enum(web, 'STDERR', stderr)
+    h5.close()
+
+    #compress the data
+
     #run performance parameters
     
     #run graphs
