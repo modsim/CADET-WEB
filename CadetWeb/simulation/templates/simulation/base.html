@@ -35,7 +35,7 @@
         height:100%;
         width:100%;
         background: rgba( 255, 255, 255, 0.8 )
-            url('/static/simulation/spiffygif_138x138.gif')
+            url('{% static "simulation/spiffygif_138x138.gif" %}')
             50% 50%
             no-repeat;
     }
@@ -153,7 +153,7 @@ $(document).ready(function() {
 
 
   $(function() {
-   var $images = $('img.imageClassUpdateAtInterval:not([src="/static/simulation/spiffygif_138x138.gif"])');
+   var $images = $('img.imageClassUpdateAtInterval:not([src="{% static "simulation/spiffygif_138x138.gif" %}"])');
 
   // Now, no such image with
    // a spinner
@@ -175,7 +175,7 @@ $(document).ready(function() {
 
    $('img.imageClassUpdateAtInterval').error(
           function () { 
-                 $(this).prop("src", "/static/simulation/spiffygif_138x138.gif");
+                 $(this).prop("src", "{% static "simulation/spiffygif_138x138.gif" %}");
                  setTimeout(fixImage, 10000);
    });
 
