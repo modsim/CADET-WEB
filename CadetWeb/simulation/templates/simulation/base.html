@@ -26,6 +26,25 @@
         .wide {width: 100%;}
         .medium {height: 300px;}
 
+    .busy {
+        display:none;
+        position:fixed;
+        z-index:10000;
+        top:0;
+        left:0;
+        height:100%;
+        width:100%;
+        background: rgba( 255, 255, 255, 0.8 )
+            url('/static/simulation/spiffygif_138x138.gif')
+            50% 50%
+            no-repeat;
+    }
+
+    body.loading { overflow: hidden; }
+
+    body.loading .busy {display: block; }
+    .above_middle {position:absolute; top: 35%; left:50%; transform: translate(-50%, -50%);}
+
     </style>
     <script type="text/javascript" src="{% static "simulation/jquery-2.1.3.min.js" %}"></script>
     <script type="text/javascript" src="{% static "simulation/bootstrap-3.3.2-dist/js/bootstrap.min.js" %}"></script>
@@ -44,6 +63,9 @@
   </head>
   
   <body class="visible-lg visible-md">
+
+  <div class="busy"><div class="above_middle"><h1>Please stand by. Simulation is running.</h1></div></div>
+
     <div class="container">
       <div class="row">
         <div class="col-md-12">

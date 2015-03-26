@@ -75,6 +75,8 @@
 
 <script type="text/javascript">
 
+$("body").addClass("loading");
+
 function start_plot(datasets, element, choices, overview_id, base_id) {
 		// hard-code color indices to prevent them from shifting as
 		// countries are turned on/off
@@ -211,7 +213,7 @@ $( document ).ready(function() {
             if (0 == json_data['success']) {
                 setTimeout(fetchData, 5000);
             } else {
-
+                $("body").removeClass("loading");
                 for (var key in json_data['data']) {
                     if (json_data['data'].hasOwnProperty(key)) {
                         //$.plot("#" + key, json_data['data'][key]);
