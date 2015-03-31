@@ -436,16 +436,22 @@ def generate_ranges(json_data):
 
 def generate_simulations(parent_dir, json_data, h5_path):
     keys, values = zip(*json_data['batch_distribution'].items())
+    try:
+        os.mkdir(os.path.join(parent_dir, 'batch'))
+    except OSError:
+        pass
+
+
     for idx, value in enumerate(itertools.product(*values)):
         temp = json_data.copy()
         temp.update(dict(zip(keys, value)))
 
         try:
-            os.mkdir(os.path.join(parent_dir, str(idx)))
+            os.mkdir(os.path.join(parent_dir, 'batch', str(idx)))
         except OSError:
             pass
         #shutil.copyfile(h5_path, os.path.join(parent_dir, str(idx), 'sim.h5'))
-        directory_path = os.path.join(parent_dir, str(idx))
+        directory_path = os.path.join(parent_dir, 'batch', str(idx))
         create_simulation_file(directory_path, temp)
 
 
