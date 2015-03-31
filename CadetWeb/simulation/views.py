@@ -664,7 +664,7 @@ def write_job_to_db(data, json_data, check_sum):
                 per_section = int(per_section)
                 sensitive = int(sensitive)
 
-                if type in ('int', 'string', 'double'):
+                if type in ('int', 'string', 'double', 'boolean'):
                     if per_component and per_section:
                         db_add_comp_and_section(name, type, data, steps, comps, job)
                     elif per_component and not per_section:
@@ -705,7 +705,7 @@ def db_add_var(lookup, name, type, data, step, comp, job):
         model_args['Job_ID'] = job
 
 
-        if type == 'int':
+        if type in ('int', 'boolean'):
             model_args['Data'] = int(data[lookup])
             models.Job_Int.objects.create(**model_args)
 
@@ -884,6 +884,8 @@ def choose_attributes_to_modify(request):
 
     data['json'] = get_json_string(data)
     data['modifies'] = utils.get_plugin_names('modify')
+
+    #every attribute can be modified except for strings, blobs, number of steps and number of components, sensitivities and checkbox settings
 
     return render(request, 'simulation/choose_attributes_to_modify.html', data)
 
