@@ -527,6 +527,7 @@ def run_job_get(request):
 
     data['download_url'] = hdf5_path
     data['new_simulation'] = url_new
+    data['batch_simulation'] = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % path
     #data['new_simulation_batch'] = url_new_batch
     data['path'] = path
     data['chunk_size'] = settings.chunk_size
