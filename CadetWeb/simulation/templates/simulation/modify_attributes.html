@@ -34,13 +34,13 @@
                  <td>{{ linear }}</td>
                 <td>{{ value }}</td>
                 <td>
-                  <input type="text" class="form-control required" id="linear_lb:{{ linear }}">
+                  <input type="text" class="form-control required" name="linear_lb:{{ linear }}" id="linear_lb:{{ linear }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control required" id="linear_ub:{{ linear }}">
+                  <input type="text" class="form-control required" name="linear_ub:{{ linear }}" id="linear_ub:{{ linear }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control required" id="linear_number:{{ linear }}">
+                  <input type="text" class="form-control required" name="linear_number:{{ linear }}" id="linear_number:{{ linear }}">
                 </td>
               </tr>
             {% endfor %}
@@ -71,13 +71,13 @@
                 <td>{{ random }}</td>
                 <td>{{ value }}</td>
                 <td>
-                  <input type="text" class="form-control required" id="random_lb:{{ random }}">
+                  <input type="text" class="form-control required" name="random_lb:{{ random }}" id="random_lb:{{ random }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control required" id="random_ub:{{ random }}">
+                  <input type="text" class="form-control required" name="random_ub:{{ random }}" id="random_ub:{{ random }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control required" id="random_number:{{ random }}">
+                  <input type="text" class="form-control required" name="random_number:{{ random }}" id="random_number:{{ random }}">
                 </td>
               </tr>
             {% endfor %}
@@ -102,7 +102,7 @@
                 <td>{{ choice }}</td>
                 <td>{{ value }}</td>
                 <td>
-                  <input type="text" class="form-control required" id="choice_{{ random }}}">
+                  <input type="text" class="form-control required" name="choice_{{ random }}}" id="choice_{{ random }}}">
                 </td>
               </tr>
             {% endfor %}

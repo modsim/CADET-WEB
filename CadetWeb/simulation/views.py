@@ -895,7 +895,7 @@ def choose_attributes_to_modify(request):
             per_section = int(per_section)
             sensitive = int(sensitive)
 
-            if type in ('int', 'double'):
+            if name not in ('NCOMP', 'NSEC') and type in ('int', 'double'):
                 if per_component and per_section:
                     for step in steps:
                         for comp in comps:
