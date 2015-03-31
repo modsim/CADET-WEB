@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 
 import numpy as np
+from numpy import random
 import h5py
 import os
 import os.path
@@ -390,11 +391,62 @@ def compress_data(h5):
         data = compress_series.compress(data)
         set_value(compress, name, 'f8', data)
 
+def gen_bounds(lb, ub, base_value):
+    if '%' in lb and '%' in ub:
+        lb = float(lb.replace('%', ''))
+        ub = float(ub.replace('%', ''))
+        if lb < 0:
+            lb = (100.0+lb)/100.0
+            ub = (100.0+ub)/100.0
+        else:
+            lb = lb/100.0
+            ub = ub/100.0
+        lb = lb * base_value
+        ub = ub * base_value
+    return lb, ub
+
+def generate_ranges(json_data):
+    changed = [(key, value) for key,value in json_data.items() if key.startswith('choose_attributes')]
+
+    ranges = {}
+
+    for key,value in changed:
+        base = key.replace('choose_attributes:', '')
+        base_value = float(json_data[base])
+        values = []
+        if value == 'random':
+            lb = json_data['random_lb:%s' % base]
+            ub = json_data['random_ub:%s' % base]
+            size = int(json_data['random_number:%s' % base])
+            lb, ub = gen_bounds(lb, ub, base_value)
+            values = random.uniform(lb, ub, size)
+        elif value == 'linear':
+            lb = json_data['linear_lb:%s' % base]
+            ub = json_data['linear_ub:%s' % base]
+            size = int(json_data['linear_number:%s' % base])
+            lb, ub = gen_bounds(lb, ub, base_value)
+            values = np.linspace(lb, ub, size, endpoint=True)
+        elif value == 'choose':
+            values = map(float, json_data['choice:%s' % base])
+        if len(values):
+            ranges[base] = values.tolist()
+    json_data['batch_distribution'] = ranges
+
+
+
 if __name__ == '__main__':
     args = run_args()
     json_data = open(args.json, 'rb').read()
     json_data = json.loads(json_data)
     json_data = encode_to_ascii(json_data)
+
+    parent_dir = os.path.dirname(args.sim)
+
+    if json_data['job_type'] == 'batch':
+        generate_ranges(json_data)
+        json.dump(json_data, open(args.json, 'w'))
+        #generate_simulations(parent_dir, json_data)
+        #run_batch_simulations(parent_dir)
 
     #run simulation
     proc = subprocess.Popen([cadet_path, args.sim], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ)
@@ -427,4 +479,4 @@ if __name__ == '__main__':
     for sensitivty_number in range(len(json_data.get("sensitivities", []))):
         plot_sensitivity.run(args.sim, sensitivty_number)
 
-    open(os.path.join(os.path.dirname(args.sim), 'complete'), 'w')
+    open(os.path.join(parent_dir, 'complete'), 'w')
