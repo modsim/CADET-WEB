@@ -377,7 +377,12 @@ def compress_data(h5):
         data = compress_series.compress(data)
         set_value(compress, name, 'f8', data)
 
-    for name in h5['/output/sensitivity'].keys():
+    try:
+        sens = h5['/output/sensitivity']
+    except KeyError:
+        sens = {}
+
+    for name in sens.keys():
         data = [solution_times,]
         for idx in range(number_of_components):
             data.append(np.array(h5['/output/sensitivity/%s/SENS_COLUMN_OUTLET_COMP_%03d' % (name, idx)]))
