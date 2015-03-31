@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from django.views.decorators import gzip
 from django.core.exceptions import ObjectDoesNotExist
 
+import settings
+
 import models
 
 import json
@@ -150,11 +152,10 @@ def single_start(request):
     data = default_value.copy()
     data.update(get_json(post))
 
-    if 'path' in request.GET and 'chunk_size' in request.GET:
+    if 'path' in request.GET:
         path = request.GET['path']
-        chunk_size =int(request.GET['chunk_size'])
 
-        relative_parts = [''.join(i for i in seq if i is not None) for seq in utils.grouper(path, chunk_size)]
+        relative_parts = [''.join(i for i in seq if i is not None) for seq in utils.grouper(path, settings.chunk_size)]
         relative_path = os.path.join(*relative_parts)
 
         json_data = open(os.path.join(storage_path, relative_path, 'setup.json'), 'rb').read()
@@ -498,9 +499,8 @@ def generate_other_graphs(request):
 @login_required
 def run_job_get(request):
     path = request.GET['path']
-    chunk_size =int(request.GET['chunk_size'])
 
-    json_path, hdf5_path, graphs, json_data = utils.get_graph_data(path, chunk_size)
+    json_path, hdf5_path, graphs, json_data = utils.get_graph_data(path, settings.chunk_size)
 
     query = request.GET.dict()
     query = urllib.urlencode(query)
@@ -528,7 +528,7 @@ def run_job_get(request):
     data['new_simulation'] = url_new
     #data['new_simulation_batch'] = url_new_batch
     data['path'] = path
-    data['chunk_size'] = chunk_size
+    data['chunk_size'] = settings.chunk_size
     data['rating'] = '%.1f' % rating
     data['notes'] = notes
     data['json_url'] = reverse('simulation:get_data', None, None)
@@ -537,7 +537,6 @@ def run_job_get(request):
 @login_required
 def simulation_rate(request):
     path = request.POST['path']
-    chunk_size = request.POST['chunk_size']
     rating = float(request.POST['rating'])
     notes = request.POST['notes']
 
@@ -550,7 +549,7 @@ def simulation_rate(request):
 
     query = {}
     query['path'] = path
-    query['chunk_size'] = chunk_size
+    query['chunk_size'] = settings.chunk_size
     query = urllib.urlencode(query)
     base = reverse('simulation:run_job_get', None, None)
     return redirect('%s?%s' % (base, query))
@@ -563,9 +562,7 @@ def run_job(request):
     json_data = get_json_string(data)
     check_sum = hashlib.sha256(json_data).hexdigest()
 
-    group_size = 20
-
-    relative_parts = [storage_path,] + [''.join(i for i in seq if i is not None) for seq in utils.grouper(check_sum, group_size)]
+    relative_parts = [storage_path,] + [''.join(i for i in seq if i is not None) for seq in utils.grouper(check_sum, settings.chunk_size)]
     relative_path = os.path.join(*relative_parts)
 
     try:
@@ -590,7 +587,7 @@ def run_job(request):
 
     query = {}
     query['path'] = check_sum
-    query['chunk_size'] = group_size
+    query['chunk_size'] = settings.chunk_size
     query = urllib.urlencode(query)
     base = reverse('simulation:run_job_get', None, None)
     return redirect('%s?%s' % (base, query))
@@ -756,9 +753,8 @@ def get_data(request):
     will pass the needed json to an external process and then read the result back."""
     json_data = {}
     path = request.GET['path']
-    chunk_size =int(request.GET['chunk_size'])
 
-    json_path, hdf5_path, graphs, data = utils.get_graph_data(path, chunk_size)
+    json_path, hdf5_path, graphs, data = utils.get_graph_data(path, settings.chunk_size)
 
     h5 = h5py.File(hdf5_path, 'r')
 
