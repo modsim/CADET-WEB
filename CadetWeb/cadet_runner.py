@@ -426,3 +426,5 @@ if __name__ == '__main__':
 
     for sensitivty_number in range(len(json_data.get("sensitivities", []))):
         plot_sensitivity.run(args.sim, sensitivty_number)
+
+    open(os.path.join(os.path.dirname(args.sim), 'complete'), 'w')
