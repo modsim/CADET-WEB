@@ -12,6 +12,7 @@ import types
 import plot_sensitivity
 import utils
 import itertools
+import shutil
 
 current_path = __file__
 parent_path, current_file_name = os.path.split(current_path)
@@ -437,9 +438,12 @@ def generate_simulations(parent_dir, json_data, h5_path):
     keys, values = zip(*json_data['batch_distribution'].items())
     for idx, value in enumerate(itertools.product(*values)):
         print zip(keys, value)
-    #iterate over all products with an enumerate
-    #create a directory for each simulation
-    #copy base simulation into new directory
+        try:
+            os.mkdir(os.path.join(parent_dir, str(idx)))
+        except OSError:
+            pass
+        shutil.copyfile(h5_path, os.path.join(parent_dir, str(idx), 'sim.h5'))
+
     #change values to new values
 
 
