@@ -29,10 +29,10 @@
             </thead>
             <tbody>
 
-            {% for linear in linears %}
+            {% for linear, value in linears %}
               <tr>
                  <td>{{ linear }}</td>
-                <td>IN PROGRESS</td>
+                <td>{{ value }}</td>
                 <td>
                   <input type="text" class="form-control required" id="linear_lb:{{ linear }}">
                 </td>
@@ -66,10 +66,10 @@
               </tr>
             </thead>
             <tbody>
-            {% for random in randoms %}
+            {% for random, value in randoms %}
               <tr>
                 <td>{{ random }}</td>
-                <td>IN PROGRESS</td>
+                <td>{{ value }}</td>
                 <td>
                   <input type="text" class="form-control required" id="random_lb:{{ random }}">
                 </td>
@@ -97,10 +97,10 @@
               </tr>
             </thead>
             <tbody>
-            {% for choice in choices %}
+            {% for choice, value in choices %}
               <tr>
                 <td>{{ choice }}</td>
-                <td>IN PROGRESS</td>
+                <td>{{ value }}</td>
                 <td>
                   <input type="text" class="form-control required" id="choice_{{ random }}}">
                 </td>
