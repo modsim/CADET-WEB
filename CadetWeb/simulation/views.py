@@ -870,7 +870,8 @@ def fix_radio(seq, data):
 def choose_attributes_to_modify(request):
 
     post = request.POST
-    data = get_json_dict(post)
+    data = default_value.copy()
+    data.update(get_json(post))
 
 
     relative_parts = [''.join(i for i in seq if i is not None) for seq in utils.grouper(request.GET.get('path'), settings.chunk_size)]
@@ -923,9 +924,10 @@ def choose_attributes_to_modify(request):
 
 @login_required
 def create_batch_simulation(request):
-
     post = request.POST
-    data = get_json(post)
+    data = default_value.copy()
+    data.update(get_json(post))
+
     search_results = []
 
     #notes = models.Job_Notes.objects.all().order_by('-rating')[:5]
@@ -957,14 +959,15 @@ def create_batch_simulation(request):
 
 @login_required
 def modify_attributes(request):
-
     post = request.POST
-    data = get_json_dict(post)
+    data = default_value.copy()
+    data.update(get_json(post))
+
     context = {'json':get_json_string(data)}
-    choose_attributes = [(key,value) for (key,value) in data.items() if 'choose_attributes_' in key]
-    context['choices'] = [key.replace('choose_attributes_', '') for (key, value) in choose_attributes if value == 'choose']
-    context['linears'] = [key.replace('choose_attributes_', '') for (key, value) in choose_attributes if value == 'linear']
-    context['randoms'] = [key.replace('choose_attributes_', '') for (key, value) in choose_attributes if value == 'random']
+    choose_attributes = [(key,value) for (key,value) in data.items() if 'choose_attributes:' in key]
+    context['choices'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'choose']
+    context['linears'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'linear']
+    context['randoms'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'random']
     return render(request, 'simulation/modify_attributes.html', context)
 
 
