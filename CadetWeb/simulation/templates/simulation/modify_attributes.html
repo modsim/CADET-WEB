@@ -8,6 +8,10 @@
 <input type="hidden" name="json" value="{{ json }}">
         <div class="col-md-12">
           <h1>Modify Attributes</h1>
+            <p>Values can be absolute numbers for the upper and lower bound or they can be percentages if a % is used.
+                The first value can also be a negative percentage and then the second value is read relative to the center.</p>
+            <p>Example: If the base value is 1 then a value of 0.75 and 1.25,  -25% to 25% and 75% to 125% will all generate the same range.</p>
+            <p>The base case is always included in the simulation.</p>
         </div>
       </div>
       <div class="row">
