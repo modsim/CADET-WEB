@@ -484,7 +484,8 @@ def query_results(request):
         isotherm = models.Job_String.objects.get(Job_ID=job, Parameter_ID=parameter).Data
         additional = result[1:]
         rating = models.Job_Notes.objects.get(Job_ID=job).rating
-        search_results.append([jobid, study_name, model_name, isotherm, additional, rating])
+        url = reverse('simulation:run_job_get', None, None) + "?path=%s" % job.uid
+        search_results.append([jobid, study_name, model_name, isotherm, additional, rating, url])
     headers = results[0][1:]
     context = {'json':get_json_string(data),
               'search_results':search_results,
