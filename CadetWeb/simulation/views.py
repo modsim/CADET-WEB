@@ -970,7 +970,7 @@ def modify_attributes(request):
 
     context['linears'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'linear']
     context['linears'] = [(key, data[key]) for key in context['linears']]
-    
+
     context['randoms'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'random']
     context['randoms'] = [(key, data[key]) for key in context['randoms']]
 
