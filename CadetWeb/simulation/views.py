@@ -872,9 +872,20 @@ def choose_attributes_to_modify(request):
     post = request.POST
     data = get_json_dict(post)
 
-    context = {'json':get_json_string(data),
-              'modifies': utils.get_plugin_names('modify')}
-    return render(request, 'simulation/choose_attributes_to_modify.html', context)
+
+    relative_parts = [''.join(i for i in seq if i is not None) for seq in utils.grouper(request.GET.get('path'), settings.chunk_size)]
+    relative_path = os.path.join(*relative_parts)
+
+    json_data = open(os.path.join(storage_path, relative_path, 'setup.json'), 'rb').read()
+
+    json_data = json.loads(json_data)
+    json_data = utils.encode_to_ascii(json_data)
+    data.update(json_data)
+
+    data['json'] = get_json_string(data)
+    data['modifies'] = utils.get_plugin_names('modify')
+
+    return render(request, 'simulation/choose_attributes_to_modify.html', data)
 
 @login_required
 def create_batch_simulation(request):
