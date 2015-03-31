@@ -512,6 +512,7 @@ def run_job_get(request):
     data['graphs'] = graphs
 
     hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
+    progress_path = os.path.join(os.path.dirname(hdf5_path), 'progress')
 
     try:
         job = models.Job.objects.get(uid=path)
@@ -532,6 +533,7 @@ def run_job_get(request):
     data['rating'] = '%.1f' % rating
     data['notes'] = notes
     data['json_url'] = reverse('simulation:get_data', None, None)
+    data['progress'] = progress_path
     return render(request, 'simulation/run_job.html', data)
 
 @login_required
@@ -586,6 +588,7 @@ def run_job(request):
 
     query = {}
     query['path'] = check_sum
+    query['chunk_size'] = settings.chunk_size
     query['chunk_size'] = settings.chunk_size
     query = urllib.urlencode(query)
     base = reverse('simulation:run_job_get', None, None)

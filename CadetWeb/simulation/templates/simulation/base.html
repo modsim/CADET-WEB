@@ -43,11 +43,12 @@
     body.loading { overflow: hidden; }
 
     body.loading .busy {display: block; }
-    .above_middle {position:absolute; top: 35%; left:50%; transform: translate(-50%, -50%);}
+    .above_middle {position:absolute; top: 20%; left:50%; transform: translate(-50%, -50%);}
 
     div.star-rating span.label {display:none;}
 
     .form-control {color:black; font-size:16px;}
+    .center {text-align: center;}
 
     </style>
     <script type="text/javascript" src="{% static "simulation/jquery-2.1.3.min.js" %}"></script>
@@ -68,7 +69,7 @@
   
   <body class="visible-lg visible-md">
 
-  <div class="busy"><div class="above_middle"><h1>Please stand by. Simulation is running.</h1></div></div>
+  <div class="busy"><div class="above_middle"><h1>Please stand by. Simulation is running.</h1><h2 class="center" id="progress"></h2></div></div>
 
     <div class="container">
       <div class="row">

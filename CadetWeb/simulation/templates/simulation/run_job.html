@@ -211,6 +211,7 @@ $( document ).ready(function() {
             data = json_data;
 
             if (0 == json_data['success']) {
+                $( "#progress" ).load( "{{ progress }}" );
                 setTimeout(fetchData, 5000);
             } else {
                 $("body").removeClass("loading");

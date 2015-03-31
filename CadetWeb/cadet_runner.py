@@ -12,7 +12,7 @@ import types
 import plot_sensitivity
 import utils
 import itertools
-import shutil
+import glob
 
 current_path = __file__
 parent_path, current_file_name = os.path.split(current_path)
@@ -450,11 +450,25 @@ def generate_simulations(parent_dir, json_data, h5_path):
             os.mkdir(os.path.join(parent_dir, 'batch', str(idx)))
         except OSError:
             pass
-        #shutil.copyfile(h5_path, os.path.join(parent_dir, str(idx), 'sim.h5'))
         directory_path = os.path.join(parent_dir, 'batch', str(idx))
         create_simulation_file(directory_path, temp)
 
+def write_progress(parent_dir, current, total):
+    with open(os.path.join(parent_dir,'progress'), 'w') as progress:
+        progress.write('%s of %s simulations completed (%.1f%%)' % (current, total, float(current)/total*100.0))
 
+def run_batch_simulations(parent_dir, json_path):
+    dirs = glob.glob(os.path.join(parent_dir, 'batch', '*'))
+    dir_count = len(dirs)
+    write_progress(parent_dir, 0, dir_count)
+    for idx, dir_name in enumerate(dirs):
+        h5_path = os.path.join(dir_name, 'sim.h5')
+        out = open(os.path.join(dir_name, 'stdout'), 'w')
+        err = open(os.path.join(dir_name, 'stderr'), 'w')
+
+        proc = subprocess.Popen(['python', __file__, '--json', json_path, '--sim', h5_path,], stdout=out, stderr=err)
+        proc.wait()
+        write_progress(parent_dir, idx+1, dir_count)
 
 if __name__ == '__main__':
     args = run_args()
@@ -464,11 +478,15 @@ if __name__ == '__main__':
 
     parent_dir = os.path.dirname(args.sim)
 
-    if json_data['job_type'] == 'batch':
-        generate_ranges(json_data)
-        json.dump(json_data, open(args.json, 'w'))
-        generate_simulations(parent_dir, json_data, args.sim)
-        #run_batch_simulations(parent_dir)
+    if 'batch' not in args.sim:
+        if json_data['job_type'] == 'batch':
+            generate_ranges(json_data)
+            json.dump(json_data, open(args.json, 'w'))
+            generate_simulations(parent_dir, json_data, args.sim)
+            run_batch_simulations(parent_dir, args.json)
+
+    if 'batch' not in args.sim:
+        write_progress(parent_dir, 0, 1)
 
     #run simulation
     proc = subprocess.Popen([cadet_path, args.sim], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ)
@@ -501,4 +519,6 @@ if __name__ == '__main__':
     for sensitivty_number in range(len(json_data.get("sensitivities", []))):
         plot_sensitivity.run(args.sim, sensitivty_number)
 
+    if 'batch' not in args.sim:
+        write_progress(parent_dir, 1, 1)
     open(os.path.join(parent_dir, 'complete'), 'w')
