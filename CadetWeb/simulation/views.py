@@ -465,17 +465,24 @@ def query_results(request):
 
     post = request.POST
     data = get_json(post)
-    results = utils.call_plugin_by_name(data['search_query'], 'search', 'process_search', data)
+    headers, results = utils.call_plugin_by_name(data['search_query'], 'search', 'process_search', data)
     search_results = []
-    for result in results[1:]:
+
+    job_ids = [result[0] for result in results]
+    JOBS = models.Job.objects.filter(id__in = job_ids)
+
+    parameter = models.Parameters.objects.get(name='ADSORPTION_TYPE')
+
+
+    for job, result in zip(JOBS, results):
         # (Job ID, Study Name, Model Name, Isotherm, [list of additional headers], rating
         #will have a search function here later that gathers up all the info we need from a jobid
-        jobid = result[0]
-        study_name = 'test'
-        model_name = 'test2'
-        isotherm = 'test3'
+        jobid = job.id
+        study_name = job.study_name
+        model_name = job.Model_ID.model
+        isotherm = models.Job_String.objects.get(Job_ID=job, Parameter_ID=parameter).Data
         additional = result[1:]
-        rating = 3.5
+        rating = models.Job_Notes.objects.get(Job_ID=job).rating
         search_results.append([jobid, study_name, model_name, isotherm, additional, rating])
     headers = results[0][1:]
     context = {'json':get_json_string(data),

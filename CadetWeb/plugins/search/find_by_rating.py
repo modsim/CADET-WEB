@@ -1,6 +1,8 @@
 __author__ = 'kosh_000'
 name = "Find by Rating"
 
+from simulation import models
+
 def run():
     html_string = '''
     <div class="row">
@@ -10,7 +12,7 @@ def run():
                 <label for="lb" class="control-label">Lower Bound</label>
               </div>
               <div class="col-sm-10">
-                <input type="text" class="form-control" placeholder="4" name="lb" id="lb">
+                <input type="text" class="form-control required" placeholder="4" name="lb" id="lb">
               </div>
             </div>
             <div class="form-group">
@@ -18,7 +20,7 @@ def run():
                 <label for="ub" class="control-label">Upper Bound</label>
               </div>
               <div class="col-sm-10">
-                <input type="text" class="form-control" placeholder="5" name="ub" id="ub">
+                <input type="text" class="form-control required" placeholder="5" name="ub" id="ub">
               </div>
             </div>
         </div>
@@ -27,7 +29,13 @@ def run():
     return html_string
 
 def process_search(search_dict):
-    search_results = [('JOBID',)]
-    search_results.append( (1,))
-    search_results.append( (2,))
-    return search_results
+    lb = float(search_dict['lb'])
+    ub = float(search_dict['ub'])
+
+    results = models.Job_Notes.objects.filter(rating__range=(lb, ub))
+
+    headers = ('JOBID',)
+    search_results = []
+    for result in results:
+        search_results.append( (result.Job_ID.id, ))
+    return headers, search_results

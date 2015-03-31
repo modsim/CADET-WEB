@@ -26,7 +26,8 @@ def run():
     return html_string
 
 def process_search(search_dict):
-    search_results = [('JOBID', 'Purity')]
+    headers = ('JOBID', 'Purity')
+    search_results = []
     search_results.append( (1, '95%'))
     search_results.append( (2, '97%'))
-    return search_results
+    return headers, search_results
