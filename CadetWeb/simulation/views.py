@@ -882,10 +882,42 @@ def choose_attributes_to_modify(request):
     json_data = utils.encode_to_ascii(json_data)
     data.update(json_data)
 
-    data['json'] = get_json_string(data)
-    data['modifies'] = utils.get_plugin_names('modify')
+    comps = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
+    modify = []
     #every attribute can be modified except for strings, blobs, number of steps and number of components, sensitivities and checkbox settings
+    with open(os.path.join(parent_path,'parms.csv'), 'rb') as csvfile:
+        reader = csv.reader(csvfile)
+        #read the header and discard it
+        reader.next()
+        for name, units, type, per_component, per_section, sensitive, description  in reader:
+            per_component = int(per_component)
+            per_section = int(per_section)
+            sensitive = int(sensitive)
+
+            if type in ('int', 'double'):
+                if per_component and per_section:
+                    for step in steps:
+                        for comp in comps:
+                            key = '%s:%s:%s' % (step, comp, name)
+                            if key in data:
+                                modify.append(key)
+                elif per_component and not per_section:
+                    for comp in comps:
+                        key = '%s:%s' % (comp, name)
+                        if key in data:
+                            modify.append(key)
+                elif per_section and not per_component:
+                    pass #we don't have any of these but leave this here in case it happens later
+                else:
+                    if name in data:
+                        modify.append(name)
+
+    data['json'] = get_json_string(data)
+    data['modifies'] = modify
+
+
 
     return render(request, 'simulation/choose_attributes_to_modify.html', data)
 
