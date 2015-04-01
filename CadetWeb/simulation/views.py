@@ -582,6 +582,7 @@ def run_job(request):
     try:
         open(os.path.join(relative_path, 'complete'), 'r')
     except IOError:
+        print "should not be here"
         write_job_to_db(data, json_data, check_sum)
 
         subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)

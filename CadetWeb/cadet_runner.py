@@ -42,9 +42,15 @@ def run_args():
 def create_simulation_file(directory_path, data):
     "create a simulation in the given directory using the given data"
     file_path = os.path.join(directory_path, 'sim.h5')
-    h5 = h5py.File(file_path, 'w')
-    create_input(h5, data)
-    create_web(h5, data)
+    h5 = h5py.File(file_path, 'a')
+
+    #only write into the simulation if it has not already been completely run
+    try:
+        h5['/output/solution/SOLUTION_TIMES']
+    except KeyError:
+        create_input(h5, data)
+        create_web(h5, data)
+
     h5.close()
 
     return file_path
