@@ -973,14 +973,13 @@ def modify_attributes(request):
     context['choices'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'choose']
     context['choices'] = [(key, data[key]) for key in context['choices']]
 
-    context['linears'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'linear']
-    context['linears'] = [(key, data[key]) for key in context['linears']]
-
-    context['randoms'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'random']
-    context['randoms'] = [(key, data[key]) for key in context['randoms']]
+    context['distributions'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'distribution']
+    context['distributions'] = [(key, data[key]) for key in context['distributions']]
 
     context['back'] = reverse('simulation:choose_attributes_to_modify', None, None)
     context['back_text'] = 'Choose Attributes to Modify'
+
+    context['allowed'] = ['Linear', 'Random Uniform', 'Truncated Random Normal']
     return render(request, 'simulation/modify_attributes.html', context)
 
 

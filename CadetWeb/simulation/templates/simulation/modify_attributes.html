@@ -26,67 +26,41 @@
               <tr>
                 <th style="width:10em;">Attribute</th>
                 <th style="width:10em;">Current Value</th>
-                <th>Lower Bound</th>
-                <th>Upper Bound</th>
-                <th>Number of Points</th>
+                <th style="width:10em;">Lower Bound</th>
+                <th style="width:10em;">Upper Bound</th>
+                <th style="width:10em;">Number of Points</th>
+                  <th>Choose Distribution</th>
               </tr>
             </thead>
             <tbody>
 
-            {% for linear, value in linears %}
+            {% for dist, value in distributions %}
               <tr>
-                 <td>{{ linear }}</td>
+                 <td>{{ dist }}</td>
                 <td>{{ value }}</td>
                 <td>
-                  <input type="text" class="form-control required" name="linear_lb:{{ linear }}" id="linear_lb:{{ linear }}">
+                  <input type="text" class="form-control required" name="dist_lb:{{ dist }}" id="dist_lb:{{ dist }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control required" name="linear_ub:{{ linear }}" id="linear_ub:{{ linear }}">
+                  <input type="text" class="form-control required" name="dist_ub:{{ dist }}" id="dist_ub:{{ dist }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control required" name="linear_number:{{ linear }}" id="linear_number:{{ linear }}">
+                  <input type="text" class="form-control required" name="dist_number:{{ dist }}" id="dist_number:{{ dist }}">
                 </td>
+                  <td>
+                      <select class="form-control" name="dist_type:{{ dist }}">
+                      {% for allow in allowed %}
+                          <option>{{ allow }}</option>
+                      {% endfor %}
+                      </select>
+                  </td>
               </tr>
             {% endfor %}
             </tbody>
           </table>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-12">
-          <h1>Random Distribution</h1>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <table class="table">
-            <thead>
-              <tr>
-                <th style="width:10em;">Attribute</th>
-                <th style="width:10em;">Current Value</th>
-                <th>Lower Bound</th>
-                <th>Upper Bound</th>
-                <th>Number of Points</th>
-              </tr>
-            </thead>
-            <tbody>
-            {% for random, value in randoms %}
-              <tr>
-                <td>{{ random }}</td>
-                <td>{{ value }}</td>
-                <td>
-                  <input type="text" class="form-control required" name="random_lb:{{ random }}" id="random_lb:{{ random }}">
-                </td>
-                <td>
-                  <input type="text" class="form-control required" name="random_ub:{{ random }}" id="random_ub:{{ random }}">
-                </td>
-                <td>
-                  <input type="text" class="form-control required" name="random_number:{{ random }}" id="random_number:{{ random }}">
-                </td>
-              </tr>
-            {% endfor %}
-            </tbody>
-          </table>
+
           <div class="col-md-12">
             <h1>Chosen Distribution</h1>
           </div>
