@@ -427,6 +427,7 @@ def generate_ranges(json_data):
             lb = json_data['modify_dist_lb:%s' % base]
             ub = json_data['modify_dist_ub:%s' % base]
             size = int(json_data['modify_dist_number:%s' % base])
+            stdev = float(json_data.get('modify_dist_stdev:%s' % base, 1))
             lb, ub = gen_bounds(lb, ub, base_value)
 
             if dist_type == 'Random Uniform':
@@ -436,9 +437,10 @@ def generate_ranges(json_data):
             elif dist_type == 'Truncated Random Normal':
                 values = []
                 while len(values) < size:
-                    value = random.randn() + base_value
+                    value = random.normal(base_value, stdev)
                     if lb < value < ub:
                         values.append(value)
+            #print dist_type, base_value, values
 
         elif value == 'choose':
             values = map(float, json_data['modify_choice:%s' % base].split(','))

@@ -28,6 +28,7 @@
                 <th style="width:10em;">Current Value</th>
                 <th style="width:10em;">Lower Bound</th>
                 <th style="width:10em;">Upper Bound</th>
+                <th style="width:10em;">Standard Deviation <br> (optional)</th>
                 <th style="width:10em;">Number of Points</th>
                   <th>Choose Distribution</th>
               </tr>
@@ -46,6 +47,9 @@
                 </td>
                 <td>
                   <input type="text" class="form-control required" name="modify_dist_number:{{ dist }}" id="dist_number:{{ dist }}">
+                </td>
+                <td>
+                  <input type="text" class="form-control" name="modify_dist_stdev:{{ dist }}" id="dist_stdev:{{ dist }}" value="1">
                 </td>
                   <td>
                       <select class="form-control" name="modify_dist_type:{{ dist }}">
