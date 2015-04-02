@@ -63,7 +63,7 @@ def get_json(post):
     if json_table:
         #clean out json_dict of sensitivities
         for key in json_dict.keys():
-            if key.startswith( ('tol', 'dist', 'choice'),):
+            if key.startswith( ('tol:', 'dist:', 'choice:'),):
                 del json_dict[key]
 
     temp.update(json_dict)

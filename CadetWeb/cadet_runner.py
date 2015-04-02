@@ -422,22 +422,31 @@ def generate_ranges(json_data):
         base = key.replace('choose_attributes:', '')
         base_value = float(json_data[base])
         values = []
-        if value == 'random':
-            lb = json_data['random_lb:%s' % base]
-            ub = json_data['random_ub:%s' % base]
-            size = int(json_data['random_number:%s' % base])
+        if value == 'distribution':
+            dist_type =  json_data['modify_dist_type:%s' % base]
+            lb = json_data['modify_dist_lb:%s' % base]
+            ub = json_data['modify_dist_ub:%s' % base]
+            size = int(json_data['modify_dist_number:%s' % base])
             lb, ub = gen_bounds(lb, ub, base_value)
-            values = random.uniform(lb, ub, size)
-        elif value == 'linear':
-            lb = json_data['linear_lb:%s' % base]
-            ub = json_data['linear_ub:%s' % base]
-            size = int(json_data['linear_number:%s' % base])
-            lb, ub = gen_bounds(lb, ub, base_value)
-            values = np.linspace(lb, ub, size, endpoint=True)
+
+            if dist_type == 'Random Uniform':
+                values = random.uniform(lb, ub, size)
+            elif dist_type == 'Linear':
+                print 'here'
+                print lb, ub, size
+                values = np.linspace(lb, ub, size, endpoint=True)
+            elif dist_type == 'Truncated Random Normal':
+                values = []
+                while len(values) < size:
+                    value = random.randn() + base_value
+                    if lb < value < ub:
+                        values.append(value)
+            print dist_type, values
+
         elif value == 'choose':
-            values = map(float, json_data['choice:%s' % base])
+            values = map(float, json_data['modify_choice:%s' % base].split(','))
         if len(values):
-            ranges[base] = values.tolist()
+            ranges[base] = list(values)
     json_data['batch_distribution'] = ranges
 
 def generate_simulations(parent_dir, json_data, h5_path):

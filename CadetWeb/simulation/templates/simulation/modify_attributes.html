@@ -39,16 +39,16 @@
                  <td>{{ dist }}</td>
                 <td>{{ value }}</td>
                 <td>
-                  <input type="text" class="form-control required" name="dist_lb:{{ dist }}" id="dist_lb:{{ dist }}">
+                  <input type="text" class="form-control required" name="modify_dist_lb:{{ dist }}" id="dist_lb:{{ dist }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control required" name="dist_ub:{{ dist }}" id="dist_ub:{{ dist }}">
+                  <input type="text" class="form-control required" name="modify_dist_ub:{{ dist }}" id="dist_ub:{{ dist }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control required" name="dist_number:{{ dist }}" id="dist_number:{{ dist }}">
+                  <input type="text" class="form-control required" name="modify_dist_number:{{ dist }}" id="dist_number:{{ dist }}">
                 </td>
                   <td>
-                      <select class="form-control" name="dist_type:{{ dist }}">
+                      <select class="form-control" name="modify_dist_type:{{ dist }}">
                       {% for allow in allowed %}
                           <option>{{ allow }}</option>
                       {% endfor %}
@@ -61,6 +61,8 @@
         </div>
       </div>
 
+    <div class="row">
+        <div class="col-md-12">
           <div class="col-md-12">
             <h1>Chosen Distribution</h1>
           </div>
@@ -80,7 +82,7 @@
                 <td>{{ choice }}</td>
                 <td>{{ value }}</td>
                 <td>
-                  <input type="text" class="form-control required" name="choice:{{ choice }}" id="choice_{{ choice }}">
+                  <input type="text" class="form-control required" name="modify_choice:{{ choice }}" id="choice_{{ choice }}">
                 </td>
               </tr>
             {% endfor %}
