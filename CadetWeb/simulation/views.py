@@ -283,8 +283,13 @@ def graph_setup(request):
     data['graph_single'] = [(name, 'checked' if data.get('graph_single:%s' % name, '')  == '1' else '', '' if data.get('graph_single:%s' % name, '')  == '1' else 'checked') for name in sorted(utils.get_plugin_names('graphing/single'))]
     data['graph_group'] = [(name, 'checked' if data.get('graph_group:%s' % name, '') == '1' else '', '' if data.get('graph_group:%s' % name, '') == '1' else 'checked') for name in sorted(utils.get_plugin_names('graphing/group'))]
     data['job_type'] = data['job_type']
-    data['back'] = reverse('simulation:simulation_setup', None, None)
-    data['back_text'] = 'Simulation Setup'
+
+    if data['job_type'] == 'batch':
+        data['back'] = reverse('simulation:modify_attributes', None, None)
+        data['back_text'] = 'Modify Attributes'
+    else:
+        data['back'] = reverse('simulation:simulation_setup', None, None)
+        data['back_text'] = 'Simulation Setup'
     return render(request, 'simulation/graph_setup.html', data)
 
 @login_required
@@ -534,6 +539,7 @@ def run_job_get(request):
     data['notes'] = notes
     data['json_url'] = reverse('simulation:get_data', None, None)
     data['progress'] = progress_path
+    data['job_id'] = models.Job.objects.get(uid=path).id
     return render(request, 'simulation/run_job.html', data)
 
 @login_required
@@ -874,15 +880,15 @@ def choose_attributes_to_modify(request):
     data = default_value.copy()
     data.update(get_json(post))
 
+    if 'path' in request.GET:
+        relative_parts = [''.join(i for i in seq if i is not None) for seq in utils.grouper(request.GET.get('path'), settings.chunk_size)]
+        relative_path = os.path.join(*relative_parts)
 
-    relative_parts = [''.join(i for i in seq if i is not None) for seq in utils.grouper(request.GET.get('path'), settings.chunk_size)]
-    relative_path = os.path.join(*relative_parts)
+        json_data = open(os.path.join(storage_path, relative_path, 'setup.json'), 'rb').read()
 
-    json_data = open(os.path.join(storage_path, relative_path, 'setup.json'), 'rb').read()
-
-    json_data = json.loads(json_data)
-    json_data = utils.encode_to_ascii(json_data)
-    data.update(json_data)
+        json_data = json.loads(json_data)
+        json_data = utils.encode_to_ascii(json_data)
+        data.update(json_data)
 
     comps = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
     steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
@@ -918,8 +924,6 @@ def choose_attributes_to_modify(request):
 
     data['json'] = get_json_string(data)
     data['modifies'] = modify
-
-
 
     return render(request, 'simulation/choose_attributes_to_modify.html', data)
 
@@ -975,6 +979,8 @@ def modify_attributes(request):
     context['randoms'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'random']
     context['randoms'] = [(key, data[key]) for key in context['randoms']]
 
+    context['back'] = reverse('simulation:choose_attributes_to_modify', None, None)
+    context['back_text'] = 'Choose Attributes to Modify'
     return render(request, 'simulation/modify_attributes.html', context)
 
 
