@@ -432,8 +432,6 @@ def generate_ranges(json_data):
             if dist_type == 'Random Uniform':
                 values = random.uniform(lb, ub, size)
             elif dist_type == 'Linear':
-                print 'here'
-                print lb, ub, size
                 values = np.linspace(lb, ub, size, endpoint=True)
             elif dist_type == 'Truncated Random Normal':
                 values = []
@@ -441,7 +439,6 @@ def generate_ranges(json_data):
                     value = random.randn() + base_value
                     if lb < value < ub:
                         values.append(value)
-            print dist_type, values
 
         elif value == 'choose':
             values = map(float, json_data['modify_choice:%s' % base].split(','))
