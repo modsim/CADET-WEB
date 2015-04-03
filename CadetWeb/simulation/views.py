@@ -279,8 +279,9 @@ def graph_setup(request):
     data = default_value.copy()
     data.update(get_json(post))
 
-    if data['job_type'] == 'batch' and 'batch_distribution' not in data:
+    if data['job_type'] == 'batch':
         cadet_runner.generate_ranges(data)
+        cadet_runner.generate_permutations(data)
 
 
     data['json'] = get_json_string(data)

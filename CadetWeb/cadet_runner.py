@@ -450,14 +450,24 @@ def generate_ranges(json_data):
             ranges[base] = list(values)
     json_data['batch_distribution'] = ranges
 
-def generate_simulations(parent_dir, json_data, h5_path):
+def generate_permutations(json_data):
     keys, values = zip(*json_data['batch_distribution'].items())
+
+    combos = []
+    for value in itertools.product(*values):
+        combos.append(value)
+    json_data['permutations_keys'] = keys
+    json_data['permutations_values'] = combos
+
+def generate_simulations(parent_dir, json_data):
+    keys = json_data['permutations_keys']
+    combos = json_data['permutations_values']
     try:
         os.mkdir(os.path.join(parent_dir, 'batch'))
     except OSError:
         pass
 
-    for idx, value in enumerate(itertools.product(*values)):
+    for idx, value in enumerate(combos):
         temp = json_data.copy()
         temp.update(dict(zip(keys, value)))
 
@@ -495,7 +505,7 @@ if __name__ == '__main__':
 
     if 'batch' not in args.sim:
         if json_data['job_type'] == 'batch':
-            generate_simulations(parent_dir, json_data, args.sim)
+            generate_simulations(parent_dir, json_data)
             run_batch_simulations(parent_dir, args.json)
 
     if 'batch' not in args.sim:
