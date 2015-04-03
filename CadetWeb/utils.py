@@ -43,7 +43,7 @@ def encode_to_ascii_list(data):
             temp.append(key)
     return temp
 
-def get_graph_data(path, chunk_size):
+def get_graph_data(path, chunk_size, rel_path):
     "return the path to the json_file, path to the hdf5 file, and the list of name,url pairs for images"
     graphs = []
 
@@ -51,7 +51,11 @@ def get_graph_data(path, chunk_size):
     relative_path = os.path.join(*relative_parts)
 
     json_path = os.path.join(storage_path, relative_path, 'setup.json')
-    hdf5_path = os.path.join(storage_path, relative_path, 'sim.h5')
+
+    if rel_path:
+        hdf5_path = os.path.join(storage_path, relative_path, 'batch', rel_path, 'sim.h5')
+    else:
+        hdf5_path = os.path.join(storage_path, relative_path, 'sim.h5')
 
     json_data = open(json_path, 'rb').read()
 

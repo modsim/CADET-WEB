@@ -508,8 +508,14 @@ def generate_other_graphs(request):
 @login_required
 def run_job_get(request):
     path = request.GET['path']
+    sim_id = request.GET.get('sim_id', '')
 
-    json_path, hdf5_path, graphs, json_data = utils.get_graph_data(path, settings.chunk_size)
+    if sim_id:
+        rel_path = models.Simulation.objects.get(id=int(sim_id)).Rel_Path
+    else:
+        rel_path = ''
+
+    json_path, hdf5_path, graphs, json_data = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     query = request.GET.dict()
     query = urllib.urlencode(query)
@@ -544,6 +550,7 @@ def run_job_get(request):
     data['progress'] = progress_path
     data['job_id'] = models.Job.objects.get(uid=path).id
     data['dropdown'] = generate_batch_choice(json_data)
+    data['sim_id'] = sim_id
     return render(request, 'simulation/run_job.html', data)
 
 def generate_batch_choice(json_data):
@@ -821,8 +828,14 @@ def get_data(request):
     will pass the needed json to an external process and then read the result back."""
     json_data = {}
     path = request.GET['path']
+    sim_id = request.GET['sim_id']
 
-    json_path, hdf5_path, graphs, data = utils.get_graph_data(path, settings.chunk_size)
+    if sim_id:
+        rel_path = models.Simulation.objects.get(id=int(sim_id)).Rel_Path
+    else:
+        rel_path = ''
+
+    json_path, hdf5_path, graphs, data = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     h5 = h5py.File(hdf5_path, 'r')
 

@@ -244,7 +244,7 @@ $( document ).ready(function() {
             type: "GET",
             dataType: "json",
             cache: false,
-            data: { 'path': '{{ path }}', 'chunk_size': '{{ chunk_size }}' },
+            data: { 'path': '{{ path }}', 'sim_id': '{{ sim_id }}' },
             success: onDataReceived
         });
     }
