@@ -582,8 +582,50 @@ def draw_selection(key, values):
 
 @login_required
 def batch_choose(request):
+    check_sum = request.POST.get('check_sum')
+
+    job = models.Job.objects.get(uid=check_sum)
+
+    search = {}
+    for key, value in request.POST.items():
+        if key.startswith('batch:'):
+            search[key.replace('batch:', '')] = float(value)
+
+    settings = serialization_settings()
+
+
+    data = {}
+    for key,value in search.items():
+        key = key.encode('ascii').split(':')
+        if len(key) == 1:
+            name = key[0]
+            comp = 'Column'
+            step = 'Setup'
+        elif len(key) == 2:
+            comp, name = key
+            step = 'Setup'
+        elif len(key) == 3:
+            step, comp, name = key
+        data[name] = (step, comp, name, value)
+
+    temp = []
+    for name, type, per_component, per_section  in settings:
+        if name in data:
+            step, comp, name, value = data[name]
+
+            step = models.Steps.objects.get(Job_ID=job,  Step=step)
+            comp = models.Components.objects.get(Job_ID=job, Component=comp)
+            name = models.Parameters.objects.get(name=name)
+
+            if type in ('int', 'boolean'):
+                value = int(value)
+                temp.extend(models.Sim_Int.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp))
+
+            elif type == 'double':
+                temp.extend(models.Sim_Double.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp))
+    print temp
     query = {}
-    query['path'] = request.POST.get('check_sum')
+    query['path'] = check_sum
     query['sim_id'] = '36'
     query = urllib.urlencode(query)
     base = reverse('simulation:run_job_get', None, None)
