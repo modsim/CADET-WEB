@@ -39,7 +39,7 @@
             </div>
         </div>
       </div>
-
+      </form>
       <div class="row">
         <div class="col-md-12">
           <div class="btn-toolbar" role="toolbar">
@@ -51,7 +51,16 @@
           </div>
         </div>
       </div>
-          </form>
+
+    <form class="form-horizontal" role="form" style="" action="{% url 'simulation:simulation_rate' %}" method="POST">
+    <div class="row">
+        <div class="col-md-12">
+      {% csrf_token %}
+      {{ dropdown|safe }}
+        </div>
+    </div>
+    </form>
+
 
     {% for id, name, url in graphs %}
 

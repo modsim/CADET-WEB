@@ -543,7 +543,35 @@ def run_job_get(request):
     data['json_url'] = reverse('simulation:get_data', None, None)
     data['progress'] = progress_path
     data['job_id'] = models.Job.objects.get(uid=path).id
+    data['dropdown'] = generate_batch_choice(json_data)
     return render(request, 'simulation/run_job.html', data)
+
+def generate_batch_choice(json_data):
+    temp = []
+    if json_data['job_type'] == 'batch':
+        temp.append('<table><tr>')
+        for key,values in json_data['batch_distribution']:
+            temp.append('<th>')
+            temp.append(key)
+            temp.append('</th>')
+        temp.append('<th></th>')
+        temp.append('</tr><tr>')
+
+        for key,values in json_data['batch_distribution']:
+            temp.append('<td>')
+            temp.append(draw_selection(key, values))
+            temp.append('</td>')
+        temp.append('<td></td>')
+        temp.append('</tr></table>')
+    return ''.join(temp)
+
+def draw_selection(key, values):
+    temp = []
+    temp.append('<select class="form-control" name="batch:%s">' % key)
+    for value in values:
+        temp.append('<option value="%s">%.3g</option>' % (value, value))
+    temp.append('</select>')
+    return ''.join(temp)
 
 @login_required
 def simulation_rate(request):

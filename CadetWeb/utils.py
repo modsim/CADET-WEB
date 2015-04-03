@@ -39,6 +39,8 @@ def encode_to_ascii_list(data):
             temp.append(encode_to_ascii_list(key))
         elif isinstance(key, types.DictType):
             temp.append(encode_to_ascii(key))
+        else:
+            temp.append(key)
     return temp
 
 def get_graph_data(path, chunk_size):

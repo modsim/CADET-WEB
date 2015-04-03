@@ -55,35 +55,6 @@ def create_simulation_file(directory_path, data):
 
     return file_path
 
-def encode_to_ascii(data):
-    "encode all the data in this dictionary to ascii"
-    temp = {}
-    for key,value in data.items():
-        if isinstance(value, types.StringTypes):
-            temp[key.encode('ascii')] = value.encode('ascii')
-        elif isinstance(value, types.ListType):
-            temp[key.encode('ascii')] = encode_to_ascii_list(value)
-        elif isinstance(value, types.DictType):
-            temp[key.encode('ascii')] = encode_to_ascii(value)
-        else:
-            temp[key.encode('ascii')] = value
-    return temp
-
-def encode_to_ascii_list(data):
-    "enocde all the data in a list to ascii"
-    temp = []
-
-    for key in data:
-        if isinstance(key, types.StringTypes):
-            temp.append(key.encode('ascii'))
-        elif isinstance(key, types.ListType):
-            temp.append(encode_to_ascii_list(key))
-        elif isinstance(key, types.DictType):
-            temp.append(encode_to_ascii(key))
-        else:
-            temp.append(key)
-    return temp
-
 def create_input(h5, data):
     "handle the input node"
     input = h5.create_group("input")
@@ -498,7 +469,7 @@ if __name__ == '__main__':
     args = run_args()
     json_data = open(args.json, 'rb').read()
     json_data = json.loads(json_data)
-    json_data = encode_to_ascii(json_data)
+    json_data = utils.encode_to_ascii(json_data)
 
     parent_dir = os.path.dirname(args.sim)
 
