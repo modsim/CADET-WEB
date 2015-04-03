@@ -589,7 +589,7 @@ def run_job(request):
         open(os.path.join(relative_path, 'complete'), 'r')
     except IOError:
         print "should not be here"
-        write_job_to_db(data, json_data, check_sum)
+        write_job_to_db(data, json_data, check_sum, request.user.username)
 
         subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
 
@@ -601,7 +601,7 @@ def run_job(request):
     base = reverse('simulation:run_job_get', None, None)
     return redirect('%s?%s' % (base, query))
 
-def write_job_to_db(data, json_data, check_sum):
+def write_job_to_db(data, json_data, check_sum, username):
     #first check if we already have this entry
 
     #FIXME: ONLY FOR TESTING WIPES THE DB ENTRY EACH TIME
@@ -645,7 +645,8 @@ def write_job_to_db(data, json_data, check_sum):
             Model_ID = model,
             study_name = data['study_name'],
             json = json_data,
-            uid = check_sum)
+            uid = check_sum,
+            username = username)
 
         #create components
         comps = [models.Components.objects.create(Job_ID=job, Component=comp) for comp in list_of_names]
