@@ -554,7 +554,7 @@ def generate_batch_choice(json_data):
             temp.append('<th>')
             temp.append(key)
             temp.append('</th>')
-        temp.append('<th></th>')
+        temp.append('<th><input type="submit" value="Load Simulation"></th>')
         temp.append('</tr><tr>')
 
         for key,values in json_data['batch_distribution']:
@@ -572,6 +572,15 @@ def draw_selection(key, values):
         temp.append('<option value="%s">%.3g</option>' % (value, value))
     temp.append('</select>')
     return ''.join(temp)
+
+@login_required
+def batch_choose(request):
+    query = {}
+    query['path'] = request.POST.get('check_sum')
+    query['sim_id'] = '36'
+    query = urllib.urlencode(query)
+    base = reverse('simulation:run_job_get', None, None)
+    return redirect('%s?%s' % (base, query))
 
 @login_required
 def simulation_rate(request):
@@ -625,8 +634,6 @@ def run_job(request):
 
     query = {}
     query['path'] = check_sum
-    query['chunk_size'] = settings.chunk_size
-    query['chunk_size'] = settings.chunk_size
     query = urllib.urlencode(query)
     base = reverse('simulation:run_job_get', None, None)
     return redirect('%s?%s' % (base, query))

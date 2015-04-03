@@ -51,9 +51,10 @@
           </div>
         </div>
       </div>
-
-    <form class="form-horizontal" role="form" style="" action="{% url 'simulation:simulation_rate' %}" method="POST">
+    <br><br>
+    <form class="form-horizontal" role="form" style="" action="{% url 'simulation:batch_choose' %}" method="POST">
     <div class="row">
+        <input type="hidden" name="check_sum" value="{{ path }}">
         <div class="col-md-12">
       {% csrf_token %}
       {{ dropdown|safe }}
