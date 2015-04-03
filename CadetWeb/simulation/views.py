@@ -665,32 +665,45 @@ def write_job_to_db(data, json_data, check_sum, username):
         #only writing parameters that could remotely make sense to search. This means the vector fields, sensitivities,
         # and similar things are not stored separately
 
-        with open(os.path.join(parent_path,'parms.csv'), 'rb') as csvfile:
-            reader = csv.reader(csvfile)
-            #read the header and discard it
-            reader.next()
-            for name, units, type, per_component, per_section, sensitive, description  in reader:
-                per_component = int(per_component)
-                per_section = int(per_section)
-                sensitive = int(sensitive)
+        settings = serialization_settings()
 
-                if type in ('int', 'string', 'double', 'boolean'):
-                    if per_component and per_section:
-                        db_add_comp_and_section(name, type, data, steps, comps, job)
-                    elif per_component and not per_section:
-                        db_add_comp(name, type, data, steps[0], comps, job)
-                    elif per_section and not per_component:
-                        pass #we don't have any of these but leave this here in case it happens later
-                    else:
-                        db_add_var(name, name, type, data, steps[0], comps[0], job)
+        write_job_values(job, data, comps, steps, settings)
 
+        insert_simulations(job, data, comps, steps, settings)
 
-                #create isotherm line if it dies not exist
-                try:
-                    models.Parameters.objects.get(name=name)
-                except ObjectDoesNotExist:
-                    models.Parameters.objects.create(name=name, units=units, description=description)
+def write_job_values(job, data, comps, steps, settings):
+    for name, type, per_component, per_section  in settings:
 
+        if type in ('int', 'string', 'double', 'boolean'):
+            if per_component and per_section:
+                db_add_comp_and_section(name, type, data, steps, comps, job)
+            elif per_component and not per_section:
+                db_add_comp(name, type, data, steps[0], comps, job)
+            elif per_section and not per_component:
+                pass #we don't have any of these but leave this here in case it happens later
+            else:
+                db_add_var(name, name, type, data, steps[0], comps[0], job)
+
+def serialization_settings():
+    with open(os.path.join(parent_path,'parms.csv'), 'rb') as csvfile:
+        temp = []
+        reader = csv.reader(csvfile)
+        #read the header and discard it
+        reader.next()
+        for name, units, type, per_component, per_section, sensitive, description  in reader:
+            per_component = int(per_component)
+            per_section = int(per_section)
+            temp.append( (name, type, per_component, per_section), )
+        return temp
+
+def insert_simulations(job, data, comps, steps, settings):
+    if data['job_type'] == 'batch':
+        keys, combos = cadet_runner.generate_permutations(data)
+        diffs = [dict(zip(keys, combo)) for combo in combos]
+
+        for idx,diff in enumerate(diffs):
+            sim = models.Simulation.objects.create(Job_ID = job, Rel_Path = str(idx))
+            write_job_values(sim, diff, comps, steps, settings)
 
 def db_add_comp_and_section(name, type, data, steps, comps, job):
     #skip the first component since it is the column
@@ -712,21 +725,29 @@ def db_add_var(lookup, name, type, data, step, comp, job):
         model_args['Step_ID'] = step
         model_args['Parameter_ID'] = models.Parameters.objects.get(name=name)
         model_args['Component_ID'] = comp
-        model_args['Job_ID'] = job
 
+        class_name = job.__class__.__name__
+
+        if class_name == 'Simulation':
+            class_name = 'Sim'
+
+        if class_name == 'Job':
+            model_args['Job_ID'] = job
+        else:
+            model_args['Simulation_ID'] = job
 
         if type in ('int', 'boolean'):
             model_args['Data'] = int(data[lookup])
-            models.Job_Int.objects.create(**model_args)
+            getattr(models, '%s_Int' % class_name).objects.create(**model_args)
 
         elif type == 'string':
             model_args['Data'] = data[lookup]
-            models.Job_String.objects.create(**model_args)
+            getattr(models, '%s_String' % class_name).objects.create(**model_args)
 
         elif type == 'double':
             model_args['Data'] = float(data[lookup])
-            models.Job_Double.objects.create(**model_args)
-        #print 'Found', lookup, lookup in data
+            getattr(models, '%s_Double' % class_name).objects.create(**model_args)
+
     except KeyError:
         #print 'Missing', lookup, lookup in data
         pass
