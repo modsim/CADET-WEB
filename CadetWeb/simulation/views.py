@@ -281,8 +281,6 @@ def graph_setup(request):
 
     if data['job_type'] == 'batch':
         cadet_runner.generate_ranges(data)
-        cadet_runner.generate_permutations(data)
-
 
     data['json'] = get_json_string(data)
     data['graph_single'] = [(name, 'checked' if data.get('graph_single:%s' % name, '')  == '1' else '', '' if data.get('graph_single:%s' % name, '')  == '1' else 'checked') for name in sorted(utils.get_plugin_names('graphing/single'))]

@@ -448,20 +448,19 @@ def generate_ranges(json_data):
             values = map(float, json_data['modify_choice:%s' % base].split(','))
         if len(values):
             ranges[base] = list(values)
-    json_data['batch_distribution'] = ranges
+    json_data['batch_distribution'] = ranges.items()
 
 def generate_permutations(json_data):
-    keys, values = zip(*json_data['batch_distribution'].items())
+    keys, values = zip(*json_data['batch_distribution'])
 
     combos = []
     for value in itertools.product(*values):
         combos.append(value)
-    json_data['permutations_keys'] = keys
-    json_data['permutations_values'] = combos
+    return keys, combos
 
 def generate_simulations(parent_dir, json_data):
-    keys = json_data['permutations_keys']
-    combos = json_data['permutations_values']
+    keys, combos = generate_permutations(json_data)
+
     try:
         os.mkdir(os.path.join(parent_dir, 'batch'))
     except OSError:
