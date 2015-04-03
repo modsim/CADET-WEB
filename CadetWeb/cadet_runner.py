@@ -80,6 +80,8 @@ def encode_to_ascii_list(data):
             temp.append(encode_to_ascii_list(key))
         elif isinstance(key, types.DictType):
             temp.append(encode_to_ascii(key))
+        else:
+            temp.append(key)
     return temp
 
 def create_input(h5, data):
@@ -455,7 +457,6 @@ def generate_simulations(parent_dir, json_data, h5_path):
     except OSError:
         pass
 
-
     for idx, value in enumerate(itertools.product(*values)):
         temp = json_data.copy()
         temp.update(dict(zip(keys, value)))
@@ -482,7 +483,7 @@ def run_batch_simulations(parent_dir, json_path):
 
         proc = subprocess.Popen(['python', __file__, '--json', json_path, '--sim', h5_path,], stdout=out, stderr=err)
         proc.wait()
-        write_progress(parent_dir, idx+1, dir_count)
+        write_progress(parent_dir, idx+1, dir_count+1)
 
 if __name__ == '__main__':
     args = run_args()
@@ -494,8 +495,6 @@ if __name__ == '__main__':
 
     if 'batch' not in args.sim:
         if json_data['job_type'] == 'batch':
-            generate_ranges(json_data)
-            json.dump(json_data, open(args.json, 'w'))
             generate_simulations(parent_dir, json_data, args.sim)
             run_batch_simulations(parent_dir, args.json)
 

@@ -279,6 +279,10 @@ def graph_setup(request):
     data = default_value.copy()
     data.update(get_json(post))
 
+    if data['job_type'] == 'batch' and 'batch_distribution' not in data:
+        cadet_runner.generate_ranges(data)
+
+
     data['json'] = get_json_string(data)
     data['graph_single'] = [(name, 'checked' if data.get('graph_single:%s' % name, '')  == '1' else '', '' if data.get('graph_single:%s' % name, '')  == '1' else 'checked') for name in sorted(utils.get_plugin_names('graphing/single'))]
     data['graph_group'] = [(name, 'checked' if data.get('graph_group:%s' % name, '') == '1' else '', '' if data.get('graph_group:%s' % name, '') == '1' else 'checked') for name in sorted(utils.get_plugin_names('graphing/group'))]
@@ -588,7 +592,6 @@ def run_job(request):
     try:
         open(os.path.join(relative_path, 'complete'), 'r')
     except IOError:
-        print "should not be here"
         write_job_to_db(data, json_data, check_sum, request.user.username)
 
         subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
@@ -607,7 +610,7 @@ def write_job_to_db(data, json_data, check_sum, username):
     #FIXME: ONLY FOR TESTING WIPES THE DB ENTRY EACH TIME
     try:
         job = models.Job.objects.get(uid=check_sum)
-        job.delete()
+        #job.delete()
         #[job.delete() for job in models.Job.objects.all()]
     except ObjectDoesNotExist:
         #create job type if it dies not exist
@@ -942,8 +945,6 @@ def create_batch_simulation(request):
 
     #JOBS = models.Job.objects.filter(id = notes)
     JOBS = models.Job.objects.exclude(job_notes=None).order_by('-job_notes__rating')[:5]
-
-    print JOBS
 
     parameter = models.Parameters.objects.get(name='ADSORPTION_TYPE')
 
