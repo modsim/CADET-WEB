@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators import gzip
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 import settings
 
@@ -576,7 +577,7 @@ def draw_selection(key, values):
     temp = []
     temp.append('<select class="form-control" name="batch:%s">' % key)
     for value in values:
-        temp.append('<option value="%s">%.3g</option>' % (value, value))
+        temp.append('<option value="%s">%.3g</option>' % (repr(value), value))
     temp.append('</select>')
     return ''.join(temp)
 
@@ -608,6 +609,8 @@ def batch_choose(request):
             step, comp, name = key
         data[name] = (step, comp, name, value)
 
+    #temp = models.Simulation.objects
+    #FIXME: For now to do the join in python until I can figure out how to get the db to do it.
     temp = []
     for name, type, per_component, per_section  in settings:
         if name in data:
@@ -619,14 +622,27 @@ def batch_choose(request):
 
             if type in ('int', 'boolean'):
                 value = int(value)
-                temp.extend(models.Sim_Int.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp))
+                #temp.filter(sim_int__Data=value, sim_int__Step_ID=step, sim_int__Parameter_ID=name, sim_int__Component_ID=comp)
+                #temp.append(Q(sim_int__Data=value, sim_int__Step_ID=step, sim_int__Parameter_ID=name, sim_int__Component_ID=comp))
+                #temp.extend(models.Sim_Int.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp))
+                temp.append(set([i.Simulation_ID for i in  models.Sim_Int.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp)]))
+                #print type, value, temp
 
             elif type == 'double':
-                temp.extend(models.Sim_Double.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp))
-    print temp
+                #temp.filter(sim_double__Data=value, sim_double__Step_ID=step, sim_double__Parameter_ID=name, sim_double__Component_ID=comp)
+                #temp.append(Q(sim_double__Data=value, sim_double__Step_ID=step, sim_double__Parameter_ID=name, sim_double__Component_ID=comp))
+                #temp.extend(models.Sim_Double.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp))
+                temp.append(set([i.Simulation_ID for i in  models.Sim_Double.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp)]))
+                #print type, value, step.Step, comp.Component, name.name, temp
+    #print "Results"
+    #print temp
+    temp = set.intersection(*temp)
+    #print temp
+    #print "End Results"
     query = {}
+    simulation = temp.pop()
     query['path'] = check_sum
-    query['sim_id'] = '36'
+    query['sim_id'] = simulation.id
     query = urllib.urlencode(query)
     base = reverse('simulation:run_job_get', None, None)
     return redirect('%s?%s' % (base, query))
