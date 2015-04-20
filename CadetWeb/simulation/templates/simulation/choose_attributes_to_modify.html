@@ -7,30 +7,60 @@
 <div class="row">
 <input type="hidden" name="json" value="{{ json }}">
 <input type="hidden" name="job_type" value="batch">
+    <input type="hidden" name="table" id="table" value="" >
     <div class="col-md-12">
     	<h1>Choose Attributes to Modify</h1>
 	</div>
 </div>
 
-{% for modify in modifies %}
-      <div class="row">
-        <div class="col-md-3">{{ modify }}</div>
-        <div class="col-md-9">
-            <div class="radio">
-                <input type="radio" id="choose_attributes_{{ modify }}1" name="choose_attributes:{{ modify }}" value="choose"><label for="choose_attributes_{{ modify }}1">Choose Values</label>
-                <input type="radio" id="choose_attributes_{{ modify }}2" name="choose_attributes:{{ modify }}" value="distribution"><label for="choose_attributes_{{ modify }}2">Distribution</label>
-                <input type="radio" id="choose_attributes_{{ modify }}4" name="choose_attributes:{{ modify }}" value="no_change" checked><label for="choose_attributes_{{ modify }}4">No Change</label>
-            </div>
-        </div>
-      </div>
-{% endfor %}
+        <table class="DataTable" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Component</th>
+                <th>Section</th>
+                <th class="col-md-4">Description</th>
+                <th class="col-md-4">Choice</th>
+            </tr>
+        </thead>
+
+        <tfoot>
+            <tr>
+                <th>Name</th>
+                <th>Component</th>
+                <th>Section</th>
+                <th>Description</th>
+                <th>Choice</th>
+            </tr>
+        </tfoot>
+        <tbody>
+
+         {% for name, component, section, description, modify, checked_1, checked_2, checked_3 in modifies %}
+             <tr>
+             <td>{{ name }}</td>
+             <td>{{ component }}</td>
+             <td>{{ section }}</td>
+             <td>{{ description }}</td>
+             <td>
+                 <div class="radio">
+                <input type="radio" id="choose_attributes_{{ modify }}1" name="choose_attributes:{{ modify }}" value="choose" {{ checked_1 }}><label for="choose_attributes_{{ modify }}1">Choose Values</label>
+                <input type="radio" id="choose_attributes_{{ modify }}2" name="choose_attributes:{{ modify }}" value="distribution" {{ checked_2 }}><label for="choose_attributes_{{ modify }}2">Distribution</label>
+                <input type="radio" id="choose_attributes_{{ modify }}3" name="choose_attributes:{{ modify }}" value="no_change" {{ checked_3 }}><label for="choose_attributes_{{ modify }}3">No Change</label>
+                </div>
+             </td>
+             </tr>
+		 {% endfor %}
+
+        </tbody>
+        </table>
+
 
         <div class="col-md-12">
 
 
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-              <button type="submit" class="btn btn-default">Continue To Attribute Setup</button>
+              <button type="submit" class="btn btn-success" id="submit_button">Continue To Attribute Setup</button>
             </div>
           </div>
         </div>

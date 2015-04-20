@@ -1040,22 +1040,38 @@ def choose_attributes_to_modify(request):
                         for comp in comps:
                             key = '%s:%s:%s' % (step, comp, name)
                             if key in data:
-                                modify.append(key)
+                                checked_1, checked_2, checked_3 = get_checked(key, data)
+                                modify.append( (name, comp, step, description, key, checked_1, checked_2, checked_3) )
                 elif per_component and not per_section:
                     for comp in comps:
                         key = '%s:%s' % (comp, name)
                         if key in data:
-                            modify.append(key)
+                            checked_1, checked_2, checked_3 = get_checked(key, data)
+                            modify.append( (name, comp, '', description, key, checked_1, checked_2, checked_3) )
                 elif per_section and not per_component:
                     pass #we don't have any of these but leave this here in case it happens later
                 else:
                     if name in data:
-                        modify.append(name)
+                        checked_1, checked_2, checked_3 = get_checked(name, data)
+                        modify.append( (name, '', '', description, name, checked_1, checked_2, checked_3) )
 
     data['json'] = get_json_string(data)
     data['modifies'] = modify
 
     return render(request, 'simulation/choose_attributes_to_modify.html', data)
+
+def get_checked(key, data):
+    try:
+        choice = data['choose_attributes:%s' % key]
+        if choice == 'choose':
+            return 'checked', '', ''
+        elif choice == 'distribution':
+            return '', 'checked', ''
+        elif choice == 'no_change':
+            return  '', '', 'checked'
+    except KeyError:
+        return '', '', 'checked'
+
 
 @login_required
 def create_batch_simulation(request):
