@@ -153,7 +153,6 @@ $(document).ready(function() {
 
     $('#submit_button').click(function() {
         var data = table.$('input').serializeObject();
-        console.log(data);
         $("#table").val(JSON.stringify(data));
         this.submit();
         return false
