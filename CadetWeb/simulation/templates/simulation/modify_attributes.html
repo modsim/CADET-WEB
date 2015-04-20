@@ -36,26 +36,26 @@
             </thead>
             <tbody>
 
-            {% for dist, value in distributions %}
+            {% for dist, value, lb, ub, number, stdev, selected in distributions %}
               <tr>
                  <td>{{ dist }}</td>
                 <td>{{ value }}</td>
                 <td>
-                  <input type="text" class="form-control required" name="modify_dist_lb:{{ dist }}" id="dist_lb:{{ dist }}">
+                  <input type="text" class="form-control required" name="modify_dist_lb:{{ dist }}" id="dist_lb:{{ dist }}" value="{{ lb }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control required" name="modify_dist_ub:{{ dist }}" id="dist_ub:{{ dist }}">
+                  <input type="text" class="form-control required" name="modify_dist_ub:{{ dist }}" id="dist_ub:{{ dist }}" value="{{ ub }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control required" name="modify_dist_number:{{ dist }}" id="dist_number:{{ dist }}">
+                  <input type="text" class="form-control required" name="modify_dist_number:{{ dist }}" id="dist_number:{{ dist }}" value="{{ number }}">
                 </td>
                 <td>
-                  <input type="text" class="form-control" name="modify_dist_stdev:{{ dist }}" id="dist_stdev:{{ dist }}" value="1">
+                  <input type="text" class="form-control" name="modify_dist_stdev:{{ dist }}" id="dist_stdev:{{ dist }}" value="{{ stdev }}">
                 </td>
                   <td>
                       <select class="form-control" name="modify_dist_type:{{ dist }}">
                       {% for allow in allowed %}
-                          <option>{{ allow }}</option>
+                          <option {% if allow == selected %} selected{% endif %}>{{ allow }}</option>
                       {% endfor %}
                       </select>
                   </td>
@@ -82,12 +82,12 @@
               </tr>
             </thead>
             <tbody>
-            {% for choice, value in choices %}
+            {% for choice, value, text in choices %}
               <tr>
                 <td>{{ choice }}</td>
                 <td>{{ value }}</td>
                 <td>
-                  <input type="text" class="form-control required" name="modify_choice:{{ choice }}" id="choice_{{ choice }}">
+                  <input type="text" class="form-control required" name="modify_choice:{{ choice }}" id="choice_{{ choice }}" value="{{ text }}">
                 </td>
               </tr>
             {% endfor %}
@@ -100,7 +100,7 @@
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
                 <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
-                <button type="submit" class="btn btn-success">Continue to Performance Parameter Selection</button>
+                <button type="submit" class="btn btn-success">Continue to Graph Selection</button>
               </div>
             </div>
         </div>

@@ -1115,10 +1115,12 @@ def modify_attributes(request):
     context = {'json':get_json_string(data)}
     choose_attributes = [(key,value) for (key,value) in data.items() if 'choose_attributes:' in key]
     context['choices'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'choose']
-    context['choices'] = [(key, data[key]) for key in context['choices']]
+    context['choices'] = [(key, data[key], data.get('modify_choice:%s' % key, '')) for key in context['choices']]
 
     context['distributions'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'distribution']
-    context['distributions'] = [(key, data[key]) for key in context['distributions']]
+    context['distributions'] = [(key, data[key], data.get("modify_dist_lb:%s" % key, ''), data.get("modify_dist_ub:%s" % key, ''),
+                                 data.get("modify_dist_number:%s" % key, ''), data.get("modify_dist_stdev:%s" % key, '1'),
+                                 data.get("modify_dist_type:%s" % key, '')) for key in context['distributions']]
 
     context['back'] = reverse('simulation:choose_attributes_to_modify', None, None)
     context['back_text'] = 'Choose Attributes to Modify'
