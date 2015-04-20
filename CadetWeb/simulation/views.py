@@ -512,8 +512,10 @@ def run_job_get(request):
     sim_id = request.GET.get('sim_id', '')
 
     if sim_id:
-        rel_path = models.Simulation.objects.get(id=int(sim_id)).Rel_Path
+        simulation = models.Simulation.objects.get(id=int(sim_id))
+        rel_path = simulation.Rel_Path
     else:
+        simulation = None
         rel_path = ''
 
     json_path, hdf5_path, graphs, json_data = utils.get_graph_data(path, settings.chunk_size, rel_path)
@@ -550,11 +552,11 @@ def run_job_get(request):
     data['json_url'] = reverse('simulation:get_data', None, None)
     data['progress'] = progress_path
     data['job_id'] = models.Job.objects.get(uid=path).id
-    data['dropdown'] = generate_batch_choice(json_data)
+    data['dropdown'] = generate_batch_choice(json_data, request)
     data['sim_id'] = sim_id
     return render(request, 'simulation/run_job.html', data)
 
-def generate_batch_choice(json_data):
+def generate_batch_choice(json_data, request):
     temp = []
     if json_data['job_type'] == 'batch':
         temp.append('<table><tr>')
@@ -567,17 +569,17 @@ def generate_batch_choice(json_data):
 
         for key,values in json_data['batch_distribution']:
             temp.append('<td>')
-            temp.append(draw_selection(key, values))
+            temp.append(draw_selection(key, values, request))
             temp.append('</td>')
         temp.append('<td></td>')
         temp.append('</tr></table>')
     return ''.join(temp)
 
-def draw_selection(key, values):
+def draw_selection(key, values, request):
     temp = []
     temp.append('<select class="form-control" name="batch:%s">' % key)
     for value in values:
-        temp.append('<option value="%s">%.3g</option>' % (repr(value), value))
+        temp.append('<option value="%s" %s>%.3g</option>' % (repr(value), "selected" if request.GET.get("batch:%s" % key) == repr(value) else "", value))
     temp.append('</select>')
     return ''.join(temp)
 
@@ -588,14 +590,17 @@ def batch_choose(request):
     job = models.Job.objects.get(uid=check_sum)
 
     search = {}
+    query = {}
     for key, value in request.POST.items():
         if key.startswith('batch:'):
+            query[key] = value
             search[key.replace('batch:', '')] = float(value)
 
     settings = serialization_settings()
 
 
     data = {}
+
     for key,value in search.items():
         key = key.encode('ascii').split(':')
         if len(key) == 1:
@@ -639,7 +644,7 @@ def batch_choose(request):
     temp = set.intersection(*temp)
     #print temp
     #print "End Results"
-    query = {}
+
     simulation = temp.pop()
     query['path'] = check_sum
     query['sim_id'] = simulation.id
