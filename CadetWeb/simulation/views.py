@@ -552,11 +552,11 @@ def run_job_get(request):
     data['json_url'] = reverse('simulation:get_data', None, None)
     data['progress'] = progress_path
     data['job_id'] = models.Job.objects.get(uid=path).id
-    data['dropdown'] = generate_batch_choice(json_data, request)
+    data['dropdown'] = generate_batch_choice(json_data, simulation)
     data['sim_id'] = sim_id
     return render(request, 'simulation/run_job.html', data)
 
-def generate_batch_choice(json_data, request):
+def generate_batch_choice(json_data, simulation):
     temp = []
     if json_data['job_type'] == 'batch':
         temp.append('<table><tr>')
@@ -569,13 +569,13 @@ def generate_batch_choice(json_data, request):
 
         for key,values in json_data['batch_distribution']:
             temp.append('<td>')
-            temp.append(draw_selection(key, values, request))
+            temp.append(draw_selection(key, values, simulation))
             temp.append('</td>')
         temp.append('<td></td>')
         temp.append('</tr></table>')
     return ''.join(temp)
 
-def draw_selection(key, values, request):
+def draw_selection(key, values, simulation):
     temp = []
     temp.append('<select class="form-control" name="batch:%s">' % key)
     for value in values:
@@ -590,10 +590,8 @@ def batch_choose(request):
     job = models.Job.objects.get(uid=check_sum)
 
     search = {}
-    query = {}
     for key, value in request.POST.items():
         if key.startswith('batch:'):
-            query[key] = value
             search[key.replace('batch:', '')] = float(value)
 
     settings = serialization_settings()
@@ -646,6 +644,7 @@ def batch_choose(request):
     #print "End Results"
 
     simulation = temp.pop()
+    query = {}
     query['path'] = check_sum
     query['sim_id'] = simulation.id
     query = urllib.urlencode(query)

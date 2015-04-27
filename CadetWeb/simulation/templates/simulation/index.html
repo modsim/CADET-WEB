@@ -1,24 +1,25 @@
 {% extends 'simulation/base.html' %}
 
+{% load staticfiles %}
+
 {% block body %}
      <section>
       <div class="container">
+          <div class="row">
+              <div class="col-md-6"><img src="{% static "simulation/CADET-GitHub.png" %}"></div>
+              <div class="col-md-6"><h1>Web</h1><h1>Interface</h1></div>
+      </div>
         <div class="row">
           <div class="col-md-12">
-            <h1>Welcome&nbsp;to&nbsp;the&nbsp;CADET&nbsp;Web&nbsp;Interface</h1>
               <h3>Examples</h3>
               <ul><li><a href="/simulation/single_start/?path=9ffce36d4505dc09f9a6a89c252be34dce54952d4d8ddf48b27fe3a992b9d303">4 component SMA</a></li></ul>
 
+              {% if request.user.is_superuser  %}
               <p><a class="btn btn-primary" href="{% url 'simulation:sync_db' %}">Sync Database</a></p>
-              <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
-              <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
-              <br>Ut enim ad minim veniam, quis nostrud</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
-              <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
-              <br>Ut enim ad minim veniam, quis nostrud</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
-              <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
-              <br>Ut enim ad minim veniam, quis nostrud</p>
+              {% endif %}
+
+              <p>This website allows researchers and teachers to use the CADET chromatography simulation software to simulation a single
+              chromatography column with multiple steps and components with different isotherms including Steric Mass Action and Langmuir.</p>
           </div>
         </div>
         <div class="row">
@@ -26,9 +27,10 @@
             <a class="btn btn-primary" href="{% url 'simulation:single_start' %}">Create&nbsp;Single&nbsp;Situation</a>
           </div>
           <div class="col-md-10">
-            <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
-              <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
-              <br>Ut enim ad minim veniam, quis nostrud</p>
+            <p>From here you can create a basic chromatography simulation. You can use any available isotherm, components
+            or steps and are only limited by CPU time and memory usage. One the simulation is completed you can view graphs,
+            share the link with others so they can view it, use the simulation to make more simulations and also download the
+            complete simulation data so you can analyze it with any tool that can read HDF5 files.</p>
           </div>
         </div>
       </div>
@@ -39,9 +41,8 @@
           <a class="btn btn-primary" href="{% url 'simulation:create_batch_simulation' %}">Create&nbsp;Batch&nbsp;Simulation</a>
         </div>
         <div class="col-md-10">
-          <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
-            <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
-            <br>Ut enim ad minim veniam, quis nostrud</p>
+          <p>This allows the creation of a set of simulations that vary one or more parameters from a single simulation.
+          This requires an already completed simulation to be used as a starting point.</p>
         </div>
       </div>
     </div>
@@ -51,21 +52,8 @@
           <a class="btn btn-primary" href="{% url 'simulation:choose_search_query' %}">Find&nbsp;Simulation</a>
         </div>
         <div class="col-md-10">
-          <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
-            <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
-            <br>Ut enim ad minim veniam, quis nostrud</p>
-        </div>
-      </div>
-    </div>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-2">
-          <a class="btn btn-primary">Manage&nbsp;Account</a>
-        </div>
-        <div class="col-md-10">
-          <p>Lorem ipsum dolor sit amet, consectetur adipisici elit,
-            <br>sed eiusmod tempor incidunt ut labore et dolore magna aliqua.
-            <br>Ut enim ad minim veniam, quis nostrud</p>
+          <p>You can use this to find any simulation you have created so you can review the results, download the simulation
+          or use the simulation as the basis for a new simulation.</p>
         </div>
       </div>
     </div>
