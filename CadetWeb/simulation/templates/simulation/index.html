@@ -6,8 +6,9 @@
      <section>
       <div class="container">
           <div class="row">
-              <div class="col-md-6"><img src="{% static "simulation/CADET-GitHub.png" %}"></div>
-              <div class="col-md-6"><h1>Web</h1><h1>Interface</h1></div>
+              <table class="logo"><tr><td><img src="{% static "simulation/CADET-GitHub.png" %}"></td>
+                  <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+              <td><h1>Web</h1><h1>Interface</h1></td></tr></table>
       </div>
         <div class="row">
           <div class="col-md-12">
@@ -23,10 +24,10 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-md-2">
-            <a class="btn btn-primary" href="{% url 'simulation:single_start' %}">Create&nbsp;Single&nbsp;Situation</a>
+          <div class="col-md-3">
+            <a class="btn btn-default" href="{% url 'simulation:single_start' %}">Create&nbsp;Single&nbsp;Situation</a>
           </div>
-          <div class="col-md-10">
+          <div class="col-md-9">
             <p>From here you can create a basic chromatography simulation. You can use any available isotherm, components
             or steps and are only limited by CPU time and memory usage. One the simulation is completed you can view graphs,
             share the link with others so they can view it, use the simulation to make more simulations and also download the
@@ -37,10 +38,10 @@
     </section>
     <div class="container">
       <div class="row">
-        <div class="col-md-2">
-          <a class="btn btn-primary" href="{% url 'simulation:create_batch_simulation' %}">Create&nbsp;Batch&nbsp;Simulation</a>
+        <div class="col-md-3">
+          <a class="btn btn-default" href="{% url 'simulation:create_batch_simulation' %}">Create&nbsp;Batch&nbsp;Simulation</a>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-9">
           <p>This allows the creation of a set of simulations that vary one or more parameters from a single simulation.
           This requires an already completed simulation to be used as a starting point.</p>
         </div>
@@ -48,10 +49,10 @@
     </div>
     <div class="container">
       <div class="row">
-        <div class="col-md-2">
-          <a class="btn btn-primary" href="{% url 'simulation:choose_search_query' %}">Find&nbsp;Simulation</a>
+        <div class="col-md-3">
+          <a class="btn btn-default" href="{% url 'simulation:choose_search_query' %}">Find&nbsp;Simulation</a>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-9">
           <p>You can use this to find any simulation you have created so you can review the results, download the simulation
           or use the simulation as the basis for a new simulation.</p>
         </div>
