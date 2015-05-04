@@ -40,6 +40,9 @@
         </div>
       </div>
       </form>
+
+      <div id="success">
+
       <div class="row">
         <div class="col-md-12">
           <div class="btn-toolbar" role="toolbar">
@@ -80,6 +83,9 @@
       </div>
 
     {% endfor %}
+    </div>
+
+<div id="failure">The simulation has failed to complete. It has either run out of time, run out of memory or crashed. You can change settings and try again.</div>
 
 
 
@@ -220,10 +226,17 @@ $( document ).ready(function() {
             // data we could merge it with what we already have.
             data = json_data;
 
-            if (0 == json_data['success']) {
+            if (1 == json_data['failed']) {
+                console.log('failed');
+                $("#success").remove();
+                $("body").removeClass("loading");
+            } else if (0 == json_data['success']) {
+                console.log('working');
                 $( "#progress" ).load( "{{ progress }}" );
                 setTimeout(fetchData, 5000);
             } else {
+                console.log('success');
+                $("#failed").remove();
                 $("body").removeClass("loading");
                 for (var key in json_data['data']) {
                     if (json_data['data'].hasOwnProperty(key)) {

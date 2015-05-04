@@ -43,12 +43,32 @@ def encode_to_ascii_list(data):
             temp.append(key)
     return temp
 
+def check_pid(pid):
+    """ Check For the existence of a unix pid. """
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    else:
+        return True
+
 def get_graph_data(path, chunk_size, rel_path):
     "return the path to the json_file, path to the hdf5 file, and the list of name,url pairs for images"
     graphs = []
 
     relative_parts = [''.join(i for i in seq if i is not None) for seq in grouper(path, chunk_size)]
     relative_path = os.path.join(*relative_parts)
+
+    try:
+        pid = int(open(os.path.join(storage_path, relative_path, 'pid')).read())
+        alive = check_pid(pid)
+    except IOError:
+        alive = False
+
+    try:
+        complete = open(os.path.join(storage_path, relative_path, 'status')).read() == 'success'
+    except IOError:
+        complete = False
 
     json_path = os.path.join(storage_path, relative_path, 'setup.json')
 
@@ -83,7 +103,7 @@ def get_graph_data(path, chunk_size, rel_path):
         id = title.replace(' ', '_').replace(':', '_')
         graphs.append( (id, title, path))
 
-    return json_path, hdf5_path, graphs, json_data
+    return json_path, hdf5_path, graphs, json_data, alive, complete
 
 #from https://docs.python.org/2/library/itertools.html
 def grouper(iterable, n, fillvalue=None):

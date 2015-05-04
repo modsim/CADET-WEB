@@ -22,6 +22,7 @@ import plot_sensitivity
 import cadet_runner
 import utils
 import numpy as np
+import resource
 
 #These are the default values for CADET that are put into the forms as a default
 default_value = {}
@@ -518,7 +519,7 @@ def run_job_get(request):
         simulation = None
         rel_path = ''
 
-    json_path, hdf5_path, graphs, json_data = utils.get_graph_data(path, settings.chunk_size, rel_path)
+    json_path, hdf5_path, graphs, json_data, alive, complete = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     query = request.GET.dict()
     query = urllib.urlencode(query)
@@ -579,7 +580,7 @@ def draw_selection(key, values, simulation):
     temp = []
     temp.append('<select class="form-control" name="batch:%s">' % key)
     for value in values:
-        temp.append('<option value="%s" %s>%.3g</option>' % (repr(value), "selected" if request.GET.get("batch:%s" % key) == repr(value) else "", value))
+        temp.append('<option value="%s" %s>%.3g</option>' % (repr(value), "", value))
     temp.append('</select>')
     return ''.join(temp)
 
@@ -897,22 +898,18 @@ def get_data(request):
     else:
         rel_path = ''
 
-    json_path, hdf5_path, graphs, data = utils.get_graph_data(path, settings.chunk_size, rel_path)
+    json_path, hdf5_path, graphs, data, alive, complete = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     h5 = h5py.File(hdf5_path, 'r')
 
     #check for success by seeing if we have output created
-    try:
-        h5['/output/solution/SOLUTION_TIMES']
-        success = 1
-    except KeyError:
-        success = 0
-    json_data['success'] = success
+    json_data['success'] = int(complete)
+    json_data['failed'] = int(not complete and not alive)
 
     #close the hdf5 file
     h5.close()
 
-    if success:
+    if json_data['success']:
         #if success get the step names and times
         section_times = cadet_runner.get_section_times(data)
         section_names = cadet_runner.get_step_names(data)

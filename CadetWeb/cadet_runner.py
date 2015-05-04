@@ -13,6 +13,11 @@ import plot_sensitivity
 import utils
 import itertools
 import glob
+import os
+from threading import Timer
+import time
+import settings
+import sys
 
 current_path = __file__
 parent_path, current_file_name = os.path.split(current_path)
@@ -456,22 +461,48 @@ def run_batch_simulations(parent_dir, json_path):
     dirs = glob.glob(os.path.join(parent_dir, 'batch', '*'))
     dir_count = len(dirs)
     write_progress(parent_dir, 0, dir_count)
-    for idx, dir_name in enumerate(dirs):
-        h5_path = os.path.join(dir_name, 'sim.h5')
-        out = open(os.path.join(dir_name, 'stdout'), 'w')
-        err = open(os.path.join(dir_name, 'stderr'), 'w')
 
-        proc = subprocess.Popen(['python', __file__, '--json', json_path, '--sim', h5_path,], stdout=out, stderr=err)
-        proc.wait()
-        write_progress(parent_dir, idx+1, dir_count+1)
+    total = settings.cpu
+
+    for idx, dir_name in enumerate(dirs):
+        if total:
+            start = time.time()
+
+            h5_path = os.path.join(dir_name, 'sim.h5')
+            out = open(os.path.join(dir_name, 'stdout'), 'w')
+            err = open(os.path.join(dir_name, 'stderr'), 'w')
+
+            proc = subprocess.Popen(['python', __file__, '--json', json_path, '--sim', h5_path,], stdout=out, stderr=err)
+
+            proc.wait()
+
+            elapsed = time.time() - start
+            total = total - elapsed
+            if total < 0:
+                total = 0
+            print total, elapsed
+            write_progress(parent_dir, idx+1, dir_count+1)
+
+def failure():
+    open(os.path.join(parent_dir, 'status'), 'w').write('failure')
+    sys.exit()
 
 if __name__ == '__main__':
+    total = settings.cpu
+    timer = Timer(total, failure)
+    timer.start()
+
     args = run_args()
     json_data = open(args.json, 'rb').read()
     json_data = json.loads(json_data)
     json_data = utils.encode_to_ascii(json_data)
 
     parent_dir = os.path.dirname(args.sim)
+
+    open(os.path.join(parent_dir, 'status'), 'w').write('working')
+
+    with open(os.path.join(parent_dir,'pid'), 'w') as pid:
+        pid.write(str(os.getpid()))
 
     if 'batch' not in args.sim:
         if json_data['job_type'] == 'batch':
@@ -483,7 +514,9 @@ if __name__ == '__main__':
 
     #run simulation
     proc = subprocess.Popen([cadet_path, args.sim], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ)
+
     proc.wait()
+
     stdout = proc.stdout.read()
     stderr = proc.stderr.read()
 
@@ -514,4 +547,6 @@ if __name__ == '__main__':
 
     if 'batch' not in args.sim:
         write_progress(parent_dir, 1, 1)
-    open(os.path.join(parent_dir, 'complete'), 'w')
+
+    timer.cancel()
+    open(os.path.join(parent_dir, 'status'), 'w').write('success')
