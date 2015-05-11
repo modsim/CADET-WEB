@@ -22,7 +22,18 @@ import plot_sensitivity
 import cadet_runner
 import utils
 import numpy as np
+import operator
 import resource
+from django.http import HttpResponse
+
+class HttpResponseTemporaryRedirect(HttpResponse):
+    status_code = 307
+
+    def __init__(self, redirect_to):
+        HttpResponse.__init__(self)
+        self['Location'] = redirect_to
+
+
 
 #These are the default values for CADET that are put into the forms as a default
 default_value = {}
@@ -283,6 +294,14 @@ def graph_setup(request):
 
     if data['job_type'] == 'batch':
         cadet_runner.generate_ranges(data)
+
+        length = reduce(operator.mul, [len(b) for c,b in data['batch_distribution']], 1)
+        if length > settings.batch_limit:
+            query = {}
+            query['batch_limit'] = length
+            query = urllib.urlencode(query)
+            base = reverse('simulation:modify_attributes', None, None)
+            return HttpResponseTemporaryRedirect('%s?%s' % (base, query))
 
     data['json'] = get_json_string(data)
     data['graph_single'] = [(name, 'checked' if data.get('graph_single:%s' % name, '')  == '1' else '', '' if data.get('graph_single:%s' % name, '')  == '1' else 'checked') for name in sorted(utils.get_plugin_names('graphing/single'))]
@@ -1127,6 +1146,12 @@ def modify_attributes(request):
     context['back_text'] = 'Choose Attributes to Modify'
 
     context['allowed'] = ['Linear', 'Random Uniform', 'Truncated Random Normal']
+
+    context['combinations'] =  settings.batch_limit
+    context['message'] = ''
+    if request.GET.get('batch_limit', '0') != '0':
+        context['message'] = 'Too many combinations where chosen. Only %d are allowed and %s where chosen' % (settings.batch_limit, request.GET.get('batch_limit'))
+
     return render(request, 'simulation/modify_attributes.html', context)
 
 

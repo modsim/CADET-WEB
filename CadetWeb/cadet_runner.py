@@ -389,6 +389,9 @@ def gen_bounds(lb, ub, base_value):
             ub = ub/100.0
         lb = lb * base_value
         ub = ub * base_value
+    else:
+        ub = float(ub)
+        lb = float(lb)
     return lb, ub
 
 def generate_ranges(json_data):
@@ -411,6 +414,7 @@ def generate_ranges(json_data):
             if dist_type == 'Random Uniform':
                 values = random.uniform(lb, ub, size)
             elif dist_type == 'Linear':
+                print lb, type(lb), ub, type(lb), size, type(size)
                 values = np.linspace(lb, ub, size, endpoint=True)
             elif dist_type == 'Truncated Random Normal':
                 values = []

@@ -7,6 +7,10 @@
 <div class="row">
 <input type="hidden" name="json" value="{{ json }}">
         <div class="col-md-12">
+            <h2 class="ui-state-error">{{ message }}</h2>
+            <br>
+            <h2 class="ui-state-highlight">Only {{ combinations }} combinations are allowed.</h2>
+
           <h1>Modify Attributes</h1>
             <p>Values can be absolute numbers for the upper and lower bound or they can be percentages if a % is used.
                 The first value can also be a negative percentage and then the second value is read relative to the center.</p>
