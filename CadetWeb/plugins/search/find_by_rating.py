@@ -3,7 +3,7 @@ name = "Find by Rating"
 
 from simulation import models
 
-def run():
+def run(request):
     html_string = '''
     <div class="row">
         <div class="col-md-12">
@@ -28,7 +28,7 @@ def run():
       '''
     return html_string
 
-def process_search(search_dict):
+def process_search(request, search_dict):
     lb = float(search_dict['lb'])
     ub = float(search_dict['ub'])
 

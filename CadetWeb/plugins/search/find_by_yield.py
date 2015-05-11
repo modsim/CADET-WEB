@@ -1,6 +1,6 @@
 name = "Find by Yield"
 
-def run():
+def run(request):
     html_string = '''
     <div class="row">
         <div class="col-md-12">
@@ -25,7 +25,7 @@ def run():
       '''
     return html_string
 
-def process_search(search_dict):
+def process_search(request, search_dict):
     headers = ('JOBID', 'Yield')
     search_results = []
     search_results.append( (1, '95%'))

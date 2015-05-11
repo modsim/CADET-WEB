@@ -487,7 +487,7 @@ def query_options(request):
     data = {}
     query = request.POST['search_query']
     data['query'] = query
-    data['query_form'] = utils.call_plugin_by_name(query, 'search', 'run')
+    data['query_form'] = utils.call_plugin_by_name(query, 'search', 'run', request)
     return render(request, 'simulation/query_options.html', data)
 
 @login_required
@@ -495,7 +495,7 @@ def query_results(request):
 
     post = request.POST
     data = get_json(post)
-    headers, results = utils.call_plugin_by_name(data['search_query'], 'search', 'process_search', data)
+    headers, results = utils.call_plugin_by_name(data['search_query'], 'search', 'process_search', request, data)
     search_results = []
 
     job_ids = [result[0] for result in results]
@@ -515,7 +515,10 @@ def query_results(request):
         rating = models.Job_Notes.objects.get(Job_ID=job).rating
         url = reverse('simulation:run_job_get', None, None) + "?path=%s" % job.uid
         search_results.append([jobid, study_name, model_name, isotherm, additional, rating, url])
-    headers = results[0][1:]
+    if results:
+        headers = results[0][1:]
+    else:
+        headers = []
     context = {'json':get_json_string(data),
               'search_results':search_results,
               'headers':headers}
