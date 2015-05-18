@@ -155,9 +155,53 @@ def generate_step_settings(step, list_of_names, data):
 
     html = '\n'.join(html)
     return html
+
+
 def index(request):
     context = {}
+
+    context['search_examples'] = get_examples(5)
+    context['search_history'] = get_most_recent_simulations(request.user.username, 5)
+
     return render(request, 'simulation/index.html', context)
+
+def get_examples(limit):
+    "return the the limit most recent 5 star simulations"
+    "format is study name, model name, isotherm, results link, create link, create batch link"
+    results = models.Job.objects.filter(username='cadet', job_notes__rating=5).order_by('-created')[:limit]
+    parameter = models.Parameters.objects.get(name='ADSORPTION_TYPE')
+
+    temp = []
+    for result in results:
+        study_name= result.study_name
+        model_name = result.Model_ID.model
+        isotherm = models.Job_String.objects.get(Job_ID=result, Parameter_ID=parameter).Data
+        results_link = reverse('simulation:run_job_get', None, None) + "?path=%s" % result.uid
+        create_single = reverse('simulation:single_start', None, None) + "?path=%s" % result.uid
+        create_batch = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % result.uid
+        temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch])
+    return temp
+
+def get_most_recent_simulations(username, limit):
+    "return a list of the most recent simulations run by the user in username"
+    "format is study name, model name, isotherm, results link, create link, create batch link"
+    print username, limit
+    if username:
+        results = models.Job.objects.filter(username=username).order_by('-created')[:limit]
+        parameter = models.Parameters.objects.get(name='ADSORPTION_TYPE')
+
+        temp = []
+        for result in results:
+            study_name= result.study_name
+            model_name = result.Model_ID.model
+            isotherm = models.Job_String.objects.get(Job_ID=result, Parameter_ID=parameter).Data
+            results_link = reverse('simulation:run_job_get', None, None) + "?path=%s" % result.uid
+            create_single = reverse('simulation:single_start', None, None) + "?path=%s" % result.uid
+            create_batch = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % result.uid
+            temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch])
+        return temp
+    else:
+        return []
 
 @login_required
 def single_start(request):

@@ -10,10 +10,48 @@
                   <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
               <td><h1>Web</h1><h1>Interface</h1></td></tr></table>
       </div>
+          {% if request.user.username  %}
+              <h1>Welcome {{ request.user.username }}</h1>
+          {% endif %}
+
         <div class="row">
           <div class="col-md-12">
               <h3>Examples</h3>
-              <ul><li><a href="/simulation/single_start/?path=9ffce36d4505dc09f9a6a89c252be34dce54952d4d8ddf48b27fe3a992b9d303">4 component SMA</a></li></ul>
+              <div class="row">
+                  <div class="col-md-2">Study</div>
+                <div class="col-md-2">Model</div>
+                  <div class="col-md-2">Isotherm</div>
+                <div class="col-md-2">Results</div>
+                  <div class="col-md-2">Create Simulation</div>
+                  <div class="col-md-2">Create Batch</div>
+              </div>
+              <hr>
+              {% for search_result in search_examples %}
+              <div class="row">
+                <div class="col-md-2">{{ search_result.0 }}</div>
+                <div class="col-md-2">{{ search_result.1 }}</div>
+                <div class="col-md-2">{{ search_result.2 }}</div>
+              <div class="col-md-2"><a class="btn btn-primary" href="{{ search_result.3 }}">Results</a></div>
+                  <div class="col-md-2"><a class="btn btn-primary" href="{{ search_result.4 }}">Start Single</a></div>
+                  <div class="col-md-2"><a class="btn btn-primary" href="{{ search_result.5 }}">Start Batch</a></div>
+              </div>
+              {% endfor %}
+
+              <h3>Recent Simulations</h3>
+              <div class="row">
+                  <div class="col-md-2">Study</div>
+                <div class="col-md-2">Model</div>
+                <div class="col-md-2">Results</div>
+              </div>
+              <hr>
+              {% for search_result in search_history %}
+              <div class="row">
+                <div class="col-md-2">{{ search_result.0 }}</div>
+                <div class="col-md-2">{{ search_result.1 }}</div>
+                <div class="col-md-2"><a class="btn btn-primary" href="{{ search_result.3 }}">Results</a></div>
+                  </div>
+              {% endfor %}
+
 
               {% if request.user.is_superuser  %}
               <p><a class="btn btn-primary" href="{% url 'simulation:sync_db' %}">Sync Database</a></p>
