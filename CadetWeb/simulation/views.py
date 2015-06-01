@@ -92,7 +92,7 @@ def get_isotherms():
         reader.next()
         return list(reader)
 
-def isotherm_setup(isotherms, parameters):
+def isotherm_setup_cache(isotherms, parameters):
     "make a dictionary that has a key of the isotherm name and then a list of all the isotherm values plus if it is per component"
     "also make a dictionary of sets to allow quickly check if an item is part of an isotherm"
     temp = {}
@@ -114,7 +114,7 @@ def isotherm_setup(isotherms, parameters):
 
 isotherms = get_isotherms()
 parameters = get_parameters()
-isotherm_settings, isotherm_set, isotherm_name_set = isotherm_setup(isotherms, parameters)
+isotherm_settings, isotherm_set, isotherm_name_set = isotherm_setup_cache(isotherms, parameters)
 
 def get_json(post):
     temp = {}
@@ -325,16 +325,63 @@ def component_and_step_setup(request):
     data['back_text'] = 'The Beginning'
     return render(request, 'simulation/component_and_step_setup.html', data)
 
+def draw_isotherm(data, isotherm):
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    html = ['<div class="row"><div class="col-md-12"><table class="table"><thead><tr><th>#</th>']
+    for name in list_of_names:
+        html.append('<th>%s</th>' % name)
+
+    html.append('</tr></thead><tbody>')
+    for (attribute, per_component) in isotherm_settings[isotherm]:
+        if per_component:
+            html.append('<tr><td>%s</td>' % attribute)
+            for name in list_of_names:
+                value = data.get('%s:%s' % (name, attribute), '0')
+                html.append('<td><input type="text" class="required" value="%s" name="%s:%s"></td>' % (value, name, attribute))
+            html.append('</tr>')
+    html.append('</tbody></table></div></div>')
+
+    for (attribute, per_component) in isotherm_settings[isotherm]:
+        if not per_component:
+            html.append('''<div class="row"><div class="col-md-12">
+                <div class="form-group">
+                  <div class="col-sm-2">
+                    <label for="%s" class="control-label">%s</label>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control required" id="%s" name="%s" aria-required="true" value="%s">
+                  </div>
+                </div>
+                </div>
+                </div>''' % (attribute, attribute, attribute, attribute, data.get(attribute, '0')))
+
+    checked_yes = 'checked' if data.get('IS_KINETIC', '') == '1' else ''
+    checked_no = '' if data.get('IS_KINETIC', '') == '1' else 'checked'
+    html.append('''<div class="row"><div class="col-md-12">
+                <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+              <div class="radio">
+                <input type="radio" name="IS_KINETIC" id="radio1" value="1" %s><label for="radio1">Use Kinetic Model</label>
+                <input type="radio" name="IS_KINETIC" id="radio2" value="0" %s><label for="radio2">Don't Use Kinetic Model</label>
+                </div>
+              </div>
+            </div>
+            </div></div>''' % (checked_yes, checked_no))
+
+    html = '\n'.join(html)
+    return html
+
+
 @login_required
 def isotherm_setup(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
     isotherm_name = data.get('ADSORPTION_TYPE')
-    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
 
     data['json'] = get_json_string(data)
-    data['isotherm'] =  utils.call_plugin_by_name(isotherm_name, 'isotherm', 'run', list_of_names, data)
+    #data['isotherm'] =  utils.call_plugin_by_name(isotherm_name, 'isotherm', 'run', list_of_names, data)
+    data['isotherm'] = draw_isotherm(data, isotherm_name)
     data['back'] = reverse('simulation:component_and_step_setup', None, None)
     data['back_text'] = 'Component and Step Setup'
     return render(request, 'simulation/isotherm_setup.html', data)
