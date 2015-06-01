@@ -926,16 +926,10 @@ def write_job_values(job, data, comps, steps, settings):
                 db_add_var(name, name, type, data, steps[0], comps[0], job)
 
 def serialization_settings():
-    with open(os.path.join(parent_path,'parms.csv'), 'rb') as csvfile:
-        temp = []
-        reader = csv.reader(csvfile)
-        #read the header and discard it
-        reader.next()
-        for name, units, type, per_component, per_section, sensitive, description  in reader:
-            per_component = int(per_component)
-            per_section = int(per_section)
-            temp.append( (name, type, per_component, per_section), )
-        return temp
+    temp = []
+    for name, units, type, per_component, per_section, sensitive, description in parameters:
+        temp.append( (name, type, per_component, per_section), )
+    return temp
 
 def insert_simulations(job, data, comps, steps, settings):
     if data['job_type'] == 'batch':
@@ -995,28 +989,18 @@ def db_add_var(lookup, name, type, data, step, comp, job):
 
 @login_required
 def sync_db(request):
-    with open(os.path.join(parent_path,'iso.csv'), 'rb') as csvfile:
-        reader = csv.reader(csvfile)
-        #read the header and discard it
-        reader.next()
-        for name, isotherm in reader:
-            #create isotherm line if it dies not exist
-            try:
-                models.Isotherms.objects.get(Name = name, Isotherm=isotherm)
-            except ObjectDoesNotExist:
-                models.Isotherms.objects.create(Name = name, Isotherm=isotherm)
+    for name,isotherm in isotherms:
+        try:
+            models.Isotherms.objects.get(Name = name, Isotherm=isotherm)
+        except ObjectDoesNotExist:
+            models.Isotherms.objects.create(Name = name, Isotherm=isotherm)
 
+    for name, units, type, per_component, per_section, sensitive, description in parameters:
+        try:
+            models.Parameters.objects.get(name=name, units=units, description=description)
+        except ObjectDoesNotExist:
+            models.Parameters.objects.create(name=name, units=units, description=description)
 
-    with open(os.path.join(parent_path,'parms.csv'), 'rb') as csvfile:
-        reader = csv.reader(csvfile)
-        #read the header and discard it
-        reader.next()
-        for name, units, type, per_component, per_section, sensitive, description  in reader:
-            #create isotherm line if it dies not exist
-            try:
-                models.Parameters.objects.get(name=name, units=units, description=description)
-            except ObjectDoesNotExist:
-                models.Parameters.objects.create(name=name, units=units, description=description)
     return render(request, 'simulation/sync_db.html', {})
 
 @login_required
