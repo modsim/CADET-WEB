@@ -371,6 +371,25 @@ def draw_isotherm(data, isotherm):
     html = '\n'.join(html)
     return html
 
+def get_suffix_data(suffix, components, data):
+    "return all the data that shares a common suffix with the component name"
+    return [data['%s:%s' % (component, suffix)] for component in components]
+
+def process_isotherm(data, isotherm_name):
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    processed_dict = {}
+    processed_dict['ISOTHERM'] = isotherm_name
+
+    for (attribute, per_component) in isotherm_settings[isotherm_name]:
+        if per_component:
+            processed_dict[attribute] = get_suffix_data(attribute, list_of_names, data)
+
+    for (attribute, per_component) in isotherm_settings[isotherm_name]:
+        if not per_component:
+            processed_dict[attribute] = data[attribute]
+
+    processed_dict['IS_KINETIC'] = data['IS_KINETIC']
+    return processed_dict
 
 @login_required
 def isotherm_setup(request):
@@ -394,7 +413,9 @@ def column_setup(request):
     isotherm_name = data.get('ADSORPTION_TYPE')
     list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
     if 'CADET_ISOTHERM' not in data:
-        data['CADET_ISOTHERM'] = utils.call_plugin_by_name(isotherm_name, 'isotherm', 'process_form', list_of_names, post)
+        data['CADET_ISOTHERM'] = process_isotherm(data, isotherm_name)
+
+    print process_isotherm(data, isotherm_name)
 
     data['json'] = get_json_string(data)
     data['column_table'] = generate_column_table(list_of_names, data)
