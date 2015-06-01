@@ -1,4 +1,4 @@
-Names,Units,Type,Per Component,Per Section,Sensitivte,Description
+Names,Units,Type,Per Component,Per Section,Sensitivity,Description
 CHROMATOGRAPHY_TYPE,,string,0,0,0,Specifies the type of mass transport model
 NCOMP,,int,0,0,0,Number of chemical components in the chromatographic media
 ADSORPTION_TYPE,,string,0,0,0,Specifies the type of adsorption model

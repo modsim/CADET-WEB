@@ -37,8 +37,9 @@
               </div>
               {% endfor %}
 
-              <h3>Recent Simulations</h3>
+              <h3>Your Recent Simulations</h3>
               <div class="row">
+                  <div class="col-md-2">When</div>
                   <div class="col-md-2">Study</div>
                 <div class="col-md-2">Model</div>
                 <div class="col-md-2">Results</div>
@@ -46,6 +47,7 @@
               <hr>
               {% for search_result in search_history %}
               <div class="row">
+                  <div class="col-md-2">{{ search_result.6 }}</div>
                 <div class="col-md-2">{{ search_result.0 }}</div>
                 <div class="col-md-2">{{ search_result.1 }}</div>
                 <div class="col-md-2"><a class="btn btn-primary" href="{{ search_result.3 }}">Results</a></div>

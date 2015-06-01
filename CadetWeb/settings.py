@@ -14,3 +14,7 @@ cpu = 20.0
 
 #limit number of combinations
 batch_limit = 15
+
+
+#days to keep simulations
+keep_time = 7

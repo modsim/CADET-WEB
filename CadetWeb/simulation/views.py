@@ -25,6 +25,7 @@ import numpy as np
 import operator
 import resource
 from django.http import HttpResponse
+from datetime import datetime, timedelta
 
 class HttpResponseTemporaryRedirect(HttpResponse):
     status_code = 307
@@ -67,6 +68,45 @@ storage_path = os.path.join(parent_path, 'sims')
 cadet_runner_path = os.path.join(parent_path, 'cadet_runner.py')
 
 cadet_plugin_path = '..'
+
+
+#cache the isotherm and parameters csv file and also do some processing with them.
+def get_parameters():
+    with open(os.path.join(parent_path,'parms.csv'), 'rb') as csvfile:
+        temp = []
+        reader = csv.reader(csvfile)
+        #read the header and discard it
+        reader.next()
+        for name, units, type, per_component, per_section, sensitive, description  in reader:
+            per_component = int(per_component)
+            per_section = int(per_section)
+            temp.append( (name, units, type, per_component, per_section, sensitive, description), )
+        return temp
+
+def get_isotherms():
+    with open(os.path.join(parent_path,'iso.csv'), 'rb') as csvfile:
+        temp = []
+        reader = csv.reader(csvfile)
+        #read the header and discard it
+        reader.next()
+        return list(reader)
+
+def isotherm_setup(isotherms, parameters):
+    "make a dictionary that has a key of the isotherm name and then a list of all the isotherm values plus if it is per component"
+    temp = {}
+
+    for name, isotherm in isotherms:
+        section = temp.get(isotherm, [])
+        for par_name, units, type, per_component, per_section, sensitive, description in parameters:
+            if name == par_name:
+                section.append( (name, per_component), )
+        temp[isotherm] = section
+    return temp
+
+
+isotherms = get_isotherms()
+parameters = get_parameters()
+isotherm_settings = isotherm_setup(isotherms, parameters)
 
 def get_json(post):
     temp = {}
@@ -165,6 +205,34 @@ def index(request):
 
     return render(request, 'simulation/index.html', context)
 
+
+@login_required
+def remove_old_simulations(request):
+    jobs = models.Job.objects.filter(created__gte=datetime.now()-timedelta(days=settings.keep_time))
+    jobs = [job for job in jobs if job.username]
+
+    UserModel.objects.get(username=username)
+
+    #need to filter out records that are not superuser
+
+    for job in jobs:
+        delete_job(job.uid)
+
+    data = {}
+    data['removed'] = len(jobs)
+
+    return render(request, 'simulation/remove_old.html', data)
+
+def delete_job(uid):
+    "delete this job from the system"
+    #delete job from database
+    models.Job.objects.filter(uid=uid).delete()
+
+    #delete job from filesystem
+    relative_parts = [''.join(i for i in seq if i is not None) for seq in utils.grouper(uid, settings.chunk_size)]
+    relative_path = os.path.join(*relative_parts)
+    path = os.path.join(storage_path, relative_path)
+
 def get_examples(limit):
     "return the the limit most recent 5 star simulations"
     "format is study name, model name, isotherm, results link, create link, create batch link"
@@ -179,7 +247,8 @@ def get_examples(limit):
         results_link = reverse('simulation:run_job_get', None, None) + "?path=%s" % result.uid
         create_single = reverse('simulation:single_start', None, None) + "?path=%s" % result.uid
         create_batch = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % result.uid
-        temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch])
+        created = result.created
+        temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created])
     return temp
 
 def get_most_recent_simulations(username, limit):
@@ -198,7 +267,8 @@ def get_most_recent_simulations(username, limit):
             results_link = reverse('simulation:run_job_get', None, None) + "?path=%s" % result.uid
             create_single = reverse('simulation:single_start', None, None) + "?path=%s" % result.uid
             create_batch = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % result.uid
-            temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch])
+            created = result.created
+            temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created])
         return temp
     else:
         return []
