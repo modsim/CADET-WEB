@@ -299,8 +299,9 @@ def single_start(request):
         json_data = utils.encode_to_ascii(json_data)
         data.update(json_data)
 
-    isotherms = utils.get_plugin_names('isotherm')
-    isotherms = [(isotherm, 'selected' if isotherm == data.get('ADSORPTION_TYPE', None) else '') for isotherm in isotherms]
+    isotherms = isotherm_set.keys()
+
+    isotherms = [(isotherm.replace('_', ' ').title(), isotherm, 'selected' if isotherm == data.get('ADSORPTION_TYPE', None) else '') for isotherm in isotherms]
     data['isotherms'] = isotherms
     data['json'] = get_json_string(data)
     return render(request, 'simulation/single_start.html', data)
