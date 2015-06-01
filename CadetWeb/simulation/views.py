@@ -80,6 +80,7 @@ def get_parameters():
         for name, units, type, per_component, per_section, sensitive, description  in reader:
             per_component = int(per_component)
             per_section = int(per_section)
+            sensitive = int(sensitive)
             temp.append( (name, units, type, per_component, per_section, sensitive, description), )
         return temp
 
@@ -93,20 +94,27 @@ def get_isotherms():
 
 def isotherm_setup(isotherms, parameters):
     "make a dictionary that has a key of the isotherm name and then a list of all the isotherm values plus if it is per component"
+    "also make a dictionary of sets to allow quickly check if an item is part of an isotherm"
     temp = {}
+    temp_set = {}
+    name_set = set()
 
     for name, isotherm in isotherms:
         section = temp.get(isotherm, [])
+        section_set = temp_set.get(isotherm, set())
+        section_set.add(name)
+        name_set.add(name)
         for par_name, units, type, per_component, per_section, sensitive, description in parameters:
             if name == par_name:
                 section.append( (name, per_component), )
         temp[isotherm] = section
-    return temp
+        temp_set[isotherm] = section_set
+    return temp, temp_set, name_set
 
 
 isotherms = get_isotherms()
 parameters = get_parameters()
-isotherm_settings = isotherm_setup(isotherms, parameters)
+isotherm_settings, isotherm_set, isotherm_name_set = isotherm_setup(isotherms, parameters)
 
 def get_json(post):
     temp = {}
@@ -455,27 +463,23 @@ def sensitivity_setup(request):
     list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
     sensitivities = []
-    with open(os.path.join(parent_path,'sensitivity.csv'), 'rb') as csvfile:
-        reader = csv.reader(csvfile)
-        sensitivities = [row for row in reader]
+    isotherm_name = data.get('ADSORPTION_TYPE').upper().replace(' ', '_')
 
-    header = sensitivities[0]
-    sensitivities = sensitivities[1:]
-
-    isotherm_name = data.get('ADSORPTION_TYPE')
-    sens = utils.call_plugin_by_name(isotherm_name, 'isotherm', 'sensitivity')
-    sensitivities.extend(sens)
+    for name, units, type, per_component, per_section, sensitive, description in parameters:
+        if sensitive:
+            if name not in isotherm_name_set or name in isotherm_name_set and name in isotherm_set[isotherm_name]:
+                sensitivities.append( (name, per_component, per_section, description), )
 
     ABS_TOL = float(data['ABSTOL'])
 
     entry = []
     for sensitivity in sensitivities:
         name, per_component, per_section, description = sensitivity
-        if per_component == '1' and per_section == '1':
+        if per_component == 1 and per_section == 1:
             seq = itertools.product(list_of_names, list_of_steps)
-        elif per_component == '0' and per_section == '1':
+        elif per_component == 0 and per_section == 1:
             seq = itertools.product(itertools.repeat('', 1), list_of_steps)
-        elif per_component == '1' and per_section == '0':
+        elif per_component == 1 and per_section == 0:
             seq = itertools.product(list_of_names, itertools.repeat('', 1))
         else:
             seq = [ ('',''), ]
@@ -1146,35 +1150,28 @@ def choose_attributes_to_modify(request):
 
     modify = []
     #every attribute can be modified except for strings, blobs, number of steps and number of components, sensitivities and checkbox settings
-    with open(os.path.join(parent_path,'parms.csv'), 'rb') as csvfile:
-        reader = csv.reader(csvfile)
-        #read the header and discard it
-        reader.next()
-        for name, units, type, per_component, per_section, sensitive, description  in reader:
-            per_component = int(per_component)
-            per_section = int(per_section)
-            sensitive = int(sensitive)
+    for name, units, type, per_component, per_section, sensitive, description in parameters:
 
-            if name not in ('NCOMP', 'NSEC') and type in ('int', 'double'):
-                if per_component and per_section:
-                    for step in steps:
-                        for comp in comps:
-                            key = '%s:%s:%s' % (step, comp, name)
-                            if key in data:
-                                checked_1, checked_2, checked_3 = get_checked(key, data)
-                                modify.append( (name, comp, step, description, key, checked_1, checked_2, checked_3) )
-                elif per_component and not per_section:
+        if name not in ('NCOMP', 'NSEC') and type in ('int', 'double'):
+            if per_component and per_section:
+                for step in steps:
                     for comp in comps:
-                        key = '%s:%s' % (comp, name)
+                        key = '%s:%s:%s' % (step, comp, name)
                         if key in data:
                             checked_1, checked_2, checked_3 = get_checked(key, data)
-                            modify.append( (name, comp, '', description, key, checked_1, checked_2, checked_3) )
-                elif per_section and not per_component:
-                    pass #we don't have any of these but leave this here in case it happens later
-                else:
-                    if name in data:
-                        checked_1, checked_2, checked_3 = get_checked(name, data)
-                        modify.append( (name, '', '', description, name, checked_1, checked_2, checked_3) )
+                            modify.append( (name, comp, step, description, key, checked_1, checked_2, checked_3) )
+            elif per_component and not per_section:
+                for comp in comps:
+                    key = '%s:%s' % (comp, name)
+                    if key in data:
+                        checked_1, checked_2, checked_3 = get_checked(key, data)
+                        modify.append( (name, comp, '', description, key, checked_1, checked_2, checked_3) )
+            elif per_section and not per_component:
+                pass #we don't have any of these but leave this here in case it happens later
+            else:
+                if name in data:
+                    checked_1, checked_2, checked_3 = get_checked(name, data)
+                    modify.append( (name, '', '', description, name, checked_1, checked_2, checked_3) )
 
     data['json'] = get_json_string(data)
     data['modifies'] = modify
