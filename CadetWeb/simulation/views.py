@@ -727,7 +727,7 @@ def run_job_get(request):
         simulation = None
         rel_path = ''
 
-    json_path, hdf5_path, graphs, json_data, alive, complete = utils.get_graph_data(path, settings.chunk_size, rel_path)
+    json_path, hdf5_path, graphs, json_data, alive, complete, failure = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     query = request.GET.dict()
     query = urllib.urlencode(query)
@@ -1090,13 +1090,13 @@ def get_data(request):
     else:
         rel_path = ''
 
-    json_path, hdf5_path, graphs, data, alive, complete = utils.get_graph_data(path, settings.chunk_size, rel_path)
+    json_path, hdf5_path, graphs, data, alive, complete, failure = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     h5 = h5py.File(hdf5_path, 'r')
 
     #check for success by seeing if we have output created
     json_data['success'] = int(complete)
-    json_data['failed'] = int(not complete and not alive)
+    json_data['failed'] = int(failure)
 
     #close the hdf5 file
     h5.close()

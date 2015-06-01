@@ -70,6 +70,11 @@ def get_graph_data(path, chunk_size, rel_path):
     except IOError:
         complete = False
 
+    try:
+        failure = open(os.path.join(storage_path, relative_path, 'status')).read() == 'failure'
+    except IOError:
+        failure = False
+
     json_path = os.path.join(storage_path, relative_path, 'setup.json')
 
     if rel_path:
@@ -103,7 +108,7 @@ def get_graph_data(path, chunk_size, rel_path):
         id = title.replace(' ', '_').replace(':', '_')
         graphs.append( (id, title, path))
 
-    return json_path, hdf5_path, graphs, json_data, alive, complete
+    return json_path, hdf5_path, graphs, json_data, alive, complete, failure
 
 #from https://docs.python.org/2/library/itertools.html
 def grouper(iterable, n, fillvalue=None):

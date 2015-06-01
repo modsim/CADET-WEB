@@ -531,7 +531,12 @@ if __name__ == '__main__':
     set_value_enum(web, 'STDOUT', stdout)
     set_value_enum(web, 'STDERR', stderr)
 
-    compress_data(h5)
+    try:
+        compress_data(h5)
+    except KeyError:
+        timer.cancel()
+        h5.close()
+        open(os.path.join(parent_dir, 'status'), 'w').write('failure')
 
     h5.close()
     #run performance parameters
