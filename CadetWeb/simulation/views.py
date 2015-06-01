@@ -412,8 +412,7 @@ def column_setup(request):
     data.update(get_json(post))
     isotherm_name = data.get('ADSORPTION_TYPE')
     list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
-    if 'CADET_ISOTHERM' not in data:
-        data['CADET_ISOTHERM'] = process_isotherm(data, isotherm_name)
+    data['CADET_ISOTHERM'] = process_isotherm(data, isotherm_name)
 
     print process_isotherm(data, isotherm_name)
 
@@ -644,7 +643,7 @@ def job_setup(request):
     except KeyError:
         pass
 
-    data['CADET_ISOTHERM'] = utils.call_plugin_by_name(data.get('ADSORPTION_TYPE'), 'isotherm', 'process_form', list_of_names, data)
+    data['CADET_ISOTHERM'] = process_isotherm(data, data.get('ADSORPTION_TYPE'))
 
     context = {'json':get_json_string(data),
                'back':reverse('simulation:sensitivity_setup', None, None),
