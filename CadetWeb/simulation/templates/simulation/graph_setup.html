@@ -1,7 +1,7 @@
 {% extends 'simulation/base.html' %}
 
 {% block body %}
-<form class="form-horizontal" role="form" style="" action="{% url 'simulation:performance_parameters' %}" method="POST">
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:sensitivity_setup' %}" method="POST">
       {% csrf_token %}
       <div class="row">
       <input type="hidden" name="json" value="{{ json }}">
@@ -40,7 +40,7 @@
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
                   <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
-                <button type="submit" class="btn btn-success">Continue to Performance Parameter Selection</button>
+                <button type="submit" class="btn btn-success">Continue to Sensitivity Setup</button>
               </div>
             </div>
         </div>

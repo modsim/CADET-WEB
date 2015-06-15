@@ -1,7 +1,7 @@
 {% extends 'simulation/base.html' %}
 
 {% block body %}
-<form class="form-horizontal" role="form" style="" action="{% url 'simulation:job_setup' %}" method="POST">
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:confirm_job' %}" method="POST">
       {% csrf_token %}
       <div class="row">
       <input type="hidden" name="json" value="{{ json }}">
@@ -58,7 +58,7 @@
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
                   <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
-                <button type="submit" class="btn btn-success" id="submit_button">Continue to Job Setup</button>
+                <button type="submit" class="btn btn-success" id="submit_button">Continue Confirm Job</button>
               </div>
             </div>
         </div>

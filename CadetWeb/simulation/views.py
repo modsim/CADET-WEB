@@ -595,8 +595,10 @@ def sensitivity_setup(request):
     data['json'] = get_json_string(data)
     data['sensitivities'] = utils.get_plugin_names('sensitivity')
     data['entry'] = entry
-    data['back'] = reverse('simulation:performance_parameters', None, None)
-    data['back_text'] = 'Performance Parameters Setup'
+    #data['back'] = reverse('simulation:performance_parameters', None, None)
+    #data['back_text'] = 'Performance Parameters Setup'
+    data['back'] = reverse('simulation:graph_setup', None, None)
+    data['back_text'] = 'Graph Setup'
     return render(request, 'simulation/sensitivity_setup.html', data)
 
 @login_required
@@ -666,11 +668,65 @@ def job_setup(request):
 @login_required
 def confirm_job(request):
     post = request.POST
+
     data = get_json(post)
+    table_data = get_json_table_dict(post)
+
+    keep = set()
+    sensitivities = []
+
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
+
+    for key,value in data.items():
+        if key.startswith('choice'):
+            type, name = key.split(':', 1)
+            keep.add(name)
+
+
+    for name in keep:
+        tol = data['dist:%s' % name]
+        dist = data['dist:%s' % name]
+
+        name, component, section = name.split(':')
+
+
+        SENS_NAME = name
+
+        try:
+            SENS_COMP = list_of_names.index(component)
+        except ValueError:
+            SENS_COMP = -1
+
+        try:
+            SENS_SECTION = list_of_steps.index(section)
+        except ValueError:
+            SENS_SECTION = -1
+
+        SENS_ABSTOL = float(tol)
+        SENS_FD_DELTA = float(dist)
+
+        sensitivity = {}
+        sensitivity['SENS_NAME'] = SENS_NAME
+        sensitivity['SENS_COMP'] = SENS_COMP
+        sensitivity['SENS_SECTION'] = SENS_SECTION
+        sensitivity['SENS_ABSTOL'] = SENS_ABSTOL
+        sensitivity['SENS_FD_DELTA'] = SENS_FD_DELTA
+
+        sensitivities.append(sensitivity)
+
+
+    data['sensitivities'] = sensitivities
+    try:
+        del data['table']
+    except KeyError:
+        pass
+
+    data['CADET_ISOTHERM'] = process_isotherm(data, data.get('ADSORPTION_TYPE'))
 
     data['json'] = get_json_string(data)
-    data['back'] = reverse('simulation:job_setup', None, None)
-    data['back_text'] = 'Job Setup'
+    data['back'] = reverse('simulation:sensitivity_setup', None, None)
+    data['back_text'] = 'Sensitivity Setup'
     data['steps'] = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
     data['comps'] = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
     return render(request, 'simulation/confirm_job.html', data)
