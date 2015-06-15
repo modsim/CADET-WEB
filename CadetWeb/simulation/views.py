@@ -26,6 +26,7 @@ import operator
 import resource
 from django.http import HttpResponse
 from datetime import datetime, timedelta
+import shutil
 
 class HttpResponseTemporaryRedirect(HttpResponse):
     status_code = 307
@@ -214,22 +215,26 @@ def index(request):
     return render(request, 'simulation/index.html', context)
 
 
-@login_required
-def remove_old_simulations(request):
-    jobs = models.Job.objects.filter(created__gte=datetime.now()-timedelta(days=settings.keep_time))
-    jobs = [job for job in jobs if job.username]
+#@login_required
+def remove_old_simulations():
+    jobs = models.Job.objects.filter(created__lte=datetime.now()-timedelta(days=settings.keep_time))
 
-    UserModel.objects.get(username=username)
-
-    #need to filter out records that are not superuser
-
+    removed = 0
     for job in jobs:
-        delete_job(job.uid)
+        if job.username not in settings.users_keep:
+            delete_job(job.uid)
+            removed = removed + 1
 
-    data = {}
-    data['removed'] = len(jobs)
+    # for root, dirs, files in os.walk(storage_path, topdown=False):
+    #     print root, dirs, files
+    #     # if a directory is empty there will be no sub-directories or files
+    #     if len(dirs) is 0 and len(files) is 0 and len(root) > len(storage_path) and root.startswith(storage_path):
+    #         shutil.rmtree(root)
 
-    return render(request, 'simulation/remove_old.html', data)
+    #data = {}
+    #data['removed'] = removed
+
+    #return render(request, 'simulation/remove_old.html', data)
 
 def delete_job(uid):
     "delete this job from the system"
@@ -240,6 +245,14 @@ def delete_job(uid):
     relative_parts = [''.join(i for i in seq if i is not None) for seq in utils.grouper(uid, settings.chunk_size)]
     relative_path = os.path.join(*relative_parts)
     path = os.path.join(storage_path, relative_path)
+    shutil.rmtree(path)
+
+    for idx in reversed(range(len(relative_parts))):
+        try:
+            os.rmdir(os.path.join(storage_path, *relative_parts[0:idx]))
+        except:
+            pass
+
 
 def get_examples(limit):
     "return the the limit most recent 5 star simulations"
@@ -1059,8 +1072,7 @@ def db_add_var(lookup, name, type, data, step, comp, job):
         #print 'Missing', lookup, lookup in data
         pass
 
-@login_required
-def sync_db(request):
+def sync_db():
     for name,isotherm in isotherms:
         try:
             models.Isotherms.objects.get(Name = name, Isotherm=isotherm)
@@ -1072,8 +1084,6 @@ def sync_db(request):
             models.Parameters.objects.get(name=name, units=units, description=description)
         except ObjectDoesNotExist:
             models.Parameters.objects.create(name=name, units=units, description=description)
-
-    return render(request, 'simulation/sync_db.html', {})
 
 @login_required
 @gzip.gzip_page
@@ -1319,5 +1329,3 @@ def modify_attributes(request):
         context['message'] = 'Too many combinations where chosen. Only %d are allowed and %s where chosen' % (settings.batch_limit, request.GET.get('batch_limit'))
 
     return render(request, 'simulation/modify_attributes.html', context)
-
-

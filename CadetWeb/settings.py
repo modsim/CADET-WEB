@@ -17,4 +17,7 @@ batch_limit = 15
 
 
 #days to keep simulations
-keep_time = 7
+keep_time = 0
+
+#users to keep records for
+users_keep = set(['cadet',])

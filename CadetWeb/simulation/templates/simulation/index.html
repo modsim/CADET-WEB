@@ -54,11 +54,6 @@
                   </div>
               {% endfor %}
 
-
-              {% if request.user.is_superuser  %}
-              <p><a class="btn btn-primary" href="{% url 'simulation:sync_db' %}">Sync Database</a></p>
-              {% endif %}
-
               <p>This website allows researchers and teachers to use the CADET chromatography simulation software to simulation a single
               chromatography column with multiple steps and components with different isotherms including Steric Mass Action and Langmuir.</p>
           </div>
