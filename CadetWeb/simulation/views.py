@@ -264,7 +264,7 @@ def get_examples(limit):
     for result in results:
         study_name= result.study_name
         model_name = result.Model_ID.model
-        isotherm = models.Job_String.objects.get(Job_ID=result, Parameter_ID=parameter).Data
+        isotherm = models.Job_String.objects.get(Job_ID=result, Parameter_ID=parameter).Data.replace('_', ' ').title()
         results_link = reverse('simulation:run_job_get', None, None) + "?path=%s" % result.uid
         create_single = reverse('simulation:single_start', None, None) + "?path=%s" % result.uid
         create_batch = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % result.uid
@@ -746,11 +746,13 @@ def query_options(request):
     return render(request, 'simulation/query_options.html', data)
 
 @login_required
-def query_results(request):
+def query_results(request, name=None):
 
     post = request.POST
     data = get_json(post)
-    headers, results = utils.call_plugin_by_name(data['search_query'], 'search', 'process_search', request, data)
+    data['user_name'] = request.user.username
+    name = name if name is not None else data['search_query']
+    headers, results = utils.call_plugin_by_name(name, 'search', 'process_search', request, data)
     search_results = []
 
     job_ids = [result[0] for result in results]
@@ -767,7 +769,12 @@ def query_results(request):
         model_name = job.Model_ID.model
         isotherm = models.Job_String.objects.get(Job_ID=job, Parameter_ID=parameter).Data
         additional = result[1:]
-        rating = models.Job_Notes.objects.get(Job_ID=job).rating
+
+        try:
+            rating = models.Job_Notes.objects.get(Job_ID=job).rating
+        except ObjectDoesNotExist:
+            rating = 0
+
         url = reverse('simulation:run_job_get', None, None) + "?path=%s" % job.uid
         search_results.append([jobid, study_name, model_name, isotherm, additional, rating, url])
     if results:
@@ -778,6 +785,10 @@ def query_results(request):
               'search_results':search_results,
               'headers':headers}
     return render(request, 'simulation/query_results.html', context)
+
+@login_required
+def find_simulations(request):
+    return query_results(request, "Find by User")
 
 @login_required
 def generate_other_graphs(request):
@@ -796,7 +807,7 @@ def run_job_get(request):
         simulation = None
         rel_path = ''
 
-    json_path, hdf5_path, graphs, json_data, alive, complete, failure = utils.get_graph_data(path, settings.chunk_size, rel_path)
+    json_path, hdf5_path, graphs, json_data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     query = request.GET.dict()
     query = urllib.urlencode(query)
@@ -1156,13 +1167,15 @@ def get_data(request):
     else:
         rel_path = ''
 
-    json_path, hdf5_path, graphs, data, alive, complete, failure = utils.get_graph_data(path, settings.chunk_size, rel_path)
+    json_path, hdf5_path, graphs, data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     h5 = h5py.File(hdf5_path, 'r')
 
     #check for success by seeing if we have output created
     json_data['success'] = int(complete)
     json_data['failed'] = int(failure)
+    json_data['stdout'] = stdout
+    json_data['stderr'] = stderr
 
     #close the hdf5 file
     h5.close()

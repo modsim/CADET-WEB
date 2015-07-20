@@ -85,6 +85,12 @@
     {% endfor %}
     </div>
 
+<h1>Output</h1>
+<pre id="stdout"></pre>
+
+<h1>Errors</h1>
+<pre id="stderr"></pre>
+
 <div id="failure">The simulation has failed to complete. It has either run out of time, run out of memory or crashed. You can change settings and try again.</div>
 
 
@@ -242,6 +248,8 @@ $( document ).ready(function() {
                     if (json_data['data'].hasOwnProperty(key)) {
                         //$.plot("#" + key, json_data['data'][key]);
                         start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
+                        document.getElementById("stdout").innerHTML = ansi_up.ansi_to_html(json_data['stdout']);
+                        document.getElementById("stderr").innerHTML = ansi_up.ansi_to_html(json_data['stderr']);
                     }
                 }
 
