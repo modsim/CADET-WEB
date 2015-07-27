@@ -841,11 +841,11 @@ def run_job_get(request):
     data['json_url'] = reverse('simulation:get_data', None, None)
     data['progress'] = progress_path
     data['job_id'] = models.Job.objects.get(uid=path).id
-    data['dropdown'] = generate_batch_choice(json_data, simulation)
+    data['dropdown'] = generate_batch_choice(json_data, simulation, request)
     data['sim_id'] = sim_id
     return render(request, 'simulation/run_job.html', data)
 
-def generate_batch_choice(json_data, simulation):
+def generate_batch_choice(json_data, simulation, request):
     temp = []
     if json_data['job_type'] == 'batch':
         temp.append('<table><tr>')
@@ -858,17 +858,24 @@ def generate_batch_choice(json_data, simulation):
 
         for key,values in json_data['batch_distribution']:
             temp.append('<td>')
-            temp.append(draw_selection(key, values, simulation))
+            temp.append(draw_selection(key, values, simulation, request))
             temp.append('</td>')
         temp.append('<td></td>')
         temp.append('</tr></table>')
     return ''.join(temp)
 
-def draw_selection(key, values, simulation):
+def draw_selection(key, values, simulation, request):
     temp = []
+    try:
+        checked = float(request.GET[u'batch:' + key.decode()])
+    except KeyError:
+        checked =None
     temp.append('<select class="form-control" name="batch:%s">' % key)
     for value in values:
-        temp.append('<option value="%s" %s>%.3g</option>' % (repr(value), "", value))
+        if value == checked:
+            temp.append('<option value="%s" %s>%.3g</option>' % (repr(value), 'selected', value))
+        else:
+            temp.append('<option value="%s" %s>%.3g</option>' % (repr(value), "", value))
     temp.append('</select>')
     return ''.join(temp)
 
@@ -936,6 +943,11 @@ def batch_choose(request):
     query = {}
     query['path'] = check_sum
     query['sim_id'] = simulation.id
+
+    for key, value in request.POST.items():
+        if key.startswith('batch:'):
+            query[key] = value
+
     query = urllib.urlencode(query)
     base = reverse('simulation:run_job_get', None, None)
     return redirect('%s?%s' % (base, query))
