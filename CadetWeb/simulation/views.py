@@ -841,11 +841,11 @@ def run_job_get(request):
     data['json_url'] = reverse('simulation:get_data', None, None)
     data['progress'] = progress_path
     data['job_id'] = models.Job.objects.get(uid=path).id
-    data['dropdown'] = generate_batch_choice(json_data, simulation, request)
+    data['dropdown'] = generate_batch_choice(json_data, simulation, request, path)
     data['sim_id'] = sim_id
     return render(request, 'simulation/run_job.html', data)
 
-def generate_batch_choice(json_data, simulation, request):
+def generate_batch_choice(json_data, simulation, request, path):
     temp = []
     if json_data['job_type'] == 'batch':
         temp.append('<table><tr>')
@@ -853,14 +853,24 @@ def generate_batch_choice(json_data, simulation, request):
             temp.append('<th>')
             temp.append(key)
             temp.append('</th>')
-        temp.append('<th><input type="submit" value="Load Simulation"></th>')
+        temp.append('<th></th>')
         temp.append('</tr><tr>')
 
+        for key,values in json_data['batch_distribution']:
+            temp.append('<td>')
+            temp.append(json_data[key])
+            temp.append('</td>')
+        temp.append('<td></td>')
+        url = url = reverse('simulation:run_job_get', None, None) + "?path=%s" % path
+        temp.append('<td><a href="%s" class="btn btn-default">Load Base Case</a></td>' % url)
+
+        temp.append('</tr><tr>')
         for key,values in json_data['batch_distribution']:
             temp.append('<td>')
             temp.append(draw_selection(key, values, simulation, request))
             temp.append('</td>')
         temp.append('<td></td>')
+        temp.append('<td><input type="submit" value="Load Simulation" class="btn btn-default"></td>')
         temp.append('</tr></table>')
     return ''.join(temp)
 
