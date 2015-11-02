@@ -1,0 +1,34 @@
+# Create virtual environment for python
+virtualenv py-cadet-env
+source py-cadet-env/bin/activate
+
+# Install required python packages
+pip install django django-allauth psycopg2 numpy scipy matplotlib cython h5py
+
+# Start database
+sudo /etc/init.d/postgresql start
+
+# Create database user "cadet" and database "cadet"
+sudo su - postgres
+createuser -P -E cadet
+
+psql
+GRANT ALL PRIVILEGES ON DATABASE cadet TO cadet;
+
+# Create tables
+python manage.py syncdb
+
+Superuser: admin 
+Password: admin
+
+# Export path to cadet-cs binary
+export PATH="/home/leweke/Dokumente/CadetWeb-Bill/cadetbin/:$PATH"
+
+# Create examples and other default database setup
+python manage.py maintenance
+
+# Run server locally
+python manage.py runserver
+
+# BRowse to
+http://localhost:8000/simulation/
