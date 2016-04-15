@@ -36,7 +36,7 @@ class Job(models.Model):
     study_name = models.CharField(max_length=80)
     json = models.TextField()
     uid = models.CharField(max_length=64)
-    username = models.CharField(max_length=30)
+    username = models.CharField(max_length=30, default='cadet')
 
     class Meta:
         ordering = ['id']

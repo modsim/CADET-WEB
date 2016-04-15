@@ -41,6 +41,8 @@
     }
 
     body.loading { overflow: hidden; }
+    
+    body.normal div.advanced, body.normal tr.advanced {display:none;}
 
     body.loading .busy {display: block; }
     .above_middle {position:absolute; top: 20%; left:50%; transform: translate(-50%, -50%);}
@@ -56,7 +58,7 @@
     .navbar-brand {margin-right:10px;}
     table.logo {margin-left:auto; margin-right:auto;}
     .row {margin-bottom:5px;}
-    #stdout, #stderr {background-color:black;}
+    #stdout, #stderr {background-color:black; color:#fff;}
 
     </style>
     <script type="text/javascript" src="{% static "simulation/jquery-2.1.3.min.js" %}"></script>
@@ -76,7 +78,7 @@
 
   </head>
   
-  <body>
+  <body class="{% if advanced_ui == 'normal' %} normal {% else %} advanced {% endif %}">
 
   <div class="busy"><div class="above_middle"><h1>Please stand by. Simulation is running.</h1><h2 class="center" id="progress"></h2></div></div>
 
@@ -86,6 +88,7 @@
           <div class="navbar navbar-default">
             <div class="navbar-header">
               <a class="navbar-brand navbar-logo" href="{% url 'simulation:index' %}"><img src="{% static "simulation/CADET-small.png" %}"></a>
+              <a class="navbar-brand btn btn-default" href="{% url 'simulation:index' %}">Home</a>
               <a class="navbar-brand btn btn-default" href="{% url 'simulation:single_start' %}">Create Single Simulation</a>
               <a class="navbar-brand btn btn-default" href="{% url 'simulation:create_batch_simulation' %}">Create Batch Simulation</a>
               <a class="navbar-brand btn btn-default" href="{% url 'simulation:choose_search_query' %}">Find Simulation</a>
@@ -97,6 +100,11 @@
                     <a href="{% url 'account_signup' %}" class="navbar-brand btn btn-default">Sign-Up</a>
               {% endif %}
               <a class="navbar-brand btn btn-default" href="{% url 'simulation:choose_search_query' %}">About Us</a>
+              
+              {% if request.user.username  %}
+              <span class="navbar-brand">Welcome {{ request.user.username }}</span>
+              {% endif %}
+              
             </div>
           </div>
         </div>

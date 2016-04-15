@@ -1,9 +1,23 @@
 {% extends 'simulation/base.html' %}
 
 {% block body %}
-<form class="form-horizontal" role="form" style="" action="{% url 'simulation:loading_setup' %}" method="POST">
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:isotherm_setup' %}" method="POST">
       {% csrf_token %}
       <div class="row">
+      
+            <div class="form-group">
+              <div class="col-sm-12">
+              <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-primary {% if advanced_ui == 'normal' %} active {% endif %} " {% if advanced_ui == 'normal' %} checked {% endif %} onclick="$('body').removeClass('advanced').addClass('normal');">
+                  <input type="radio" name="advanced_ui" value="normal" id="option1" autocomplete="off"> Normal User Interface
+                </label>
+                <label class="btn btn-primary {% if advanced_ui == 'advanced' %} active {% endif %}" {% if advanced_ui == 'advanced' %} checked {% endif %} onclick="$('body').addClass('advanced').removeClass('normal');">
+                  <input type="radio" name="advanced_ui" value="advanced" id="option2" autocomplete="off"> Advanced User Interface
+                </label>
+              </div>  
+              </div>
+            </div>     
+      
       <input type="hidden" name="json" value="{{ json }}">
         <div class="col-md-12">
           <h1>Column&nbsp;Setup</h1>
@@ -13,20 +27,28 @@
         <div class="col-md-12">
             <div class="form-group">
               <div class="col-sm-2">
-                <label class="control-label">Column Dispersion</label>
-              </div>
-              <div class="col-sm-10">
-                <input type="text" class="form-control required" name="COL_DISPERSION" value="{{ COL_DISPERSION }}">
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-2">
                 <label class="control-label">Column Length (m)</label>
               </div>
               <div class="col-sm-10">
                 <input type="text" class="form-control required" name="COL_LENGTH" value="{{ COL_LENGTH }}">
               </div>
             </div>
+            <div class="form-group">
+              <div class="col-sm-2">
+                <label class="control-label">Velocity (m/s)</label>
+              </div>
+              <div class="col-sm-10">
+                <input type="text" class="form-control required" name="VELOCITY" value="{{ VELOCITY }}">
+              </div>
+            </div>            
+            <div class="form-group">
+              <div class="col-sm-2">
+                <label class="control-label">Particle Radius</label>
+              </div>
+              <div class="col-sm-10">
+                <input type="text" class="form-control required" name="PAR_RADIUS" value = "{{ PAR_RADIUS }}">
+              </div>
+            </div>            
             <div class="form-group">
               <div class="col-sm-2">
                 <label class="control-label">Column Porosity</label>
@@ -45,25 +67,18 @@
             </div>
             <div class="form-group">
               <div class="col-sm-2">
-                <label class="control-label">Particle Radius</label>
+                <label class="control-label">Column Dispersion</label>
               </div>
               <div class="col-sm-10">
-                <input type="text" class="form-control required" name="PAR_RADIUS" value = "{{ PAR_RADIUS }}">
+                <input type="text" class="form-control required" name="COL_DISPERSION" value="{{ COL_DISPERSION }}">
               </div>
             </div>
-            <div class="form-group">
-              <div class="col-sm-2">
-                <label class="control-label">Velocity (m/s)</label>
-              </div>
-              <div class="col-sm-10">
-                <input type="text" class="form-control required" name="VELOCITY" value="{{ VELOCITY }}">
-              </div>
-            </div>
+
             {{ column_table|safe }}
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
                   <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
-                <button type="submit" class="btn btn-success">Continue To Loading Setup</button>
+                <button type="submit" class="btn btn-success">Continue To Isotherm Setup</button>
               </div>
             </div>
          

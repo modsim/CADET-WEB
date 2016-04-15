@@ -4,12 +4,27 @@
 <form class="form-horizontal" role="form" style="" action="{% url 'simulation:graph_setup' %}" method="POST">
       {% csrf_token %}
       <div class="row">
+      
+            <div class="form-group">
+              <div class="col-sm-12">
+              <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-primary {% if advanced_ui == 'normal' %} active {% endif %} " {% if advanced_ui == 'normal' %} checked {% endif %} onclick="$('body').removeClass('advanced').addClass('normal');">
+                  <input type="radio" name="advanced_ui" value="normal" id="option1" autocomplete="off"> Normal User Interface
+                </label>
+                <label class="btn btn-primary {% if advanced_ui == 'advanced' %} active {% endif %}" {% if advanced_ui == 'advanced' %} checked {% endif %} onclick="$('body').addClass('advanced').removeClass('normal');">
+                  <input type="radio" name="advanced_ui" value="advanced" id="option2" autocomplete="off"> Advanced User Interface
+                </label>
+              </div>  
+              </div>
+            </div>     
+      
+      
       <input type="hidden" name="json" value="{{ json }}">
-        <div class="col-md-12">
+        <div class="col-md-12 advanced">
         	<h1>Simulation&nbsp;Setup</h1>
         </div>
 
-		<div class="col-md-12">
+		<div class="col-md-12 advanced">
 			<div class="form-group">
 		          <div class="col-sm-2">
 		            <label class="control-label">Chromatography Type</label>
@@ -47,7 +62,7 @@
 		        <input type="text" class="form-control required" id="NPAR" name="NPAR" value="{{ NPAR }}">
 		      </div>
 		    </div>
-		    <div class="form-group">
+		    <div class="form-group advanced">
 		      <div class="col-sm-2">
 		        <label class="control-label">Particle Discretization Type</label>
 		      </div>
@@ -61,7 +76,7 @@
 		      </div>
 	        </div>
 
-                <div class="form-group">
+                <div class="form-group advanced">
                   <div class="col-sm-2">
                     <label for="PAR_DISC_VECTOR" class="control-label">PAR_DISC_VECTOR</label>
                   </div>
@@ -75,7 +90,7 @@
                     <input type="text" class="form-control required" id="PAR_DISC_VECTOR_2" name="PAR_DISC_VECTOR_3" value="{{ PAR_DISC_VECTOR_3 }}">
                   </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group advanced">
                   <div class="col-sm-2">
                     <label class="control-label">Reconstruction</label>
                   </div>
@@ -89,10 +104,10 @@
                   </div>
                 </div>
             </div>
-            <div class="col-md-12">
+            <div class="col-md-12 advanced">
               <h2>Weno</h2>
             </div>
-            <div class="col-md-12">
+            <div class="col-md-12 advanced">
                 <div class="form-group">
                   <div class="col-sm-2">
                     <label for="weno_boundary_model" class="control-label">Boundary Model</label>
@@ -121,7 +136,7 @@
             </div>
             <div class="col-md-12">
               <h2>Solver</h2>
-                <div class="form-group">
+                <div class="form-group advanced ">
                   <div class="col-sm-2">
                     <label class="control-label">Log Level</label>
                   </div>
@@ -133,7 +148,7 @@
                     </select>
                   </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group advanced">
                   <div class="col-sm-2">
                     <label class="control-label">Number of &nbsp;Threads</label>
                   </div>
@@ -151,7 +166,7 @@
                 </div>
                 
                 {% for radio_text, radio_form, checked_yes, checked_no in radios %}
-                <div class="form-group">
+                <div class="form-group advanced">
                   <div class="col-sm-offset-2 col-sm-10">
                   <div class="radio">
                    <div class="col-sm-3">{{ radio_text }}</div>
@@ -163,7 +178,7 @@
                 {% endfor %}
                 
               
-            <div class="col-md-12">
+            <div class="col-md-12 advanced">
               <h2>Schur Solver</h2>
                 <div class="form-group">
                   <div class="col-sm-2">
@@ -234,7 +249,7 @@
             </div>
  
           
-		<div class="col-md-12">
+		<div class="col-md-12 advanced">
           <h2>Sensitivity Setup</h2>
         </div>
 

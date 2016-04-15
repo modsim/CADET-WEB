@@ -2,28 +2,43 @@
 
 {% block body %}
 
-<form class="form-horizontal" role="form" style="" action="{% url 'simulation:column_setup' %}"  method="POST">
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:loading_setup' %}"  method="POST">
     {% csrf_token %}
 <div class="row">
+
+            <div class="form-group">
+              <div class="col-sm-12">
+              <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-primary {% if advanced_ui == 'normal' %} active {% endif %} " {% if advanced_ui == 'normal' %} checked {% endif %} onclick="$('body').removeClass('advanced').addClass('normal');">
+                  <input type="radio" name="advanced_ui" value="normal" id="option1" autocomplete="off"> Normal User Interface
+                </label>
+                <label class="btn btn-primary {% if advanced_ui == 'advanced' %} active {% endif %}" {% if advanced_ui == 'advanced' %} checked {% endif %} onclick="$('body').addClass('advanced').removeClass('normal');">
+                  <input type="radio" name="advanced_ui" value="advanced" id="option2" autocomplete="off"> Advanced User Interface
+                </label>
+              </div>  
+              </div>
+            </div>
+
+
 <input type="hidden" name="json" value="{{ json }}">
         <div class="col-md-12">
           <h1>Isotherm&nbsp;Setup</h1>
         </div>
       </div>
       {{ isotherm|safe }}
-      <div class="row">
+      <div class="row advanced">
         <div class="col-md-12">
           <h1>External Function</h1>
         </div>
       </div>
-      <div class="row">
+      <div class="row advanced">
         <div class="col-md-12">
           <p>Paste in a comma seperated value string of values for each function. I
             have not yet thought of any good way to handle tens to hundreds to possibly
             thousands of values in a sane UI that anyone would want to use.</p>
         </div>
       </div>
-      <div class="row">
+      <div class="row advanced">
         <div class="col-md-12">
             <div class="form-group">
               <div class="col-sm-2">
@@ -49,14 +64,18 @@
                 <textarea class="form-control" id="ext_profile_delta" name="ext_profile_delta">{{ ext_profile_delta }}</textarea>
               </div>
             </div>
-            <div class="form-group">
+     </div>
+     </div>
+     
+     <div class="row">
+                 <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
                   <button type="submit" class="btn btn-danger back" data-post="{{ back }}" formnovalidate>Back To {{ back_text }}</button>
-                <button type="submit" class="btn btn-success">Continue To Column Setup</button>
+                <button type="submit" class="btn btn-success">Continue To Loading Setup</button>
               </div>
             </div>
-          
-        </div>
+            </div>
+     
       </div>
 </form>
 

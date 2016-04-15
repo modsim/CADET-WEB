@@ -4,6 +4,20 @@
 <form id="cadet_form" class="form-horizontal" role="form" style="" action="{% url 'simulation:simulation_setup' %}" method="POST">
       {% csrf_token %}
       <div class="row">
+
+            <div class="form-group">
+              <div class="col-sm-12">
+              <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-primary {% if advanced_ui == 'normal' %} active {% endif %} " {% if advanced_ui == 'normal' %} checked {% endif %} onclick="$('body').removeClass('advanced').addClass('normal');">
+                  <input type="radio" name="advanced_ui" value="normal" id="option1" autocomplete="off"> Normal User Interface
+                </label>
+                <label class="btn btn-primary {% if advanced_ui == 'advanced' %} active {% endif %}" {% if advanced_ui == 'advanced' %} checked {% endif %} onclick="$('body').addClass('advanced').removeClass('normal');">
+                  <input type="radio" name="advanced_ui" value="advanced" id="option2" autocomplete="off"> Advanced User Interface
+                </label>
+              </div>  
+              </div>
+            </div>   
+      
       <input type="hidden" name="json" value="{{ json }}">
 
         <div class="col-md-12">

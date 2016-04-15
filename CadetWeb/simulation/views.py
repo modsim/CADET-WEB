@@ -165,10 +165,10 @@ def generate_column_table(list_of_names, data):
 
     html.append('</tr></thead><tbody>')
 
-    vals = ( ('FILM_DIFFUSION', 'Film Diffusion'),
-             ("INIT_C", 'Initial Mobile Concentration'),
-             ('INIT_Q', 'Initial Bound Concentration'),
-             ("PAR_DIFFUSION", 'Particle Diffusion'),
+    vals = ( ("INIT_C", 'Initial Mobile Phase Concentration'),
+             ('INIT_Q', 'Initial Stationary Phase Concentration'),
+             ('FILM_DIFFUSION', 'External Mass Transfer Diffusion'),
+             ("PAR_DIFFUSION", 'Particle Pore Diffusion'),
              ('PAR_SURFDIFFUSION', 'Particle Surface Diffusion'), )
 
     for attribute, title in vals:
@@ -189,13 +189,13 @@ def generate_step_settings(step, list_of_names, data):
 
     html.append('</tr></thead><tbody>')
 
-    vals = ( ('CONST_COEFF', 'Constant'),
-             ('LIN_COEFF', "Linear"),
-             ('QUAD_COEFF', 'Quadratic'),
-             ('CUBE_COEFF', "Cubic"), )
+    vals = ( ('CONST_COEFF', 'Constant', ''),
+             ('LIN_COEFF', "Linear", ''),
+             ('QUAD_COEFF', 'Quadratic', 'advanced'),
+             ('CUBE_COEFF', "Cubic", 'advanced'), )
 
-    for attribute, title in vals:
-        html.append('<tr><td>%s</td>' % title)
+    for attribute, title, cssClass in vals:
+        html.append('<tr class="%s"><td>%s</td>' % (cssClass, title))
         for name in list_of_names:
             value = data.get("%s:%s:%s" % (step, name, attribute), '0')
             html.append('<td><input type="text" class="required" name="%s:%s:%s" value="%s"></td>' % (step, name, attribute, value))
@@ -218,7 +218,7 @@ def index(request):
 #@login_required
 def remove_old_simulations():
     jobs = models.Job.objects.filter(created__lte=datetime.now()-timedelta(days=settings.keep_time))
-
+    
     removed = 0
     for job in jobs:
         if job.username not in settings.users_keep:
@@ -374,8 +374,8 @@ def draw_isotherm(data, isotherm):
                 <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
               <div class="radio">
-                <input type="radio" name="IS_KINETIC" id="radio1" value="1" %s><label for="radio1">Use Kinetic Model</label>
-                <input type="radio" name="IS_KINETIC" id="radio2" value="0" %s><label for="radio2">Don't Use Kinetic Model</label>
+                <input type="radio" name="IS_KINETIC" id="radio1" value="1" %s><label for="radio1">Use Kinetic Binding Model</label>
+                <input type="radio" name="IS_KINETIC" id="radio2" value="0" %s><label for="radio2">Use Isotherm Binding Model</label>
                 </div>
               </div>
             </div>
@@ -414,8 +414,8 @@ def isotherm_setup(request):
     data['json'] = get_json_string(data)
     #data['isotherm'] =  utils.call_plugin_by_name(isotherm_name, 'isotherm', 'run', list_of_names, data)
     data['isotherm'] = draw_isotherm(data, isotherm_name)
-    data['back'] = reverse('simulation:component_and_step_setup', None, None)
-    data['back_text'] = 'Component and Step Setup'
+    data['back'] = reverse('simulation:column_setup', None, None)
+    data['back_text'] = 'Column Setup'  
     return render(request, 'simulation/isotherm_setup.html', data)
 
 @login_required
@@ -423,16 +423,13 @@ def column_setup(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
-    isotherm_name = data.get('ADSORPTION_TYPE')
-    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
-    data['CADET_ISOTHERM'] = process_isotherm(data, isotherm_name)
 
-    print process_isotherm(data, isotherm_name)
 
     data['json'] = get_json_string(data)
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
     data['column_table'] = generate_column_table(list_of_names, data)
-    data['back'] = reverse('simulation:isotherm_setup', None, None)
-    data['back_text'] = 'Isotherm Setup'
+    data['back'] = reverse('simulation:component_and_step_setup', None, None)
+    data['back_text'] = 'Component and Step Setup'
     return render(request, 'simulation/column_setup.html', data)
 
 @login_required
@@ -441,6 +438,11 @@ def loading_setup(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
+    
+    isotherm_name = data.get('ADSORPTION_TYPE')
+    
+    data['CADET_ISOTHERM'] = process_isotherm(data, isotherm_name)
+    
     list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
     list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
@@ -455,8 +457,8 @@ def loading_setup(request):
     data['continuous'] = continuous
     step_times = ['Start:' + step for step in list_of_steps] + ['End:' + list_of_steps[-1]]
     data['step_times'] = [(name.replace(':', ' '), name, data.get(name, '0')) for name in step_times]
-    data['back'] = reverse('simulation:column_setup', None, None)
-    data['back_text'] = 'Column Setup'
+    data['back'] = reverse('simulation:isotherm_setup', None, None)
+    data['back_text'] = 'Isotherm Setup'
 
     return render(request, 'simulation/loading_setup.html', data)
 
@@ -479,7 +481,7 @@ def simulation_setup(request):
                         ('Use Analytical Jacobian', 'USE_ANALYTIC_JACOBIAN','1'),
                         ('Write at User Times', 'WRITE_AT_USER_TIMES','0'),
                         ('Write All Sensitivities', 'WRITE_SENS_ALL','0'),
-                        ('Write Sensitivity at Column Outlet', 'WRITE_SENS_COLUMN_OUTLET','0'),
+                        ('Write Sensitivity at Column Outlet', 'WRITE_SENS_COLUMN_OUTLET','1'),
                         ('Write Solution All', 'WRITE_SOLUTION_ALL','0'),
                         ('Write Solution Column Inlet', 'WRITE_SOLUTION_COLUMN_INLET','1'),
                         ('Write Solution Column Outlet', 'WRITE_SOLUTION_COLUMN_OUTLET','1'),
