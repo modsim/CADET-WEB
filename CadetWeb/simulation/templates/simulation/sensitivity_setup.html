@@ -8,6 +8,19 @@
 <input type="hidden" name="table" id="table" value="" >
          <div class="col-md-12"><h2>Sensitivity parameters</h2></div>
 
+          <div class="form-group">
+              <div class="col-sm-12">
+              <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default {% if advanced_ui == 'normal' %} active {% endif %} " {% if advanced_ui == 'normal' %} checked {% endif %} onclick="$('body').removeClass('advanced').addClass('normal');">
+                  <input type="radio" name="advanced_ui" value="normal" id="option1" autocomplete="off"> Normal User Interface
+                </label>
+                <label class="btn btn-default {% if advanced_ui == 'advanced' %} active {% endif %}" {% if advanced_ui == 'advanced' %} checked {% endif %} onclick="$('body').addClass('advanced').removeClass('normal');">
+                  <input type="radio" name="advanced_ui" value="advanced" id="option2" autocomplete="off"> Advanced User Interface
+                </label>
+              </div>  
+              </div>
+            </div>
+
 		<div class="col-md-12">
 		<div class="form-group">
 
@@ -19,8 +32,8 @@
                 <th>Component</th>
                 <th>Section</th>
                 <th>Description</th>
-                <th>Absolute Tolerance</th>
-                <th>Relative Disturbance</th>
+                <th class="advanced">Absolute Tolerance</th>
+                <th class="advanced">Relative Disturbance</th>
             </tr>
         </thead>
 
@@ -31,8 +44,8 @@
                 <th>Component</th>
                 <th>Section</th>
                 <th>Description</th>
-                <th>Absolute Tolerance</th>
-                <th>Relative Disturbance</th>
+                <th class="advanced">Absolute Tolerance</th>
+                <th class="advanced">Relative Disturbance</th>
             </tr>
         </tfoot>
         <tbody>
@@ -43,8 +56,8 @@
              <td>{{ name }}</td><td>{{ component }}</td>
              <td>{{ section }}</td>
              <td>{{ description }}</td>
-             <td><input type="text" name="{{ abs_tol }}" min="0" value="{{ abs_tol_val }}"></td>
-             <td><input type="text" name="{{ rel_dist }}" min="0" value="{{ rel_dist_value }}"></td></tr>
+             <td class="advanced"><input type="text" name="{{ abs_tol }}" min="0" value="{{ abs_tol_val }}"></td>
+             <td class="advanced"><input type="text" name="{{ rel_dist }}" min="0" value="{{ rel_dist_value }}"></td></tr>
 		 {% endfor %}
 
         </tbody>
