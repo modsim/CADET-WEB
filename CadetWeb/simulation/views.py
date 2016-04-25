@@ -60,6 +60,7 @@ default_value['WENO_ORDER'] = '3'
 default_value['NTHREADS'] = '4'
 default_value['LOG_LEVEL'] = '4'
 default_value['advanced_ui'] = 'normal'
+default_value['graph_single:Chromatogram'] = '1'
 
 current_path = __file__
 simulation_path, current_file_name = os.path.split(current_path)
