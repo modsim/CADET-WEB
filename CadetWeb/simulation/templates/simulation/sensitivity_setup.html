@@ -50,10 +50,10 @@
         </tfoot>
         <tbody>
 
-         {% for check, checked, name, component, section, description, abs_tol, abs_tol_val, rel_dist, rel_dist_value in entry %}
+         {% for check, checked, name, tip, component, section, description, abs_tol, abs_tol_val, rel_dist, rel_dist_value in entry %}
              <tr>
              <td><input type="checkbox" name="{{ check }}" value="1"  {{ checked }}></td>
-             <td>{{ name }}</td><td>{{ component }}</td>
+             <td data-toggle="tooltip" data-placement="bottom" title="{{ tip }}">{{ name }}</td><td>{{ component }}</td>
              <td>{{ section }}</td>
              <td>{{ description }}</td>
              <td class="advanced"><input type="text" name="{{ abs_tol }}" min="0" value="{{ abs_tol_val }}"></td>

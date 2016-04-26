@@ -434,7 +434,10 @@ def isotherm_setup(request):
     #data['isotherm'] =  utils.call_plugin_by_name(isotherm_name, 'isotherm', 'run', list_of_names, data)
     data['isotherm'] = draw_isotherm(data, isotherm_name)
     data['back'] = reverse('simulation:column_setup', None, None)
-    data['back_text'] = 'Column Setup'  
+    data['back_text'] = 'Column Setup'
+    data['velocity_name'], data['velocity_tip'] = name_lookup['EXT_VELOCITY']
+    data['profile_name'], data['profile_tip'] = name_lookup['EXT_PROFILE']
+    data['delta_name'], data['delta_tip'] = name_lookup['EXT_PROF_DELTA']  
     return render(request, 'simulation/isotherm_setup.html', data)
 
 @login_required
@@ -599,10 +602,12 @@ def sensitivity_setup(request):
             except ZeroDivisionError:
                 default = 0
             form_name = ':'.join([i for i in name, component, section])
+            human_name, tool_tip = name_lookup[name]
             entry.append( (
                 'choice:%s' % (form_name),
                 'checked' if data.get('choice:%s' % (form_name), '') == '1' else '',
-                name,
+                human_name,
+                tool_tip,
                 component,
                 section,
                 description,
