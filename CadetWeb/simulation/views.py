@@ -207,13 +207,15 @@ def generate_step_settings(step, list_of_names, data):
 
     html.append('</tr></thead><tbody>')
 
-    vals = ( ('CONST_COEFF', 'Constant', ''),
-             ('LIN_COEFF', "Linear", ''),
-             ('QUAD_COEFF', 'Quadratic', 'advanced'),
-             ('CUBE_COEFF', "Cubic", 'advanced'), )
+    vals = ( ( 'CONST_COEFF', ''),
+             ('LIN_COEFF', ''),
+             ('QUAD_COEFF', 'advanced'),
+             ('CUBE_COEFF', 'advanced'), )
 
-    for attribute, title, cssClass in vals:
-        html.append('<tr class="%s"><td>%s</td>' % (cssClass, title))
+    for attribute, cssClass in vals:
+        human_name, tooltip, units = name_lookup_python[attribute]
+
+        html.append('<tr class="%s"><td data-toggle="tooltip" data-placement="bottom" title="%s">%s </td>' % (cssClass, tooltip, human_name) )
         for name in list_of_names:
             value = data.get("%s:%s:%s" % (step, name, attribute), '0')
             html.append('<td><input type="text" class="required" name="%s:%s:%s" value="%s"></td>' % (step, name, attribute, value))
@@ -501,19 +503,19 @@ def simulation_setup(request):
     data['discretizations'] = nice_names(['EQUIDISTANT_PAR', 'EQUIVOLUME_PAR', 'USER_DEFINED_PAR'], data, 'PAR_DISC_TYPE')
     data['reconstructions'] = nice_names(['WENO'], data, 'RECONSTRUCTION')
     data['log_levels'] = nice_names(['ERROR', 'WARNING', 'INFO', 'DEBUG1', 'DEBUG2', 'TRACE1', 'TRACE2'], data, 'LOG_LEVEL')
-    data['radios'] = fix_radio([ ('Print Config', 'PRINT_CONFIG','0'),
-                        ('Print Parameter List', 'PRINT_PARAMLIST','0'),
-                        ('Print Progress', 'PRINT_PROGRESS','0'),
-                        ('Print Statistics', 'PRINT_STATISTICS','1'),
-                        ('Print Timing', 'PRINT_TIMING','1'),
-                        ('Use Analytical Jacobian', 'USE_ANALYTIC_JACOBIAN','1'),
-                        ('Write at User Times', 'WRITE_AT_USER_TIMES','0'),
-                        ('Write All Sensitivities', 'WRITE_SENS_ALL','0'),
-                        ('Write Sensitivity at Column Outlet', 'WRITE_SENS_COLUMN_OUTLET','1'),
-                        ('Write Solution All', 'WRITE_SOLUTION_ALL','0'),
-                        ('Write Solution Column Inlet', 'WRITE_SOLUTION_COLUMN_INLET','1'),
-                        ('Write Solution Column Outlet', 'WRITE_SOLUTION_COLUMN_OUTLET','1'),
-                        ('Write Solution Times', 'WRITE_SOLUTION_TIMES','1')], data)
+    data['radios'] = fix_radio([ ('PRINT_CONFIG','0'),
+                        ('PRINT_PARAMLIST','0'),
+                        ('PRINT_PROGRESS','0'),
+                        ('PRINT_STATISTICS','1'),
+                        ('PRINT_TIMING','1'),
+                        ('USE_ANALYTIC_JACOBIAN','1'),
+                        ('WRITE_AT_USER_TIMES','0'),
+                        ('WRITE_SENS_ALL','0'),
+                        ('WRITE_SENS_COLUMN_OUTLET','1'),
+                        ('WRITE_SOLUTION_ALL','0'),
+                        ('WRITE_SOLUTION_COLUMN_INLET','1'),
+                        ('WRITE_SOLUTION_COLUMN_OUTLET','1'),
+                        ('WRITE_SOLUTION_TIMES','1')], data)
     data['back'] = reverse('simulation:loading_setup', None, None)
     data['back_text'] = 'Loading Setup'
     data.update(name_lookup_template)
@@ -1323,7 +1325,10 @@ def nice_names(seq, data, name):
 
 def fix_radio(seq, data):
     temp = []
-    for label, name, value in seq:
+    for name, value in seq:
+
+        human_name, tool_tip, units = name_lookup_python[name]
+
         value = data.get(name, value)
         if value == '1':
             yes = 'checked="checked"'
@@ -1331,7 +1336,7 @@ def fix_radio(seq, data):
         else:
             yes = ''
             no = 'checked="checked"'
-        temp.append( (label, name, yes, no))
+        temp.append( (human_name, tool_tip, name, yes, no))
     return temp
 
 @login_required

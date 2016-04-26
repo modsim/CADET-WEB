@@ -7,8 +7,8 @@ INIT_Q,mol/m^3,double,1,0,0,Same as INIT_C but for the bound phase,Bound Initial
 COL_DISPERSION,m^2/s,double,0,0,1,Axial dispersion coefficient,Column Dispersion
 COL_LENGTH,m,double,0,0,1,Column length,Column Length
 COL_POROSITY,,double,0,0,1,Column porosity,Column Porosity
-FILM_DIFFUSION,m/s,double,1,0,1,A vector with film diffusion coefficients,Film Diffusion
-PAR_DIFFUSION,m^2/s,double,1,0,1,A vector with particle diffusion coefficients,Particle Diffusion
+FILM_DIFFUSION,m/s,double,1,0,1,A vector with film diffusion coefficients,External Mass Transfer Diffusion
+PAR_DIFFUSION,m^2/s,double,1,0,1,A vector with particle diffusion coefficients,Particle Pore Diffusion
 PAR_POROSITY,,double,0,0,1,Particle porosity,Particle Porosity
 PAR_RADIUS,m,double,0,0,1,Particle radius,Particle Radius
 PAR_SURFDIFFUSION,m^2/s,double,1,0,1,A vector with particle surface diffusion coefficients,Particle Surface Diffusion
@@ -135,3 +135,4 @@ EXTSMA_LAMBDA,,double,0,0,1,Stationary phase capacity (monovalent salt counterio
 EXTSMA_LAMBDA_T,,double,0,0,1,Stationary phase capacity (monovalent salt counterions) in the thermal steric mass action model,Lambda Linear
 EXTSMA_LAMBDA_TT,,double,0,0,1,Stationary phase capacity (monovalent salt counterions) in the thermal steric mass action model,Lambda Quadratic
 EXTSMA_LAMBDA_TTT,,double,0,0,1,Stationary phase capacity (monovalent salt counterions) in the thermal steric mass action model,Lambda Cubic
+NTHREADS,,int,0,0,0,Number of OpenMP threads to use for each simulation,Number of Threads

@@ -27,7 +27,7 @@
 		<div class="col-md-12 advanced">
 			<div class="form-group">
 		          <div class="col-sm-2">
-		            <label class="control-label">Chromatography Type</label>
+		            <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ CHROMATOGRAPHY_TYPE_tip }}">{{ CHROMATOGRAPHY_TYPE_human }}</label>
 		          </div>
 		          <div class="col-sm-10">
 		            <select class="form-control required" name="CHROMATOGRAPHY_TYPE">
@@ -48,7 +48,7 @@
 		<div class="col-md-12">
 		    <div class="form-group">
 		      <div class="col-sm-2">
-		        <label for="NCOL" class="control-label">NCOL</label>
+		        <label for="NCOL" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ NCOL_tip }}">{{ NCOL_human }}</label>
 		      </div>
 		      <div class="col-sm-10">
 		        <input type="text" class="form-control required" id="NCOL" name="NCOL" value="{{ NCOL }}">
@@ -56,7 +56,7 @@
 		    </div>
 		    <div class="form-group">
 		      <div class="col-sm-2">
-		        <label for="NPAR" class="control-label">NPAR</label>
+		        <label for="NPAR" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ NPAR_tip }}">{{ NPAR_human }}</label>
 		      </div>
 		      <div class="col-sm-10">
 		        <input type="text" class="form-control required" id="NPAR" name="NPAR" value="{{ NPAR }}">
@@ -64,7 +64,7 @@
 		    </div>
 		    <div class="form-group advanced">
 		      <div class="col-sm-2">
-		        <label class="control-label">Particle Discretization Type</label>
+		        <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ PAR_DISC_TYPE_tip }}">{{ PAR_DISC_TYPE_human }}</label>
 		      </div>
 		      <div class="col-sm-10">
 		        <select class="form-control required" name="PAR_DISC_TYPE">
@@ -78,7 +78,7 @@
 
                 <div class="form-group advanced">
                   <div class="col-sm-2">
-                    <label for="PAR_DISC_VECTOR" class="control-label">PAR_DISC_VECTOR</label>
+                    <label for="PAR_DISC_VECTOR" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ PAR_DISC_VECTOR_tip }}">{{ PAR_DISC_VECTOR_human }}</label>
                   </div>
                   <div class="col-sm-3">
                     <input type="text" class="form-control required" id="PAR_DISC_VECTOR_1" name="PAR_DISC_VECTOR_1" value="{{ PAR_DISC_VECTOR_1 }}">
@@ -92,7 +92,7 @@
                 </div>
                 <div class="form-group advanced">
                   <div class="col-sm-2">
-                    <label class="control-label">Reconstruction</label>
+                    <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ RECONSTRUCTION_tip }}">{{ RECONSTRUCTION_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <select class="form-control required" name="RECONSTRUCTION">
@@ -110,7 +110,7 @@
             <div class="col-md-12 advanced">
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="weno_boundary_model" class="control-label">Boundary Model</label>
+                    <label for="weno_boundary_model" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ BOUNDARY_MODEL_tip }}">{{ BOUNDARY_MODEL_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="BOUNDARY_MODEL" name="BOUNDARY_MODEL" value="{{ BOUNDARY_MODEL }}">
@@ -118,7 +118,7 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="weno_EPS" class="control-label">EPS</label>
+                    <label for="weno_EPS" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ WENO_EPS_tip }}">{{ WENO_EPS_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="WENO_EPS" name="WENO_EPS" value="{{ WENO_EPS }}">
@@ -126,7 +126,7 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="weno_order" class="control-label">Order</label>
+                    <label for="weno_order" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ WENO_ORDER_tip }}">{{ WENO_ORDER_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="WENO_ORDER" name="WENO_ORDER" value="{{ WENO_ORDER }}">
@@ -138,7 +138,7 @@
               <h2>Solver</h2>
                 <div class="form-group advanced ">
                   <div class="col-sm-2">
-                    <label class="control-label">Log Level</label>
+                    <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ LOG_LEVEL_tip }}">{{ LOG_LEVEL_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <select class="form-control required" name="LOG_LEVEL">
@@ -150,7 +150,7 @@
                 </div>
                 <div class="form-group advanced">
                   <div class="col-sm-2">
-                    <label class="control-label">Number of &nbsp;Threads</label>
+                    <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ NTHREADS_tip }}">{{ NTHREADS_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" name="NTHREADS" value="{{ NTHREADS }}">
@@ -158,18 +158,18 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label class="control-label">User Solution Times (comma seperated)</label>
+                    <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ USER_SOLUTION_TIMES_tip }}">{{ USER_SOLUTION_TIMES_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <textarea class="form-control" name="USER_SOLUTION_TIMES"></textarea>
                   </div>
                 </div>
                 
-                {% for radio_text, radio_form, checked_yes, checked_no in radios %}
+                {% for radio_text, radio_tip, radio_form, checked_yes, checked_no in radios %}
                 <div class="form-group advanced">
                   <div class="col-sm-offset-2 col-sm-10">
                   <div class="radio">
-                   <div class="col-sm-3">{{ radio_text }}</div>
+                   <div class="col-sm-3" data-toggle="tooltip" data-placement="bottom" title="{{ radio_tip }}">{{ radio_text }}</div>
     				<input type="radio" id="{{ radio_form }}1" name="{{ radio_form }}" {{ checked_yes|safe }} value="1"><label for="{{ radio_form }}1">Yes</label>
     				<input type="radio" id="{{ radio_form }}2" name="{{ radio_form }}" {{ checked_no|safe }} value="0"><label for="{{ radio_form }}2">No</label>
      			  </div>
@@ -182,7 +182,7 @@
               <h2>Schur Solver</h2>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="GS_TYPE" class="control-label">GS_TYPE</label>
+                    <label for="GS_TYPE" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ GS_TYPE_tip }}">{{ GS_TYPE_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="GS_TYPE" name="GS_TYPE" value="{{ GS_TYPE }}">
@@ -190,7 +190,7 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="MAX_KRYLOV" class="control-label">MAX_KRYLOV</label>
+                    <label for="MAX_KRYLOV" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ MAX_KRYLOV_tip }}">{{ MAX_KRYLOV_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="MAX_KRYLOV" name="MAX_KRYLOV" value="{{ MAX_KRYLOV }}">
@@ -198,7 +198,7 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="MAX_RESTARTS" class="control-label">MAX_RESTARTS</label>
+                    <label for="MAX_RESTARTS" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ MAX_RESTARTS_tip }}">{{ MAX_RESTARTS_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="MAX_RESTARTS" name="MAX_RESTARTS" value="{{ MAX_RESTARTS }}">
@@ -206,7 +206,7 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="SCHUR_SAFETY" class="control-label">SCHUR_SAFETY</label>
+                    <label for="SCHUR_SAFETY" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ SCHUR_SAFETY_tip }}">{{ SCHUR_SAFETY_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="SCHUR_SAFETY" name="SCHUR_SAFETY" value="{{ SCHUR_SAFETY }}">
@@ -215,7 +215,7 @@
               <h2>Time Integrator</h2>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="time_ABSTOL" class="control-label">ABSTOL</label>
+                    <label for="time_ABSTOL" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ ABSTOL_tip }}">{{ ABSTOL_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="ABSTOL" name="ABSTOL" value="{{ ABSTOL }}">
@@ -223,7 +223,7 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="time_INIT_STEP_SIZE" class="control-label">INIT_STEP_SIZE</label>
+                    <label for="time_INIT_STEP_SIZE" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ INIT_STEP_SIZE_tip }}">{{ INIT_STEP_SIZE_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="INIT_STEP_SIZE" name="INIT_STEP_SIZE" value="{{ INIT_STEP_SIZE }}">
@@ -231,7 +231,7 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="time_MAX_STEPS" class="control-label">MAX_STEPS</label>
+                    <label for="time_MAX_STEPS" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ MAX_STEPS_tip }}">{{ MAX_STEPS_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="MAX_STEPS" name="MAX_STEPS" value="{{ MAX_STEPS }}">
@@ -239,7 +239,7 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="time_REL_TOL" class="control-label">RELTOL</label>
+                    <label for="time_REL_TOL" class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ RELTOL_tip }}">{{ RELTOL_human }}</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="time_RELTOL" name="RELTOL" value="{{ RELTOL }}">
@@ -247,11 +247,6 @@
                 </div>
  
             </div>
- 
-          
-		<div class="col-md-12 advanced">
-          <h2>Sensitivity Setup</h2>
-        </div>
 
         <div class="col-md-12">
 
