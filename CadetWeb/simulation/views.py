@@ -132,6 +132,7 @@ def generate_name_lookup(paraemters):
         temp_python[par_name] = (human_name, description)
         temp_django[par_name+ '_human'] = human_name
         temp_django[par_name+ '_tip'] = description
+        temp_django[par_name+ '_units'] = units
     return temp_python, temp_django
 
 
