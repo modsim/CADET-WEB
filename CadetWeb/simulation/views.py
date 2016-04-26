@@ -123,14 +123,21 @@ isotherm_settings, isotherm_set, isotherm_name_set = isotherm_setup_cache(isothe
 #the key is the CADET name and the value is a tuple of a name to display and the text for a tooltip
 
 def generate_name_lookup(paraemters):
-    "generate the dictionary that maps CADET names to more human names"
-    temp = {}
+    "generate the dictionarys that maps CADET names to more human names"
+    "The first dictionary is used in python to quickly look up human names and tooltips"
+    "The second dictionary is used for django templates and the names are modified in a predictable way to make it easy to use in templates without conflicts"
+    temp_python = {}
+    temp_django = {}
     for par_name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
-        temp[par_name] = (human_name, description)
-    return temp
+        temp_python[par_name] = (human_name, description)
+        temp_django[par_name+ '_human'] = human_name
+        temp_django[par_name+ '_tip'] = description
+    return temp_python, temp_django
 
 
-name_lookup = generate_name_lookup(parameters)
+name_lookup_python, name_lookup_template = generate_name_lookup(parameters)
+
+
 
 
 
@@ -316,7 +323,7 @@ def single_start(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
-
+    
     if 'path' in request.GET:
         path = request.GET['path']
 
@@ -334,6 +341,7 @@ def single_start(request):
     isotherms = [(isotherm.replace('_', ' ').title(), isotherm, 'selected' if isotherm == data.get('ADSORPTION_TYPE', None) else '') for isotherm in isotherms]
     data['isotherms'] = isotherms
     data['json'] = get_json_string(data)
+    data.update(name_lookup_template)
     return render(request, 'simulation/single_start.html', data)
 
 @login_required
@@ -353,6 +361,7 @@ def component_and_step_setup(request):
     data['steps'] = steps
     data['back'] = reverse('simulation:single_start', None, None)
     data['back_text'] = 'The Beginning'
+    data.update(name_lookup_template)
     return render(request, 'simulation/component_and_step_setup.html', data)
 
 def draw_isotherm(data, isotherm):
@@ -364,7 +373,7 @@ def draw_isotherm(data, isotherm):
     html.append('</tr></thead><tbody>')
     for (attribute, per_component) in isotherm_settings[isotherm]:
         if per_component:
-            human_name, tooltip = name_lookup[attribute]
+            human_name, tooltip = name_lookup_python[attribute]
             html.append('<tr><td data-toggle="tooltip" data-placement="bottom" title="%s">%s</td>' % (tooltip, human_name))
             for name in list_of_names:
                 value = data.get('%s:%s' % (name, attribute), '0')
@@ -374,7 +383,7 @@ def draw_isotherm(data, isotherm):
 
     for (attribute, per_component) in isotherm_settings[isotherm]:
         if not per_component:
-            human_name, tooltip = name_lookup[attribute]
+            human_name, tooltip = name_lookup_python[attribute]
             html.append('''<div class="row"><div class="col-md-12">
                 <div class="form-group">
                   <div class="col-sm-2">
@@ -428,6 +437,7 @@ def isotherm_setup(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
+    
     isotherm_name = data.get('ADSORPTION_TYPE')
 
     data['json'] = get_json_string(data)
@@ -435,9 +445,7 @@ def isotherm_setup(request):
     data['isotherm'] = draw_isotherm(data, isotherm_name)
     data['back'] = reverse('simulation:column_setup', None, None)
     data['back_text'] = 'Column Setup'
-    data['velocity_name'], data['velocity_tip'] = name_lookup['EXT_VELOCITY']
-    data['profile_name'], data['profile_tip'] = name_lookup['EXT_PROFILE']
-    data['delta_name'], data['delta_tip'] = name_lookup['EXT_PROF_DELTA']  
+    data.update(name_lookup_template)
     return render(request, 'simulation/isotherm_setup.html', data)
 
 @login_required
@@ -445,6 +453,7 @@ def column_setup(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
+    
 
 
     data['json'] = get_json_string(data)
@@ -452,6 +461,7 @@ def column_setup(request):
     data['column_table'] = generate_column_table(list_of_names, data)
     data['back'] = reverse('simulation:component_and_step_setup', None, None)
     data['back_text'] = 'Component and Step Setup'
+    data.update(name_lookup_template)
     return render(request, 'simulation/column_setup.html', data)
 
 @login_required
@@ -460,6 +470,7 @@ def loading_setup(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
+    
     
     isotherm_name = data.get('ADSORPTION_TYPE')
     
@@ -481,7 +492,7 @@ def loading_setup(request):
     data['step_times'] = [(name.replace(':', ' '), name, data.get(name, '0')) for name in step_times]
     data['back'] = reverse('simulation:isotherm_setup', None, None)
     data['back_text'] = 'Isotherm Setup'
-
+    data.update(name_lookup_template)
     return render(request, 'simulation/loading_setup.html', data)
 
 @login_required
@@ -489,6 +500,7 @@ def simulation_setup(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
+    
 
     data['json'] = get_json_string(data)
     data['rate_models'] = nice_names(['GENERAL_RATE_MODEL',], data, 'CHROMATOGRAPHY_TYPE')
@@ -510,7 +522,7 @@ def simulation_setup(request):
                         ('Write Solution Times', 'WRITE_SOLUTION_TIMES','1')], data)
     data['back'] = reverse('simulation:loading_setup', None, None)
     data['back_text'] = 'Loading Setup'
-
+    data.update(name_lookup_template)
     return render(request, 'simulation/simulation_setup.html', data)
 
 @login_required
@@ -518,6 +530,7 @@ def graph_setup(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
+    
 
     if data['job_type'] == 'batch':
         cadet_runner.generate_ranges(data)
@@ -541,6 +554,7 @@ def graph_setup(request):
     else:
         data['back'] = reverse('simulation:simulation_setup', None, None)
         data['back_text'] = 'Simulation Setup'
+    data.update(name_lookup_template)
     return render(request, 'simulation/graph_setup.html', data)
 
 @login_required
@@ -548,6 +562,7 @@ def performance_parameters(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
+    
 
     data['json'] = get_json_string(data)
     data['perf_single'] = [(name, 'checked' if data.get('perf_single:%s' % name, '')  == '1' else '', '' if data.get('perf_single:%s' % name, '')  == '1' else 'checked') for name in sorted(utils.get_plugin_names('performance/single'))]
@@ -555,7 +570,7 @@ def performance_parameters(request):
     data['job_type'] = data['job_type']
     data['back'] = reverse('simulation:graph_setup', None, None)
     data['back_text'] = 'Graph Setup'
-
+    data.update(name_lookup_template)
     return render(request, 'simulation/performance_parameters.html', data)
 
 @login_required
@@ -563,6 +578,7 @@ def sensitivity_setup(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
+    
 
     list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
     list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
@@ -602,7 +618,7 @@ def sensitivity_setup(request):
             except ZeroDivisionError:
                 default = 0
             form_name = ':'.join([i for i in name, component, section])
-            human_name, tool_tip = name_lookup[name]
+            human_name, tool_tip = name_lookup_python[name]
             entry.append( (
                 'choice:%s' % (form_name),
                 'checked' if data.get('choice:%s' % (form_name), '') == '1' else '',
@@ -625,6 +641,7 @@ def sensitivity_setup(request):
     #data['back_text'] = 'Performance Parameters Setup'
     data['back'] = reverse('simulation:graph_setup', None, None)
     data['back_text'] = 'Graph Setup'
+    data.update(name_lookup_template)
     return render(request, 'simulation/sensitivity_setup.html', data)
 
 @login_required
