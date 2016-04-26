@@ -186,14 +186,11 @@ def generate_column_table(list_of_names, data):
 
     html.append('</tr></thead><tbody>')
 
-    vals = ( ("INIT_C", 'Initial Mobile Phase Concentration'),
-             ('INIT_Q', 'Initial Stationary Phase Concentration'),
-             ('FILM_DIFFUSION', 'External Mass Transfer Diffusion'),
-             ("PAR_DIFFUSION", 'Particle Pore Diffusion'),
-             ('PAR_SURFDIFFUSION', 'Particle Surface Diffusion'), )
+    vals = ( "INIT_C", 'INIT_Q', 'FILM_DIFFUSION', "PAR_DIFFUSION", 'PAR_SURFDIFFUSION' )
 
-    for attribute, title in vals:
-        html.append('<tr><td>%s</td>' % title)
+    for attribute in vals:
+        human_name, tooltip, units = name_lookup_python[attribute]
+        html.append('<tr><td data-toggle="tooltip" data-placement="bottom" title="%s">%s (%s) </td>' % (tooltip, human_name, units) )
         for name in list_of_names:
             value = data.get('%s:%s' % (name, attribute), '0')
             html.append('<td><input type="text" class="required" name="%s:%s" value="%s"></td>' % (name, attribute, value))
