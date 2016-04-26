@@ -80,11 +80,11 @@ def get_parameters():
         reader = csv.reader(csvfile)
         #read the header and discard it
         reader.next()
-        for name, units, type, per_component, per_section, sensitive, description  in reader:
+        for name, units, type, per_component, per_section, sensitive, description, human_name  in reader:
             per_component = int(per_component)
             per_section = int(per_section)
             sensitive = int(sensitive)
-            temp.append( (name, units, type, per_component, per_section, sensitive, description), )
+            temp.append( (name, units, type, per_component, per_section, sensitive, description, human_name), )
         return temp
 
 def get_isotherms():
@@ -107,7 +107,7 @@ def isotherm_setup_cache(isotherms, parameters):
         section_set = temp_set.get(isotherm, set())
         section_set.add(name)
         name_set.add(name)
-        for par_name, units, type, per_component, per_section, sensitive, description in parameters:
+        for par_name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
             if name == par_name:
                 section.append( (name, per_component), )
         temp[isotherm] = section
@@ -118,6 +118,21 @@ def isotherm_setup_cache(isotherms, parameters):
 isotherms = get_isotherms()
 parameters = get_parameters()
 isotherm_settings, isotherm_set, isotherm_name_set = isotherm_setup_cache(isotherms, parameters)
+
+#create a lookup table to map the CADET name to a more user friendly name
+#the key is the CADET name and the value is a tuple of a name to display and the text for a tooltip
+
+def generate_name_lookup(paraemters):
+    "generate the dictionary that maps CADET names to more human names"
+    temp = {}
+    for par_name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
+        temp[par_name] = (human_name, description)
+    return temp
+
+
+name_lookup = generate_name_lookup(parameters)
+
+
 
 def get_json(post):
     temp = {}
@@ -349,7 +364,8 @@ def draw_isotherm(data, isotherm):
     html.append('</tr></thead><tbody>')
     for (attribute, per_component) in isotherm_settings[isotherm]:
         if per_component:
-            html.append('<tr><td>%s</td>' % attribute)
+            human_name, tooltip = name_lookup[attribute]
+            html.append('<tr><td data-toggle="tooltip" data-placement="bottom" title="%s">%s</td>' % (tooltip, human_name))
             for name in list_of_names:
                 value = data.get('%s:%s' % (name, attribute), '0')
                 html.append('<td><input type="text" class="required" value="%s" name="%s:%s"></td>' % (value, name, attribute))
@@ -358,17 +374,18 @@ def draw_isotherm(data, isotherm):
 
     for (attribute, per_component) in isotherm_settings[isotherm]:
         if not per_component:
+            human_name, tooltip = name_lookup[attribute]
             html.append('''<div class="row"><div class="col-md-12">
                 <div class="form-group">
                   <div class="col-sm-2">
-                    <label for="%s" class="control-label">%s</label>
+                    <label for="%s" class="control-label" data-toggle="tooltip" data-placement="bottom" title="%s">%s</label>
                   </div>
                   <div class="col-sm-10">
                     <input type="text" class="form-control required" id="%s" name="%s" aria-required="true" value="%s">
                   </div>
                 </div>
                 </div>
-                </div>''' % (attribute, attribute, attribute, attribute, data.get(attribute, '0')))
+                </div>''' % (attribute, tooltip, human_name, attribute, attribute, data.get(attribute, '0')))
 
     checked_yes = 'checked' if data.get('IS_KINETIC', '') == '1' else ''
     checked_no = '' if data.get('IS_KINETIC', '') == '1' else 'checked'
@@ -550,7 +567,7 @@ def sensitivity_setup(request):
     sensitivities = []
     isotherm_name = data.get('ADSORPTION_TYPE').upper().replace(' ', '_')
 
-    for name, units, type, per_component, per_section, sensitive, description in parameters:
+    for name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
         if sensitive:
             if name not in isotherm_name_set or name in isotherm_name_set and name in isotherm_set[isotherm_name]:
                 sensitivities.append( (name, per_component, per_section, description), )
@@ -1105,7 +1122,7 @@ def write_job_values(job, data, comps, steps, settings):
 
 def serialization_settings():
     temp = []
-    for name, units, type, per_component, per_section, sensitive, description in parameters:
+    for name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
         temp.append( (name, type, per_component, per_section), )
     return temp
 
@@ -1172,7 +1189,7 @@ def sync_db():
         except ObjectDoesNotExist:
             models.Isotherms.objects.create(Name = name, Isotherm=isotherm)
 
-    for name, units, type, per_component, per_section, sensitive, description in parameters:
+    for name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
         try:
             models.Parameters.objects.get(name=name, units=units, description=description)
         except ObjectDoesNotExist:
@@ -1323,7 +1340,7 @@ def choose_attributes_to_modify(request):
 
     modify = []
     #every attribute can be modified except for strings, blobs, number of steps and number of components, sensitivities and checkbox settings
-    for name, units, type, per_component, per_section, sensitive, description in parameters:
+    for name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
 
         if name not in ('NCOMP', 'NSEC') and type in ('int', 'double'):
             if per_component and per_section:
