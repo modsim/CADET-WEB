@@ -27,7 +27,7 @@
         <div class="col-md-12">
             <div class="form-group">
               <div class="col-sm-2">
-                <label class="control-label">Column Length (m)</label>
+                <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ COL_LENGTH_tip }}">{{ COL_LENGTH_human }} ({{ COL_LENGTH_units }})</label>
               </div>
               <div class="col-sm-10">
                 <input type="text" class="form-control required" name="COL_LENGTH" value="{{ COL_LENGTH }}">
@@ -35,7 +35,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-2">
-                <label class="control-label">Velocity (m/s)</label>
+                <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ VELOCITY_tip }}">{{ VELOCITY_human }} ({{ VELOCITY_units }})</label>
               </div>
               <div class="col-sm-10">
                 <input type="text" class="form-control required" name="VELOCITY" value="{{ VELOCITY }}">
@@ -43,7 +43,7 @@
             </div>            
             <div class="form-group">
               <div class="col-sm-2">
-                <label class="control-label">Particle Radius</label>
+                <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ PAR_RADIUS_tip }}">{{ PAR_RADIUS_human }} ({{ PAR_RADIUS_units }})</label>
               </div>
               <div class="col-sm-10">
                 <input type="text" class="form-control required" name="PAR_RADIUS" value = "{{ PAR_RADIUS }}">
@@ -51,7 +51,7 @@
             </div>            
             <div class="form-group">
               <div class="col-sm-2">
-                <label class="control-label">Column Porosity</label>
+                <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ COL_POROSITY_tip }}">{{ COL_POROSITY_human }}</label>
               </div>
               <div class="col-sm-10">
                 <input type="text" class="form-control required" name="COL_POROSITY" value="{{ COL_POROSITY }}">
@@ -59,7 +59,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-2">
-                <label class="control-label">Particle Porosity</label>
+                <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ COL_POROSITY_tip }}">{{ PAR_POROSITY_human }}</label>
               </div>
               <div class="col-sm-10">
                 <input type="text" class="form-control required" name="PAR_POROSITY" value="{{ PAR_POROSITY}}">
@@ -67,7 +67,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-2">
-                <label class="control-label">Column Dispersion</label>
+                <label class="control-label" data-toggle="tooltip" data-placement="bottom" title="{{ COL_DISPERSION_tip }}">{{ COL_DISPERSION_human }} ({{ COL_DISPERSION_units }})</label>
               </div>
               <div class="col-sm-10">
                 <input type="text" class="form-control required" name="COL_DISPERSION" value="{{ COL_DISPERSION }}">

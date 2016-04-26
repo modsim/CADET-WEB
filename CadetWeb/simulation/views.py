@@ -129,7 +129,7 @@ def generate_name_lookup(paraemters):
     temp_python = {}
     temp_django = {}
     for par_name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
-        temp_python[par_name] = (human_name, description)
+        temp_python[par_name] = (human_name, description, units)
         temp_django[par_name+ '_human'] = human_name
         temp_django[par_name+ '_tip'] = description
         temp_django[par_name+ '_units'] = units
@@ -137,10 +137,6 @@ def generate_name_lookup(paraemters):
 
 
 name_lookup_python, name_lookup_template = generate_name_lookup(parameters)
-
-
-
-
 
 def get_json(post):
     temp = {}
@@ -374,7 +370,7 @@ def draw_isotherm(data, isotherm):
     html.append('</tr></thead><tbody>')
     for (attribute, per_component) in isotherm_settings[isotherm]:
         if per_component:
-            human_name, tooltip = name_lookup_python[attribute]
+            human_name, tooltip, units = name_lookup_python[attribute]
             html.append('<tr><td data-toggle="tooltip" data-placement="bottom" title="%s">%s</td>' % (tooltip, human_name))
             for name in list_of_names:
                 value = data.get('%s:%s' % (name, attribute), '0')
@@ -384,7 +380,7 @@ def draw_isotherm(data, isotherm):
 
     for (attribute, per_component) in isotherm_settings[isotherm]:
         if not per_component:
-            human_name, tooltip = name_lookup_python[attribute]
+            human_name, tooltip, units = name_lookup_python[attribute]
             html.append('''<div class="row"><div class="col-md-12">
                 <div class="form-group">
                   <div class="col-sm-2">
@@ -619,7 +615,7 @@ def sensitivity_setup(request):
             except ZeroDivisionError:
                 default = 0
             form_name = ':'.join([i for i in name, component, section])
-            human_name, tool_tip = name_lookup_python[name]
+            human_name, tool_tip, units = name_lookup_python[name]
             entry.append( (
                 'choice:%s' % (form_name),
                 'checked' if data.get('choice:%s' % (form_name), '') == '1' else '',
