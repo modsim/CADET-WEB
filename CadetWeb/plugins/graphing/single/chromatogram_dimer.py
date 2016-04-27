@@ -14,6 +14,7 @@ name = "Chromatogram 10x Dimer"
 depends_performance = []
 depends_sensitivity = []
 file_name = 'chromatogram_10x.png'
+file_name_csv = 'chromatogram_10x.csv'
 
 def run(hdf5_path):
     #generate a chromatogram
@@ -30,8 +31,8 @@ def run(hdf5_path):
 
     parent, hdf5_name = os.path.split(hdf5_path)
 
-    axis.set_xlabel('Time')
-    axis.set_ylabel('Concentration')
+    axis.set_xlabel('Time (s)')
+    axis.set_ylabel('Concentration (mMol)')
 
     id, title, data = get_data(hdf5_path)
     for idx, data in enumerate(data):

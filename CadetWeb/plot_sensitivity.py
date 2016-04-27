@@ -34,6 +34,9 @@ def get_picture_id(hdf5_path, sensitivity_number):
     file_name = '%s_%s_%s.png' % (name, section, component)
     file_name = file_name.replace('-', 'minus')
 
+    file_name_csv = '%s_%s_%s.csv' % (name, section, component)
+    file_name_csv = file_name_csv.replace('-', 'minus')
+
     if component == -1:
         component = "All"
     else:
@@ -46,13 +49,14 @@ def get_picture_id(hdf5_path, sensitivity_number):
 
     title = 'Sensitivity Name:%s  Component:%s  Section:%s' % (name.replace('_', ' ').title(), component, section)
     h5.close()
-    return file_name, title
+
+    return file_name, file_name_csv, title
 
 def run(hdf5_path, sensitivity_number):
     #generate a chromatogram
     parent, hdf5_name = os.path.split(hdf5_path)
 
-    file_name, title = get_picture_id(hdf5_path, sensitivity_number)
+    file_name, file_name_csv, title = get_picture_id(hdf5_path, sensitivity_number)
 
     figure = plt.figure(file_name)
     figure.clear()
@@ -65,8 +69,8 @@ def run(hdf5_path, sensitivity_number):
     axis.set_position([0.2,0.1,0.7,0.7])
     salt_axis.set_position([0.2,0.1,0.7,0.7])
 
-    axis.set_xlabel('Time')
-    axis.set_ylabel('Concentration')
+    axis.set_xlabel('Time (s)')
+    axis.set_ylabel('Concentration (mMol)')
 
     id, title, data = get_data(hdf5_path, sensitivity_number)
     for idx, data in enumerate(data):
@@ -90,7 +94,7 @@ def get_data(hdf5_path, sensitivity_number):
     parent, hdf5_name = os.path.split(hdf5_path)
     data = []
 
-    file_name, title = get_picture_id(hdf5_path, sensitivity_number)
+    file_name, file_name_csv, title = get_picture_id(hdf5_path, sensitivity_number)
 
     h5 = h5py.File(hdf5_path, 'r')
 

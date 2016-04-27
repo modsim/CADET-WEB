@@ -15,6 +15,7 @@ name = "Chromatogram"
 depends_performance = []
 depends_sensitivity = []
 file_name = 'chromatogram.png'
+file_name_csv = 'chromatogram.csv'
 
 def run(hdf5_path):
     #generate a chromatogram
@@ -31,8 +32,8 @@ def run(hdf5_path):
 
     parent, hdf5_name = os.path.split(hdf5_path)
     
-    axis.set_xlabel('Time')
-    axis.set_ylabel('Concentration')
+    axis.set_xlabel('Time (s)')
+    axis.set_ylabel('Concentration (mMol)')
 
     id, title, data = get_data(hdf5_path)
     for idx, data in enumerate(data):
@@ -62,7 +63,6 @@ def get_data(hdf5_path):
     components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
 
     solution_values = np.array(h5['/web/compress/OUTLET'])
-    print solution_values.shape
     solution_times = solution_values[:,0]
 
     for idx, comp_name in enumerate(components):

@@ -5,16 +5,16 @@
       {% csrf_token %}
       <div class="row">
       <input type="hidden" name="json" value="{{ json }}">
-        <div class="col-md-6">
-          <h1>Job #: {{ job_id }}</h1>
+        <div class="col-md-2">
+          <label class="control-label">Job #: {{ job_id }}</label>
         </div>
         <div class="col-md-6">
-          <h1>Job Status: &nbsp;Complete</h1>
+          <strong>Job Status: &nbsp;Complete</strong>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6">
-          <h1>Star Rating System</h1>
+        <div class="col-md-2">
+          <label class="control-label">Star Rating System</label>
         </div>
         <div class="col-md-6">
           <input type="number" name="rating" class="star_rating" min=0 max=5 step=0.5 value="{{ rating }}">
@@ -66,15 +66,18 @@
     </form>
 
 
-    {% for id, name, url in graphs %}
+    {% for id, name, url, url_download in graphs %}
 
        <div class="jumbotron">
            <h3>{{ name }}</h3>
         <div>
-            <p></p><a href="{{ url }}">Download {{ name }} image</a></p>
+            <p><a href="{{ url }}" role='button' class='btn btn-default'>Download {{ name }} image</a></p>
             <div class="row">
                 <div class="col-md-9 tall" id="{{ id }}"></div>
-                <div class="col-md-3 tall" id="{{ id }}choice"></div>
+                <div class="col-md-3 tall" id="{{ id }}choice">
+                    <a href="{{ url_download }}" role="button" class="btn btn-default"
+                          data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in a CSV format (Excel compatible).">Download Data</a>
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-9 small" id="{{ id }}overview"></div>
@@ -112,16 +115,16 @@ function start_plot(datasets, element, choices, overview_id, base_id) {
 		// insert checkboxes
 		var choiceContainer = $(choices);
 
+		choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "download'>Download Current Graph</a>");
+		choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
+
 		for (var key in datasets) {
-		    choiceContainer.append("<br/><input type='checkbox' name='" + key +
+		    choiceContainer.prepend("<br/><input type='checkbox' name='" + key +
 				"' checked='checked' id='id" + key + "'></input>" +
 				"<label for='id" + key + "'>"
 				+ datasets[key].label + "</label>");
 		};
-		choiceContainer.append("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
-		choiceContainer.append("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "download'>Download Current Graph</a>");
-
-
+		
 		choiceContainer.find("input").click(plotAccordingToChoices);
 
 		$('#' + base_id + 'zoom').click(function (e) {

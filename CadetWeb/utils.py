@@ -91,22 +91,27 @@ def get_graph_data(path, chunk_size, rel_path):
         if key.startswith('graph_single') and value == '1':
             _, name = key.split(':')
             filename = get_attribute_by_name(name, 'graphing/single', 'file_name')
+            filename_csv = get_attribute_by_name(name, 'graphing/single', 'file_name_csv')
             path = os.path.join('/static/simulation/sims', relative_path, filename)
+            path_download = os.path.join('/static/simulation/sims', relative_path, filename_csv)
             id = name.replace(' ', '_').replace(':', '_')
-            graphs.append( (id, name, path) )
+            graphs.append( (id, name, path, path_download) )
 
         if key.startswith('graph_group') and value == '1':
             _, name = key.split(':')
             filename = get_attribute_by_name(name, 'graphing/group', 'file_name')
+            filename_csv = get_attribute_by_name(name, 'graphing/single', 'file_name_csv')
             path = os.path.join('/static/simulation/sims', relative_path, filename)
+            path_download = os.path.join('/static/simulation/sims', relative_path, filename_csv)
             id = name.replace(' ', '_').replace(':', '_')
-            graphs.append( (id, name, path) )
+            graphs.append( (id, name, path, path_download) )
 
     for sensitivity_number in range(len(json_data.get("sensitivities", []))):
-        file_name, title = plot_sensitivity.get_picture_id(hdf5_path, sensitivity_number)
+        file_name, file_name_csv, title = plot_sensitivity.get_picture_id(hdf5_path, sensitivity_number)
         path = os.path.join('/static/simulation/sims', relative_path, file_name)
+        path_download = os.path.join('/static/simulation/sims', relative_path, file_name_csv)
         id = title.replace(' ', '_').replace(':', '_')
-        graphs.append( (id, title, path))
+        graphs.append( (id, title, path, path_download))
 
     try:
         stdout = open(os.path.join(storage_path, relative_path, 'stdout')).read()
