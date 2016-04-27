@@ -3,6 +3,7 @@ import matplotlib
 matplotlib.use('AGG')
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import h5py
@@ -58,6 +59,26 @@ def run(hdf5_path, sensitivity_number):
 
     file_name, file_name_csv, title = get_picture_id(hdf5_path, sensitivity_number)
 
+    generate_plot(file_name, title, hdf5_path, sensitivity_number)
+    generate_csv(file_name_csv, hdf5_path, sensitivity_number)
+
+def generate_csv(file_name, hdf5_path, sensivitity_number):
+    data = pandas.DataFrame()
+    data['Time'] = h5['/output/solution/SOLUTION_TIMES']
+    
+    number_of_components = h5['/input/model/NCOMP'].value
+    components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
+
+    columns = ['Time']
+
+    for idx, comp in enumerate(components):
+        columns.append(comp)
+        data[comp] = h5['/output/sensitivity/param_%03d/SENS_COLUMN_OUTLET_COMP_%03d' % (sensivitity_number, idx)]
+
+    data.to_csv(file_name, columns=columns, index=False)
+
+
+def generate_plot(file_name, title, hdf5_path, sensitivity_number):
     figure = plt.figure(file_name)
     figure.clear()
     figure.suptitle(title)
