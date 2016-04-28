@@ -1229,57 +1229,69 @@ def get_data(request):
         rel_path = ''
 
     json_path, hdf5_path, graphs, data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
+    parent, hdf5_name = os.path.split(hdf5_path)
+    json_cache = os.path.join(parent, rel_path, 'json_cache')
+    if not os.path.exists(json_cache):
 
-    h5 = h5py.File(hdf5_path, 'r')
-
-    #check for success by seeing if we have output created
-    json_data['success'] = int(complete)
-    json_data['failed'] = int(failure)
-    json_data['stdout'] = stdout
-    json_data['stderr'] = stderr
-
-    if json_data['success']:
-        json_data['cadet_version'] = str(np.array(h5['/meta/CADET_VERSION']))
-        json_data['cadet_git_version'] = str(np.array(h5['/meta/CADET_COMMIT']))
-
-    #close the hdf5 file
-    h5.close()
-
-    if json_data['success']:
-        #if success get the step names and times
-        section_times = cadet_runner.get_section_times(data)
-        section_names = cadet_runner.get_step_names(data)
-        times = zip(section_names, section_times[:-1])
-        times.append( ('End', section_times[-1]), )
-        json_data['times'] = times
         
-        json_data['data'] = {}
-        #run graphs
-        for key,value in data.items():
-            if key.startswith('graph_single') and value == '1':
-                _, name = key.split(':')
-                id, title, data_sets = utils.call_plugin_by_name(name, 'graphing/single', 'get_data', hdf5_path)
+
+        h5 = h5py.File(hdf5_path, 'r')
+
+        #check for success by seeing if we have output created
+        json_data['success'] = int(complete)
+        json_data['failed'] = int(failure)
+        json_data['stdout'] = stdout
+        json_data['stderr'] = stderr
+
+        if json_data['success']:
+            json_data['cadet_version'] = str(np.array(h5['/meta/CADET_VERSION']))
+            json_data['cadet_git_version'] = str(np.array(h5['/meta/CADET_COMMIT']))
+
+        #close the hdf5 file
+        h5.close()
+
+        if json_data['success']:
+            #if success get the step names and times
+            section_times = cadet_runner.get_section_times(data)
+            section_names = cadet_runner.get_step_names(data)
+            times = zip(section_names, section_times[:-1])
+            times.append( ('End', section_times[-1]), )
+            json_data['times'] = times
+        
+            json_data['data'] = {}
+            #run graphs
+            for key,value in data.items():
+                if key.startswith('graph_single') and value == '1':
+                    _, name = key.split(':')
+                    id, title, data_sets = utils.call_plugin_by_name(name, 'graphing/single', 'get_data', hdf5_path)
+                    if data_sets:
+                        json_data['data'][id] = data_sets
+
+                if key.startswith('graph_group') and value == '1':
+                    _, name = key.split(':')
+                    id, title, data_sets = utils.call_plugin_by_name(name, 'graphing/group', 'get_data', hdf5_path)
+                    if data_sets:
+                        json_data['data'][id] = data_sets
+
+            for sensitivity_number in range(len(data.get("sensitivities", []))):
+                id, title, data_sets = plot_sensitivity.get_data(hdf5_path, sensitivity_number)
                 if data_sets:
                     json_data['data'][id] = data_sets
 
-            if key.startswith('graph_group') and value == '1':
-                _, name = key.split(':')
-                id, title, data_sets = utils.call_plugin_by_name(name, 'graphing/group', 'get_data', hdf5_path)
-                if data_sets:
-                    json_data['data'][id] = data_sets
+            if json_data['data']:
+                #process the dictionary into the interleaved format needed
+                for id, data_sets in json_data['data'].items():
+                    for data_set in data_sets:
+                        time = list(data_set['data'][0])
+                        values = list(data_set['data'][1])
+                        data_set['data'] = zip(time, values)
 
-        for sensitivity_number in range(len(data.get("sensitivities", []))):
-            id, title, data_sets = plot_sensitivity.get_data(hdf5_path, sensitivity_number)
-            if data_sets:
-                json_data['data'][id] = data_sets
+            open(json_cache, 'wb').write(json.dumps(json_data))
 
-        if json_data['data']:
-            #process the dictionary into the interleaved format needed
-            for id, data_sets in json_data['data'].items():
-                for data_set in data_sets:
-                    time = list(data_set['data'][0])
-                    values = list(data_set['data'][1])
-                    data_set['data'] = zip(time, values)
+    else:
+        json_data = open(json_cache, 'rb').read()
+        json_data = json.loads(json_data)
+        json_data = utils.encode_to_ascii(json_data)
 
     return JsonResponse(json_data, safe=False)
 
