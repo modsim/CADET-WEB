@@ -6,15 +6,18 @@
       <div class="row">
       <input type="hidden" name="json" value="{{ json }}">
         <div class="col-md-2">
-          <label class="control-label">Job #: {{ job_id }}</label>
+            <strong>Job #: {{ job_id }}</strong>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-2">
           <strong>Job Status: &nbsp;Complete</strong>
+        </div>
+        <div class="col-md-2">
+            <strong data-toggle="tooltip" data-placement="bottom" title="Git commit version:" id="cadet_git_version">CADET Version: <span id="cadet_version"></span></strong>
         </div>
       </div>
       <div class="row">
         <div class="col-md-2">
-          <label class="control-label">Star Rating System</label>
+          <strong>Star Rating System</strong>
         </div>
         <div class="col-md-6">
           <input type="number" name="rating" class="star_rating" min=0 max=5 step=0.5 value="{{ rating }}">
@@ -68,11 +71,13 @@
 
     {% for id, name, url, url_download in graphs %}
 
-       <div class="jumbotron">
+       <div class="jumbotron graph_wide">
            <h3>{{ name }}</h3>
         <div>
             <p><a href="{{ url }}" role='button' class='btn btn-default'>Download {{ name }} image</a></p>
-            <div class="row">
+            <div class="row graph_row">
+                <div class="x_label">Time(s)</div>
+                <div class="y_label">Concentration (mMol)</div>
                 <div class="col-md-9 tall" id="{{ id }}"></div>
                 <div class="col-md-3 tall" id="{{ id }}choice">
                     <a href="{{ url_download }}" role="button" class="btn btn-default"
@@ -236,23 +241,24 @@ $( document ).ready(function() {
             data = json_data;
 
             if (1 == json_data['failed']) {
-                console.log('failed');
                 $("#success").remove();
                 $("body").removeClass("loading");
             } else if (0 == json_data['success']) {
-                console.log('working');
                 $( "#progress" ).load( "{{ progress }}" );
                 setTimeout(fetchData, 5000);
             } else {
-                console.log('success');
                 $("#failed").remove();
                 $("body").removeClass("loading");
+
+                document.getElementById("stdout").innerHTML = ansi_up.ansi_to_html(json_data['stdout']);
+                document.getElementById("stderr").innerHTML = ansi_up.ansi_to_html(json_data['stderr']);
+
+                $('#cadet_version').text(json_data['cadet_version']);
+                $('#cadet_git_version').prop('title', 'Git Version Commit String: ' + json_data['cadet_git_version']);
+
                 for (var key in json_data['data']) {
                     if (json_data['data'].hasOwnProperty(key)) {
-                        //$.plot("#" + key, json_data['data'][key]);
                         start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
-                        document.getElementById("stdout").innerHTML = ansi_up.ansi_to_html(json_data['stdout']);
-                        document.getElementById("stderr").innerHTML = ansi_up.ansi_to_html(json_data['stderr']);
                     }
                 }
 

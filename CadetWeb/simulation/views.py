@@ -1238,6 +1238,10 @@ def get_data(request):
     json_data['stdout'] = stdout
     json_data['stderr'] = stderr
 
+    if json_data['success']:
+        json_data['cadet_version'] = str(np.array(h5['/meta/CADET_VERSION']))
+        json_data['cadet_git_version'] = str(np.array(h5['/meta/CADET_COMMIT']))
+
     #close the hdf5 file
     h5.close()
 
@@ -1248,9 +1252,7 @@ def get_data(request):
         times = zip(section_names, section_times[:-1])
         times.append( ('End', section_times[-1]), )
         json_data['times'] = times
-
-
-
+        
         json_data['data'] = {}
         #run graphs
         for key,value in data.items():
