@@ -59,11 +59,13 @@ def run(hdf5_path, sensitivity_number):
 
     file_name, file_name_csv, title = get_picture_id(hdf5_path, sensitivity_number)
 
-    generate_plot(file_name, title, hdf5_path, sensitivity_number)
-    generate_csv(file_name_csv, hdf5_path, sensitivity_number)
+    generate_plot(file_name, title, hdf5_path, sensitivity_number, parent)
+    generate_csv(file_name_csv, hdf5_path, sensitivity_number, parent)
 
-def generate_csv(file_name, hdf5_path, sensivitity_number):
-    data = pandas.DataFrame()
+def generate_csv(file_name, hdf5_path, sensivitity_number, parent):
+    h5 = h5py.File(hdf5_path, 'r')
+    
+    data = pd.DataFrame()
     data['Time'] = h5['/output/solution/SOLUTION_TIMES']
     
     number_of_components = h5['/input/model/NCOMP'].value
@@ -75,10 +77,12 @@ def generate_csv(file_name, hdf5_path, sensivitity_number):
         columns.append(comp)
         data[comp] = h5['/output/sensitivity/param_%03d/SENS_COLUMN_OUTLET_COMP_%03d' % (sensivitity_number, idx)]
 
-    data.to_csv(file_name, columns=columns, index=False)
+    dst = os.path.join(parent, file_name)
+    data.to_csv(dst, columns=columns, index=False)
+    h5.close()
 
 
-def generate_plot(file_name, title, hdf5_path, sensitivity_number):
+def generate_plot(file_name, title, hdf5_path, sensitivity_number, parent):
     figure = plt.figure(file_name)
     figure.clear()
     figure.suptitle(title)
@@ -116,6 +120,10 @@ def get_data(hdf5_path, sensitivity_number):
     data = []
 
     file_name, file_name_csv, title = get_picture_id(hdf5_path, sensitivity_number)
+
+    dst = os.path.join(parent, file_name_csv)
+    if not os.path.exists(dst):
+        generate_csv(file_name_csv, hdf5_path, sensitivity_number, parent)
 
     h5 = h5py.File(hdf5_path, 'r')
 
