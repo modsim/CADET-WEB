@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import h5py
 import os.path
 import shutil
+import pandas as pd
 
 
 
@@ -18,6 +19,31 @@ file_name = 'chromatogram.png'
 file_name_csv = 'chromatogram.csv'
 
 def run(hdf5_path):
+
+    generate_plot(hdf5_path)
+    generate_csv(hdf5_path)
+
+def generate_csv(hdf5_path):
+    h5 = h5py.File(hdf5_path, 'r')
+    
+    data = pd.DataFrame()
+    data['Time'] = h5['/output/solution/SOLUTION_TIMES']
+    
+    number_of_components = h5['/input/model/NCOMP'].value
+    components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
+
+    columns = ['Time']
+
+    for idx, comp in enumerate(components):
+        columns.append(comp)
+        data[comp] = h5['/output/solution/SOLUTION_COLUMN_OUTLET_COMP_%03d' % idx]
+
+    parent, hdf5_name = os.path.split(hdf5_path)
+    dst = os.path.join(parent, file_name_csv)
+    data.to_csv(dst, columns=columns, index=False)
+    h5.close()
+
+def generate_plot(hdf5_path):
     #generate a chromatogram
     figure = plt.figure(name)
     figure.clear()
@@ -55,6 +81,11 @@ def run(hdf5_path):
 def get_data(hdf5_path):
     data = []
     parent, hdf5_name = os.path.split(hdf5_path)
+
+    dst = os.path.join(parent, file_name_csv)
+    if not os.path.exists(dst):
+        generate_csv(hdf5_path)
+
 
     h5 = h5py.File(hdf5_path, 'r')
 
