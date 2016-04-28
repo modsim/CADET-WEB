@@ -28,10 +28,12 @@
       </div>
 
 
-    <div class="jumbotron">
+    <div class="jumbotron graph_wide">
            <h3>Inlet Profile</h3>
         <div>
-            <div class="row">
+            <div class="row graph_row">
+                <div class="x_label">Time(s)</div>
+                <div class="y_label">Concentration (mMol)</div>
                 <div class="col-md-9 medium" id="graph"></div>
                 <div class="col-md-3 medium" id="graphchoice"></div>
             </div>
@@ -39,22 +41,93 @@
       </div>
 
     <script type="text/javascript" language="javascript">
-  $(document).ready(function() {
-    function my_plot() {
+        $(document).ready(function () {
+
+            function start_plot(datasets, init) {
+                // hard-code color indices to prevent them from shifting as
+                // countries are turned on/off
+                var datasets = datasets;
+                var i = 0;
+                $.each(datasets, function (key, val) {
+                    val.color = i;
+                    ++i;
+                });
+
+                // insert checkboxes
+                var choiceContainer = $('#graphchoice');
+
+                if (init == 1) {
+                    for (var key in datasets) {
+                        choiceContainer.prepend("<br/><input type='checkbox' name='" + key +
+                            "' checked='checked' id='id" + key + "'></input>" +
+                            "<label for='id" + key + "'>"
+                            + datasets[key].label + "</label>");
+                    };
+                };
+
+                choiceContainer.find("input").click(plotAccordingToChoices);
+
+                function plotAccordingToChoices() {
+
+                    var data = [];
+
+                    choiceContainer.find("input:checked").each(function () {
+                        var key = $(this).attr("name");
+                        if (key && datasets[key]) {
+                            data.push(datasets[key]);
+                        }
+                    });
+
+                    var plot = $.plot('#graph', data, {
+                        canvas: true,
+                        yaxis: {
+                            //min: 0,
+                            //zoomRange: null,
+                            //panRange: [0, maxY]
+                        },
+                        y2axis: {
+                            //min: 0,
+                            //zoomRange: null,
+                            //panRange: [0, maxY]
+                        },
+                        xaxis: {
+                            //tickDecimals: 0,
+                            //zoomRange: null,
+                            //panRange: [0, maxX]
+                        },
+                        zoom: {
+                            interactive: false
+                        },
+                        pan: {
+                            interactive: false
+                        },
+                        yaxes: [{}, { position: "right" }]
+                    });
+
+
+
+
+                }
+
+                plotAccordingToChoices();
+            }
+
+
+    function my_plot(init) {
         $.post(
              "/simulation/inlet_graph/",
              $("#cadet_form").serialize(),
-             function(data) {
-                $.plot('#graph', data);
+             function (data) {
+                     start_plot(data, init);
              }
 
           );
     };
 
-    my_plot();
+    my_plot(1);
 
     $("input").bind("change paste keyup", function(event) {
-          my_plot();
+          my_plot(0);
       });
    });
    </script>
