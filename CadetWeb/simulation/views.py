@@ -289,7 +289,9 @@ def get_examples(limit):
         create_single = reverse('simulation:single_start', None, None) + "?path=%s" % result.uid
         create_batch = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % result.uid
         created = result.created
-        temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created])
+        simulation_path = utils.get_hdf5_path(result.uid, settings.chunk_size, None)
+        simulation_path = '/static/simulation/sims/' + simulation_path.replace(utils.storage_path, '')
+        temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created, simulation_path])
     return temp
 
 def get_most_recent_simulations(username, limit):
@@ -309,7 +311,9 @@ def get_most_recent_simulations(username, limit):
             create_single = reverse('simulation:single_start', None, None) + "?path=%s" % result.uid
             create_batch = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % result.uid
             created = result.created
-            temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created])
+            simulation_path = utils.get_hdf5_path(result.uid, settings.chunk_size, None)
+            simulation_path = '/static/simulation/sims/' + simulation_path.replace(utils.storage_path, '')
+            temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created, simulation_path])
         return temp
     else:
         return []

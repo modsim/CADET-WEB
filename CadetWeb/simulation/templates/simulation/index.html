@@ -46,7 +46,7 @@
         </div>
         <div class="col-md-9">
           <p>You can use this to find any simulation you have created so you can review the results, download the simulation
-          or use the simulation as the basis for a new simulation.</p>
+          or use the simulation as the starting point for a new simulation.</p>
         </div>
       </div>
 
@@ -58,22 +58,35 @@
                   <div class="col-md-2">Study</div>
                 <div class="col-md-2">Model</div>
                   <div class="col-md-2">Isotherm</div>
-                <div class="col-md-2">Results</div>
+                <div class="col-md-1">Results</div>
                   <div class="col-md-2">Create Simulation</div>
-                  <div class="col-md-2">Create Batch</div>
+                  <div class="col-md-2">Create DoE</div>
+                  <div class="col-md-1">Download</div>
               </div>
               <hr>
               {% for search_result in search_examples %}
               <div class="row">
-                <div class="col-md-2">{{ search_result.0 }}</div>
-                <div class="col-md-2">{{ search_result.1 }}</div>
-                <div class="col-md-2">{{ search_result.2 }}</div>
-              <div class="col-md-2"><a class="btn btn-primary" href="{{ search_result.3 }}"
-                         data-toggle="tooltip" data-placement="bottom" title="View the results of this simulation along with downloading the simulation file, images and results.">Results</a></div>
-                  <div class="col-md-2"><a class="btn btn-primary" href="{{ search_result.4 }}"
-                         data-toggle="tooltip" data-placement="bottom" title="Create a new simulation using this simulation as a basis">Start New</a></div>
-                  <div class="col-md-2"><a class="btn btn-primary" href="{{ search_result.5 }}"
-                         data-toggle="tooltip" data-placement="bottom" title="Create a new Design of Experiments set of simulations based on this simulation">Start DoE</a></div>
+                  <div class="col-md-2">{{ search_result.0 }}</div>
+                  <div class="col-md-2">{{ search_result.1 }}</div>
+                  <div class="col-md-2">{{ search_result.2 }}</div>
+                  <div class="col-md-1">
+                      <a class="btn btn-primary" href="{{ search_result.3 }}"
+                         data-toggle="tooltip" data-placement="bottom" title="View the results of this simulation along with downloading the simulation file, images and results.">Results</a>
+                  </div>
+                  <div class="col-md-2">
+                      <a class="btn btn-primary" href="{{ search_result.4 }}"
+                         data-toggle="tooltip" data-placement="bottom" title="Create a new simulation using this simulation as a starting point">Start New</a>
+                  </div>
+                  <div class="col-md-2">
+                      <a class="btn btn-primary" href="{{ search_result.5 }}"
+                         data-toggle="tooltip" data-placement="bottom" title="Create a new Design of Experiments set of simulations based on this simulation">Start DoE</a>
+                  </div>
+
+                  <div class="col-md-1">
+                      <a class="btn btn-primary" href="{{ search_result.7 }}"
+                         data-toggle="tooltip" data-placement="bottom" title="Download HDF5 file for this simulation"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a>
+                  </div>
+
               </div>
               {% endfor %}
 
@@ -82,17 +95,34 @@
                   <div class="col-md-2">When</div>
                   <div class="col-md-2">Study</div>
                 <div class="col-md-2">Model</div>
-                <div class="col-md-2">Results</div>
+                <div class="col-md-1">Results</div>
+                  <div class="col-md-2">Create Simulation</div>
+                  <div class="col-md-2">Create DoE</div>
+                  <div class="col-md-1">Download</div>
               </div>
               <hr>
               {% for search_result in search_history %}
               <div class="row">
                   <div class="col-md-2">{{ search_result.6 }}</div>
-                <div class="col-md-2">{{ search_result.0 }}</div>
-                <div class="col-md-2">{{ search_result.1 }}</div>
-                <div class="col-md-2"><a class="btn btn-primary" href="{{ search_result.3 }}"
-                    data-toggle="tooltip" data-placement="bottom" title="View the results of this simulation along with downloading the simulation file, images and results.">Results</a></div>
+                  <div class="col-md-2">{{ search_result.0 }}</div>
+                  <div class="col-md-2">{{ search_result.1 }}</div>
+                  <div class="col-md-1">
+                      <a class="btn btn-primary" href="{{ search_result.3 }}"
+                         data-toggle="tooltip" data-placement="bottom" title="View the results of this simulation along with downloading the simulation file, images and results.">Results</a>
                   </div>
+                  <div class="col-md-2">
+                      <a class="btn btn-primary" href="{{ search_result.4 }}"
+                         data-toggle="tooltip" data-placement="bottom" title="Create a new simulation using this simulation as a starting point">Start New</a>
+                  </div>
+                  <div class="col-md-2">
+                      <a class="btn btn-primary" href="{{ search_result.5 }}"
+                         data-toggle="tooltip" data-placement="bottom" title="Create a new Design of Experiments set of simulations based on this simulation">Start DoE</a>
+                  </div>
+                  <div class="col-md-1">
+                      <a class="btn btn-primary" href="{{ search_result.7 }}"
+                         data-toggle="tooltip" data-placement="bottom" title="Download HDF5 file for this simulation"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span></a>
+                  </div>
+              </div>
               {% endfor %}
 
               

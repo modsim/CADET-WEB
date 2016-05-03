@@ -52,6 +52,16 @@ def check_pid(pid):
     else:
         return True
 
+def get_hdf5_path(path, chunk_size, rel_path):
+    "return just the path to the hdf5 file"
+    relative_parts = [''.join(i for i in seq if i is not None) for seq in grouper(path, chunk_size)]
+    relative_path = os.path.join(*relative_parts)
+
+    if rel_path:
+        return os.path.join(storage_path, relative_path, 'batch', rel_path, 'sim.h5')
+    else:
+        return os.path.join(storage_path, relative_path, 'sim.h5')
+
 def get_graph_data(path, chunk_size, rel_path):
     "return the path to the json_file, path to the hdf5 file, and the list of name,url pairs for images"
     graphs = []
