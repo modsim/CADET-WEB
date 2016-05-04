@@ -565,8 +565,8 @@ if __name__ == '__main__':
 
     h5 = h5py.File(args.sim, 'a')
     web = h5["web"]
-    set_value_enum(web, 'CADET_SIMULATION_TIME', stdout)
-    set_value_enum(web, 'TOTAL_RUN_TIME', stderr)
+    set_value(web, 'CADET_SIMULATION_TIME', 'f8', simulation_time)
+    set_value(web, 'TOTAL_RUN_TIME', 'f8', processing_time)
     h5.close()
 
     open(os.path.join(parent_dir, 'status'), 'w').write('success')
