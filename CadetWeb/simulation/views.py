@@ -277,11 +277,12 @@ def delete_job(uid):
 def get_examples(limit):
     "return the the limit most recent 5 star simulations"
     "format is study name, model name, isotherm, results link, create link, create batch link"
-    results = models.Job.objects.filter(username='cadet', job_notes__rating=5).order_by('-created')[:limit]
+    results = models.Job.objects.filter(username='cadet', job_notes__rating=5).select_related('job_notes').order_by('-created')[:limit]
     parameter = models.Parameters.objects.get(name='ADSORPTION_TYPE')
 
     temp = []
     for result in results:
+        print(result)
         study_name= result.study_name
         model_name = result.Model_ID.model
         isotherm = models.Job_String.objects.get(Job_ID=result, Parameter_ID=parameter).Data.replace('_', ' ').title()
@@ -291,7 +292,11 @@ def get_examples(limit):
         created = result.created
         simulation_path = utils.get_hdf5_path(result.uid, settings.chunk_size, None)
         simulation_path = '/static/simulation/sims/' + simulation_path.replace(utils.storage_path, '')
-        temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created, simulation_path])
+        try:
+            note = result.job_notes.notes
+        except models.Job_Notes.DoesNotExist:
+            note = ''
+        temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created, simulation_path, note])
     return temp
 
 def get_most_recent_simulations(username, limit):
@@ -299,7 +304,7 @@ def get_most_recent_simulations(username, limit):
     "format is study name, model name, isotherm, results link, create link, create batch link"
     print username, limit
     if username:
-        results = models.Job.objects.filter(username=username).order_by('-created')[:limit]
+        results = models.Job.objects.filter(username=username).select_related('job_notes').order_by('-created')[:limit]
         parameter = models.Parameters.objects.get(name='ADSORPTION_TYPE')
 
         temp = []
@@ -313,7 +318,11 @@ def get_most_recent_simulations(username, limit):
             created = result.created
             simulation_path = utils.get_hdf5_path(result.uid, settings.chunk_size, None)
             simulation_path = '/static/simulation/sims/' + simulation_path.replace(utils.storage_path, '')
-            temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created, simulation_path])
+            try:
+                note = result.job_notes.notes
+            except models.Job_Notes.DoesNotExist:
+                note = ''
+            temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created, simulation_path, note])
         return temp
     else:
         return []

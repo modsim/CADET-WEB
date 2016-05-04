@@ -66,9 +66,9 @@
               <hr>
               {% for search_result in search_examples %}
               <div class="row">
-                  <div class="col-md-2">{{ search_result.0 }}</div>
-                  <div class="col-md-2">{{ search_result.1 }}</div>
-                  <div class="col-md-2">{{ search_result.2 }}</div>
+                  <div class="col-md-2" data-toggle="tooltip" data-placement="bottom" title="{{ search_result.8 }}">{{ search_result.0 }}</div>
+                  <div class="col-md-2" data-toggle="tooltip" data-placement="bottom" title="{{ search_result.8 }}">{{ search_result.1 }}</div>
+                  <div class="col-md-2" data-toggle="tooltip" data-placement="bottom" title="{{ search_result.8 }}">{{ search_result.2 }}</div>
                   <div class="col-md-1">
                       <a class="btn btn-primary" href="{{ search_result.3 }}"
                          data-toggle="tooltip" data-placement="bottom" title="View the results of this simulation along with downloading the simulation file, images and results.">Results</a>
@@ -103,9 +103,9 @@
               <hr>
               {% for search_result in search_history %}
               <div class="row">
-                  <div class="col-md-2">{{ search_result.6 }}</div>
-                  <div class="col-md-2">{{ search_result.0 }}</div>
-                  <div class="col-md-2">{{ search_result.1 }}</div>
+                  <div class="col-md-2" data-toggle="tooltip" data-placement="bottom" title="{{ search_result.8 }}">{{ search_result.6 }}</div>
+                  <div class="col-md-2" data-toggle="tooltip" data-placement="bottom" title="{{ search_result.8 }}">{{ search_result.0 }}</div>
+                  <div class="col-md-2" data-toggle="tooltip" data-placement="bottom" title="{{ search_result.8 }}">{{ search_result.1 }}</div>
                   <div class="col-md-1">
                       <a class="btn btn-primary" href="{{ search_result.3 }}"
                          data-toggle="tooltip" data-placement="bottom" title="View the results of this simulation along with downloading the simulation file, images and results.">Results</a>

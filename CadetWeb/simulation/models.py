@@ -150,7 +150,7 @@ class Sim_Blob(models.Model):
         ordering = ['id']
 
 class Job_Results(models.Model):
-    Job_ID = models.ForeignKey('Job')
+    Job_ID = models.OneToOneField('Job')
     Timestamp = models.DateTimeField(auto_now_add=True)
     Attempted = models.IntegerField()
     Successful = models.IntegerField()
@@ -159,7 +159,7 @@ class Job_Results(models.Model):
         ordering = ['id']
 
 class Sim_Results(models.Model):
-    Simulation_ID = models.ForeignKey('Simulation')
+    Simulation_ID = models.OneToOneField('Simulation')
     Timestamp = models.DateTimeField(auto_now_add=True)
     Success = models.IntegerField()
 
@@ -167,7 +167,7 @@ class Sim_Results(models.Model):
         ordering = ['id']
 
 class Job_Notes(models.Model):
-    Job_ID = models.ForeignKey('Job')
+    Job_ID = models.OneToOneField('Job')
     rating = models.FloatField()
     notes = models.TextField()
 
