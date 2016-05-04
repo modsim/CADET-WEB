@@ -496,6 +496,8 @@ if __name__ == '__main__':
     timer = Timer(total, failure)
     timer.start()
 
+    start_processing = time.time()
+
     args = run_args()
     json_data = open(args.json, 'rb').read()
     json_data = json.loads(json_data)
@@ -517,9 +519,12 @@ if __name__ == '__main__':
         write_progress(parent_dir, 0, 1)
 
     #run simulation
+    start = time.time()
     proc = subprocess.Popen([cadet_path, args.sim], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ)
 
     proc.wait()
+    timer.cancel()
+    simulation_time = time.time() - start
 
     stdout = proc.stdout.read()
     stderr = proc.stderr.read()
@@ -534,9 +539,8 @@ if __name__ == '__main__':
     try:
         compress_data(h5)
     except KeyError:
-        timer.cancel()
         h5.close()
-        open(os.path.join(parent_dir, 'status'), 'w').write('failure')
+        failure()
 
     h5.close()
     #run performance parameters
@@ -557,5 +561,12 @@ if __name__ == '__main__':
     if 'batch' not in args.sim:
         write_progress(parent_dir, 1, 1)
 
-    timer.cancel()
+    processing_time = time.time() - start_processing
+
+    h5 = h5py.File(args.sim, 'a')
+    web = h5["web"]
+    set_value_enum(web, 'CADET_SIMULATION_TIME', stdout)
+    set_value_enum(web, 'TOTAL_RUN_TIME', stderr)
+    h5.close()
+
     open(os.path.join(parent_dir, 'status'), 'w').write('success')
