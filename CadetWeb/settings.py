@@ -9,11 +9,11 @@ chunk_size = 20
 memory = 500
 
 #cpu time in seconds (total time cadet is allowed to run) analysis takes places after this
-cpu = 50.0
+cpu = 500.0
 
 
 #limit number of combinations
-batch_limit = 15
+batch_limit = 45
 
 
 #days to keep simulations

@@ -986,23 +986,11 @@ def batch_choose(request):
 
             if type in ('int', 'boolean'):
                 value = int(value)
-                #temp.filter(sim_int__Data=value, sim_int__Step_ID=step, sim_int__Parameter_ID=name, sim_int__Component_ID=comp)
-                #temp.append(Q(sim_int__Data=value, sim_int__Step_ID=step, sim_int__Parameter_ID=name, sim_int__Component_ID=comp))
-                #temp.extend(models.Sim_Int.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp))
                 temp.append(set([i.Simulation_ID for i in  models.Sim_Int.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp)]))
-                #print type, value, temp
 
             elif type == 'double':
-                #temp.filter(sim_double__Data=value, sim_double__Step_ID=step, sim_double__Parameter_ID=name, sim_double__Component_ID=comp)
-                #temp.append(Q(sim_double__Data=value, sim_double__Step_ID=step, sim_double__Parameter_ID=name, sim_double__Component_ID=comp))
-                #temp.extend(models.Sim_Double.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp))
                 temp.append(set([i.Simulation_ID for i in  models.Sim_Double.objects.filter(Data=value, Step_ID=step, Parameter_ID=name, Component_ID=comp)]))
-                #print type, value, step.Step, comp.Component, name.name, temp
-    #print "Results"
-    #print temp
     temp = set.intersection(*temp)
-    #print temp
-    #print "End Results"
 
     simulation = temp.pop()
     query = {}
@@ -1246,11 +1234,8 @@ def get_data(request):
 
     json_path, hdf5_path, graphs, data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
     parent, hdf5_name = os.path.split(hdf5_path)
-    json_cache = os.path.join(parent, rel_path, 'json_cache')
+    json_cache = os.path.join(parent, 'json_cache')
     if not os.path.exists(json_cache):
-
-        
-
         h5 = h5py.File(hdf5_path, 'r')
 
         #check for success by seeing if we have output created

@@ -469,23 +469,14 @@ def run_batch_simulations(parent_dir, json_path):
     total = settings.cpu
 
     for idx, dir_name in enumerate(dirs):
-        if total:
-            start = time.time()
+        h5_path = os.path.join(dir_name, 'sim.h5')
+        out = open(os.path.join(dir_name, 'stdout'), 'w')
+        err = open(os.path.join(dir_name, 'stderr'), 'w')
 
-            h5_path = os.path.join(dir_name, 'sim.h5')
-            out = open(os.path.join(dir_name, 'stdout'), 'w')
-            err = open(os.path.join(dir_name, 'stderr'), 'w')
+        proc = subprocess.Popen(['python', __file__, '--json', json_path, '--sim', h5_path,], stdout=out, stderr=err)
 
-            proc = subprocess.Popen(['python', __file__, '--json', json_path, '--sim', h5_path,], stdout=out, stderr=err)
-
-            proc.wait()
-
-            elapsed = time.time() - start
-            total = total - elapsed
-            if total < 0:
-                total = 0
-            print total, elapsed
-            write_progress(parent_dir, idx+1, dir_count+1)
+        proc.wait()
+        write_progress(parent_dir, idx+1, dir_count+1)
 
 def failure():
     open(os.path.join(parent_dir, 'status'), 'w').write('failure')
