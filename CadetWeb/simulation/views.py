@@ -488,9 +488,12 @@ def loading_setup(request):
     list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
     list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
+    #This will remove all whitespace
+    list_of_step_ids = [''.join(step.split()) for step in list_of_steps]
+
     data['json'] = get_json_string(data)
     values = [generate_step_settings(step, list_of_names, data) for step in list_of_steps]
-    data['steps'] = zip(list_of_steps, values)
+    data['steps'] = zip(list_of_step_ids, list_of_steps, values)
 
     #This flattens out the array and django needs that to render properly
     continuous = [(idx, first, second) for idx, (first, second) in enumerate(zip(list_of_steps[:-1], list_of_steps[1:]))]

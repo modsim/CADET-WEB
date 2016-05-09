@@ -150,7 +150,7 @@
 	                <label class="control-label">{{ label }} (s)</label>
 	              </div>
 	              <div class="col-sm-6">
-	                <input type="text" class="form-control required" value="{{ value }}" name={{ form_name }}>
+	                <input type="text" class="form-control required" value="{{ value }}" name="{{ form_name }}">
 	              </div>
 	            </div>
 			{% endfor %}
@@ -171,8 +171,8 @@
         </tr></table>
   </div>
 
-    {% for step, value in steps %}
-         <div id="{{ step }}">{{ value|safe }}</div>
+    {% for step_id, step, value in steps %}
+         <div id="{{ step_id }}">{{ value|safe }}</div>
       {% endfor %}
 
                 <div class="form-group">
