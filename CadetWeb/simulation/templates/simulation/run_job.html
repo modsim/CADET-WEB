@@ -2,77 +2,94 @@
 
 {% block body %}
 <form class="form-horizontal" role="form" style="" action="{% url 'simulation:simulation_rate' %}" method="POST">
-      {% csrf_token %}
-      <div class="row">
-      <input type="hidden" name="json" value="{{ json }}">
+    {% csrf_token %}
+
+    {{ request.session.items }}
+
+    <div class="row">
+        <input type="hidden" name="json" value="{{ json }}">
         <div class="col-md-2">
             <strong>Job #: {{ job_id }}</strong>
         </div>
         <div class="col-md-2">
-          <strong>Job Status: &nbsp;Complete</strong>
+            <strong>Job Status: &nbsp;Complete</strong>
         </div>
         <div class="col-md-2">
             <strong data-toggle="tooltip" data-placement="bottom" title="Git commit version:" id="cadet_git_version">CADET Version: <span id="cadet_version"></span></strong>
         </div>
-      </div>
-      <div class="row">
+    </div>
+    <div class="row">
         <div class="col-md-2">
-          <strong>Star Rating System</strong>
+            <strong>Star Rating System</strong>
         </div>
         <div class="col-md-6">
-          <input type="number" name="rating" class="star_rating" min=0 max=5 step=0.5 value="{{ rating }}">
+            <input type="number" name="rating" class="star_rating" min=0 max=5 step=0.5 value="{{ rating }}">
             <input type="hidden" name="chunk_size" value="{{ chunk_size }}">
             <input type="hidden" name="path" value="{{ path }}">
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-            <div class="form-group">
-              <div class="col-sm-2">
-                <label for="inputEmail3" class="control-label">Notes</label>
-              </div>
-              <div class="col-sm-10">
-                <textarea class="form-control" id="inputEmail3" name="notes" placeholder="Simulation Notes">{{ notes }}</textarea>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-default">Save</button>
-              </div>
-            </div>
-        </div>
-      </div>
-      </form>
-
-      <div id="success">
-
-      <div class="row">
-        <div class="col-md-12">
-          <div class="btn-toolbar" role="toolbar">
-            <div class="btn-group">
-              <a type="button" class="btn btn-default" href="{{ download_url}}">Download Simulation</a>
-              <a type="button" class="btn btn-default" href="{{ new_simulation }}">Create New Simulation From This Simulation</a>
-              <a type="button" class="btn btn-default" href="{{ batch_simulation }}">Create Batch Job Based on this Simulation</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    <br><br>
-    <form class="form-horizontal" role="form" style="" action="{% url 'simulation:batch_choose' %}" method="POST">
+    </div>
     <div class="row">
-        <input type="hidden" name="check_sum" value="{{ path }}">
         <div class="col-md-12">
-      {% csrf_token %}
-      {{ dropdown|safe }}
+            <div class="form-group">
+                <div class="col-sm-2">
+                    <label for="inputEmail3" class="control-label">Notes</label>
+                </div>
+                <div class="col-sm-10">
+                    <textarea class="form-control" id="inputEmail3" name="notes" placeholder="Simulation Notes">{{ notes }}</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default">Save</button>
+                </div>
+            </div>
         </div>
     </div>
+</form>
+
+<div id="success">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-toolbar" role="toolbar">
+                <div class="btn-group">
+                    <a type="button" class="btn btn-default" href="{{ download_url}}">Download Simulation</a>
+                    <a type="button" class="btn btn-default" href="{{ new_simulation }}">Create New Simulation From This Simulation</a>
+                    <a type="button" class="btn btn-default" href="{{ batch_simulation }}">Create Batch Job Based on this Simulation</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+
+    <form class="form-inline" role="form" action="{% url 'simulation:add_comparison' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="sr-only" for="comparision_name">Comparison Name</label>
+            <input type="text" class="form-control" id="comparision_name" name="comparison_name" placeholder="Comparison Name">
+            <input type="hidden" name="simulation_id" value="{{ sim_id }}">
+        </div>
+        <button type="submit" class="btn btn-default">Add Comparison</button>
+    </form>
+
+    <br>
+
+    <form class="form-horizontal" role="form" style="" action="{% url 'simulation:batch_choose' %}" method="POST">
+        <div class="row">
+            <input type="hidden" name="check_sum" value="{{ path }}">
+            <div class="col-md-12">
+                {% csrf_token %}
+                {{ dropdown|safe }}
+            </div>
+        </div>
     </form>
 
 
     {% for id, name, url, url_download in graphs %}
 
-       <div class="jumbotron graph_wide">
-           <h3>{{ name }}</h3>
+    <div class="jumbotron graph_wide">
+        <h3>{{ name }}</h3>
         <div>
             <p><a href="{{ url }}" role='button' class='btn btn-default'>Download {{ name }} image</a></p>
             <div class="row graph_row">
@@ -81,17 +98,17 @@
                 <div class="col-md-9 tall" id="{{ id }}"></div>
                 <div class="col-md-3 tall" id="{{ id }}choice">
                     <a href="{{ url_download }}" role="button" class="btn btn-default"
-                          data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in a CSV format (Excel compatible).">Download Data</a>
+                       data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in a CSV format (Excel compatible).">Download Data</a>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-9 small" id="{{ id }}overview"></div>
             </div>
         </div>
-      </div>
+    </div>
 
     {% endfor %}
-    </div>
+</div>
 
 <h1>Output</h1>
 <pre id="stdout"></pre>
@@ -105,34 +122,34 @@
 
 <script type="text/javascript">
 
-$("body").addClass("loading");
+    $("body").addClass("loading");
 
-function start_plot(datasets, element, choices, overview_id, base_id) {
-		// hard-code color indices to prevent them from shifting as
-		// countries are turned on/off
+    function start_plot(datasets, element, choices, overview_id, base_id) {
+        // hard-code color indices to prevent them from shifting as
+        // countries are turned on/off
         var datasets = datasets;
-		var i = 0;
-		$.each(datasets, function(key, val) {
-			val.color = i;
-			++i;
-		});
+        var i = 0;
+        $.each(datasets, function (key, val) {
+            val.color = i;
+            ++i;
+        });
 
-		// insert checkboxes
-		var choiceContainer = $(choices);
+        // insert checkboxes
+        var choiceContainer = $(choices);
 
-		choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "download'>Download Current Graph</a>");
-		choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
+        choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "download'>Download Current Graph</a>");
+        choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
 
-		for (var key in datasets) {
-		    choiceContainer.prepend("<br/><input type='checkbox' name='" + key +
+        for (var key in datasets) {
+            choiceContainer.prepend("<br/><input type='checkbox' name='" + key +
 				"' checked='checked' id='id" + key + "'></input>" +
 				"<label for='id" + key + "'>"
 				+ datasets[key].label + "</label>");
-		};
-		
-		choiceContainer.find("input").click(plotAccordingToChoices);
+        };
 
-		$('#' + base_id + 'zoom').click(function (e) {
+        choiceContainer.find("input").click(plotAccordingToChoices);
+
+        $('#' + base_id + 'zoom').click(function (e) {
             plotAccordingToChoices();
             e.preventDefault();
         });
@@ -147,16 +164,16 @@ function start_plot(datasets, element, choices, overview_id, base_id) {
             //e.preventDefault();
         });
 
-		function plotAccordingToChoices() {
+        function plotAccordingToChoices() {
 
-			var data = [];
+            var data = [];
 
-			choiceContainer.find("input:checked").each(function () {
-				var key = $(this).attr("name");
-				if (key && datasets[key]) {
-					data.push(datasets[key]);
-				}
-			});
+            choiceContainer.find("input:checked").each(function () {
+                var key = $(this).attr("name");
+                if (key && datasets[key]) {
+                    data.push(datasets[key]);
+                }
+            });
 
             var plot = $.plot(element, data, {
                 canvas: true,
@@ -184,7 +201,7 @@ function start_plot(datasets, element, choices, overview_id, base_id) {
                 selection: {
                     mode: "xy"
                 },
-                yaxes: [ {}, {position:"right"}]
+                yaxes: [{}, { position: "right" }]
             });
 
             var overview = $.plot(overview_id, data, {
@@ -206,7 +223,7 @@ function start_plot(datasets, element, choices, overview_id, base_id) {
             $(element).bind("plotselected", function (event, ranges) {
 
                 // do the zooming
-                $.each(plot.getXAxes(), function(_, axis) {
+                $.each(plot.getXAxes(), function (_, axis) {
                     var opts = axis.options;
                     opts.min = ranges.xaxis.from;
                     opts.max = ranges.xaxis.to;
@@ -226,56 +243,56 @@ function start_plot(datasets, element, choices, overview_id, base_id) {
 
         }
 
-		plotAccordingToChoices();
-	}
-
-$( document ).ready(function() {
-    var data;
-
-    function fetchData() {
-
-        function onDataReceived(json_data) {
-
-            // Load all the data in one pass; if we only got partial
-            // data we could merge it with what we already have.
-            data = json_data;
-
-            if (1 == json_data['failed']) {
-                $("#success").remove();
-                $("body").removeClass("loading");
-            } else if (0 == json_data['success']) {
-                $( "#progress" ).load( "{{ progress }}" );
-                setTimeout(fetchData, 5000);
-            } else {
-                $("#failed").remove();
-                $("body").removeClass("loading");
-
-                document.getElementById("stdout").innerHTML = ansi_up.ansi_to_html(json_data['stdout']);
-                document.getElementById("stderr").innerHTML = ansi_up.ansi_to_html(json_data['stderr']);
-
-                $('#cadet_version').text(json_data['cadet_version']);
-                $('#cadet_git_version').prop('title', 'Git Version Commit String: ' + json_data['cadet_git_version']);
-
-                for (var key in json_data['data']) {
-                    if (json_data['data'].hasOwnProperty(key)) {
-                        start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
-                    }
-                }
-
-            }
-        }
-
-        $.ajax({
-            url: "{{ json_url }}",
-            type: "GET",
-            dataType: "json",
-            cache: false,
-            data: { 'path': '{{ path }}', 'sim_id': '{{ sim_id }}' },
-            success: onDataReceived
-        });
+        plotAccordingToChoices();
     }
 
-    fetchData();
-});
+    $(document).ready(function () {
+        var data;
+
+        function fetchData() {
+
+            function onDataReceived(json_data) {
+
+                // Load all the data in one pass; if we only got partial
+                // data we could merge it with what we already have.
+                data = json_data;
+
+                if (1 == json_data['failed']) {
+                    $("#success").remove();
+                    $("body").removeClass("loading");
+                } else if (0 == json_data['success']) {
+                    $("#progress").load("{{ progress }}");
+                    setTimeout(fetchData, 5000);
+                } else {
+                    $("#failed").remove();
+                    $("body").removeClass("loading");
+
+                    document.getElementById("stdout").innerHTML = ansi_up.ansi_to_html(json_data['stdout']);
+                    document.getElementById("stderr").innerHTML = ansi_up.ansi_to_html(json_data['stderr']);
+
+                    $('#cadet_version').text(json_data['cadet_version']);
+                    $('#cadet_git_version').prop('title', 'Git Version Commit String: ' + json_data['cadet_git_version']);
+
+                    for (var key in json_data['data']) {
+                        if (json_data['data'].hasOwnProperty(key)) {
+                            start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
+                        }
+                    }
+
+                }
+            }
+
+            $.ajax({
+                url: "{{ json_url }}",
+                type: "GET",
+                dataType: "json",
+                cache: false,
+                data: { 'path': '{{ path }}', 'sim_id': '{{ sim_id }}' },
+                success: onDataReceived
+            });
+        }
+
+        fetchData();
+    });
 </script>
 {% endblock %}

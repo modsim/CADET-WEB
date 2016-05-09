@@ -1005,6 +1005,16 @@ def batch_choose(request):
     base = reverse('simulation:run_job_get', None, None)
     return redirect('%s?%s' % (base, query))
 
+
+@login_required
+def add_comparison(request):
+    comparison_name = request.POST.get('comparison_name')
+    simulation_id = request.POST.get('simulation_id')
+    if simulation_id not in request.session:
+        request.session[simulation_id] = comparison_name
+
+    return redirect(request.META.get('HTTP_REFERER'))
+
 @login_required
 def simulation_rate(request):
     path = request.POST['path']

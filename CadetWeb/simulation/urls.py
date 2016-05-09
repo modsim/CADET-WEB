@@ -31,4 +31,5 @@ urlpatterns = patterns('',
     url(r'^query_results/$', views.query_results, name='query_results'),
     url(r'^find_simulations/$', views.find_simulations, name='find_simulations'),
     url(r'^batch_choose/$', views.batch_choose, name='batch_choose'),
+    url(r'^add_comparison/$', views.add_comparison, name='add_comparison'),
 )
