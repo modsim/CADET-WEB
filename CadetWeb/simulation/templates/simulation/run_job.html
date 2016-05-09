@@ -4,8 +4,6 @@
 <form class="form-horizontal" role="form" style="" action="{% url 'simulation:simulation_rate' %}" method="POST">
     {% csrf_token %}
 
-    {{ request.session.items }}
-
     <div class="row">
         <input type="hidden" name="json" value="{{ json }}">
         <div class="col-md-2">
