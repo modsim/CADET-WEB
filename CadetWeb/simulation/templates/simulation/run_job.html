@@ -56,21 +56,61 @@
                     <a type="button" class="btn btn-default" href="{{ download_url}}">Download Simulation</a>
                     <a type="button" class="btn btn-default" href="{{ new_simulation }}">Create New Simulation From This Simulation</a>
                     <a type="button" class="btn btn-default" href="{{ batch_simulation }}">Create Batch Job Based on this Simulation</a>
+
+                    {% if request.session.comparison %}
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#compare_simulations">Compare Simulations</button>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
     </div>
     <br>
 
+    <div class="modal fade" id="compare_simulations" tabindex="-1" role="dialog" aria-labelledby="compare_simulations">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Compare Simulations</h4>
+                </div>
+                <form class="form-horizontal" role="form" action="{% url 'simulation:process_comparison' %}" method="POST">
+                    <div class="modal-body">
 
-    <form class="form-inline" role="form" action="{% url 'simulation:add_comparison' %}" method="POST">
+                        {% csrf_token %}
+                        {% for comp_id, name in comparison %}
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="selected" value="{{ comp_id }}">{{ name }}
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary dom_submit" name="type" value="delete">Delete Selected</button>
+                        <button type="submit" class="btn btn-primary dom_submit" name="type" value="graph">Compare Selected</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <form class="form-inline" role="form" action="{% url 'simulation:process_comparison' %}" method="POST">
         {% csrf_token %}
         <div class="form-group">
             <label class="sr-only" for="comparision_name">Comparison Name</label>
             <input type="text" class="form-control" id="comparision_name" name="comparison_name" placeholder="Comparison Name">
-            <input type="hidden" name="simulation_id" value="{{ sim_id }}">
+            {% if sim_id %}
+            <input type="hidden" name="simulation_id" value="{{ job_id }}_{{ sim_id }}">
+            {% else %}
+            <input type="hidden" name="simulation_id" value="{{ job_id }}">
+            {% endif %}
         </div>
-        <button type="submit" class="btn btn-default">Add Comparison</button>
+        <button type="submit" class="btn btn-default" name="type" value="add">Add Comparison</button>
     </form>
 
     <br>

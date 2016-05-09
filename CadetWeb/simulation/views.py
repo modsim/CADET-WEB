@@ -898,7 +898,38 @@ def run_job_get(request):
     data['job_id'] = models.Job.objects.get(uid=path).id
     data['dropdown'] = generate_batch_choice(json_data, simulation, request, path)
     data['sim_id'] = sim_id
+
+    if 'comparison' in request.session:
+        data['comparison'] = request.session['comparison'].items()
+
     return render(request, 'simulation/run_job.html', data)
+
+@login_required
+def draw_comparison(request):
+    selected = request.GET.getlist('selected')
+
+    temp = []
+
+    for item in selected:
+        id = item
+        tag = request.session['comparison'][item]
+        if '_' in item:
+            job_id, sim_id = item.split('_')
+            path = models.Job.objects.get(pk=int(job_id)).uid
+            rel_path = models.Simulation.objects.get(id=int(sim_id)).Rel_Path
+            
+        else:
+            job_id = item
+            path = models.Job.objects.get(pk=int(job_id)).uid
+            rel_path = ''
+
+        json_path, hdf5_path, graphs, json_data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
+        hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
+        temp.append(  (id, tag, hdf5_path) )
+
+    data = {}
+    data['selected'] = temp
+    return render(request, 'simulation/draw_comparison.html', data)
 
 def generate_batch_choice(json_data, simulation, request, path):
     temp = []
@@ -1007,13 +1038,33 @@ def batch_choose(request):
 
 
 @login_required
-def add_comparison(request):
-    comparison_name = request.POST.get('comparison_name')
-    simulation_id = request.POST.get('simulation_id')
-    if simulation_id not in request.session:
-        request.session[simulation_id] = comparison_name
+def process_comparison(request):
+    if 'comparison' not in request.session:
+        request.session['comparison'] = {}
 
-    return redirect(request.META.get('HTTP_REFERER'))
+    type = request.POST.get('type')
+
+    if type == 'add':
+        comparison_name = request.POST.get('comparison_name')
+        simulation_id = request.POST.get('simulation_id')
+    
+        if simulation_id not in request.session['comparison']:
+            request.session['comparison'][simulation_id] = comparison_name
+            request.session.modified = True
+        return redirect(request.META.get('HTTP_REFERER'))
+    elif type == 'delete':
+        selected = request.POST.getlist('selected')
+        for item in selected:
+            del request.session['comparison'][item]
+        request.session.modified = True
+        return redirect(request.META.get('HTTP_REFERER'))
+    elif type == 'graph':
+        query = [('selected', item) for item in request.POST.getlist('selected')]
+        query = urllib.urlencode(query)
+        base = reverse('simulation:draw_comparison', None, None)
+        return redirect('%s?%s' % (base, query))
+
+    
 
 @login_required
 def simulation_rate(request):

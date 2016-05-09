@@ -1,0 +1,9 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+
+{% for item, tag, hdf5_path in selected %}
+<p> {{ item }}  {{ tag }}  {{ hdf5_path }}</p>
+                        {% endfor %}
+
+{% endblock %}
