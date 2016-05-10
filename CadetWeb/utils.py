@@ -102,26 +102,31 @@ def get_graph_data(path, chunk_size, rel_path):
             _, name = key.split(':')
             filename = get_attribute_by_name(name, 'graphing/single', 'file_name')
             filename_csv = get_attribute_by_name(name, 'graphing/single', 'file_name_csv')
+            filename_xls = get_attribute_by_name(name, 'graphing/single', 'file_name_xls')
             path = os.path.join('/static/simulation/sims', relative_path, filename)
             path_download = os.path.join('/static/simulation/sims', relative_path, filename_csv)
+            path_download_xls = os.path.join('/static/simulation/sims', relative_path, filename_xls)
             id = name.replace(' ', '_').replace(':', '_')
-            graphs.append( (id, name, path, path_download) )
+            graphs.append( (id, name, path, path_download, path_download_xls) )
 
         if key.startswith('graph_group') and value == '1':
             _, name = key.split(':')
             filename = get_attribute_by_name(name, 'graphing/group', 'file_name')
             filename_csv = get_attribute_by_name(name, 'graphing/single', 'file_name_csv')
+            filename_xls = get_attribute_by_name(name, 'graphing/single', 'file_name_xls')
             path = os.path.join('/static/simulation/sims', relative_path, filename)
             path_download = os.path.join('/static/simulation/sims', relative_path, filename_csv)
+            path_download_xls = os.path.join('/static/simulation/sims', relative_path, filename_xls)
             id = name.replace(' ', '_').replace(':', '_')
-            graphs.append( (id, name, path, path_download) )
+            graphs.append( (id, name, path, path_download, path_download_xls) )
 
     for sensitivity_number in range(len(json_data.get("sensitivities", []))):
-        file_name, file_name_csv, title = plot_sensitivity.get_picture_id(hdf5_path, sensitivity_number)
+        file_name, file_name_csv, file_name_xls, title = plot_sensitivity.get_picture_id(hdf5_path, sensitivity_number)
         path = os.path.join('/static/simulation/sims', relative_path, file_name)
         path_download = os.path.join('/static/simulation/sims', relative_path, file_name_csv)
+        path_download_xls = os.path.join('/static/simulation/sims', relative_path, file_name_xls)
         id = title.replace(' ', '_').replace(':', '_')
-        graphs.append( (id, title, path, path_download))
+        graphs.append( (id, title, path, path_download, path_download_xls))
 
     try:
         stdout = open(os.path.join(storage_path, relative_path, 'stdout')).read()

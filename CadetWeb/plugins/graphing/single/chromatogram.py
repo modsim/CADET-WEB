@@ -17,6 +17,7 @@ depends_performance = []
 depends_sensitivity = []
 file_name = 'chromatogram.png'
 file_name_csv = 'chromatogram.csv'
+file_name_xls = 'chromatogram.xlsx'
 
 def run(hdf5_path):
 
@@ -39,8 +40,8 @@ def generate_csv(hdf5_path):
         data[comp] = h5['/output/solution/SOLUTION_COLUMN_OUTLET_COMP_%03d' % idx]
 
     parent, hdf5_name = os.path.split(hdf5_path)
-    dst = os.path.join(parent, file_name_csv)
-    data.to_csv(dst, columns=columns, index=False)
+    data.to_csv(os.path.join(parent, file_name_csv), columns=columns, index=False)
+    data.to_excel(os.path.join(parent, file_name_xls), columns=columns, index=False)
     h5.close()
 
 def generate_plot(hdf5_path):

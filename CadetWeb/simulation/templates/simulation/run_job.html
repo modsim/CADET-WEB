@@ -124,7 +124,7 @@
     </form>
 
 
-    {% for id, name, url, url_download in graphs %}
+    {% for id, name, url, url_download, url_download_xls in graphs %}
 
     <div class="jumbotron graph_wide">
         <h3>{{ name }}</h3>
@@ -136,7 +136,9 @@
                 <div class="col-md-9 tall" id="{{ id }}"></div>
                 <div class="col-md-3 tall" id="{{ id }}choice">
                     <a href="{{ url_download }}" role="button" class="btn btn-default"
-                       data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in a CSV format (Excel compatible).">Download Data</a>
+                       data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in a CSV format.">Download Data (CSV)</a>
+                    <a href="{{ url_download_xls }}" role="button" class="btn btn-default"
+                       data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in a CSV format.">Download Data (XLSX)</a>
                 </div>
             </div>
             <div class="row">

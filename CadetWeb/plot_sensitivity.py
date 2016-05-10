@@ -38,6 +38,8 @@ def get_picture_id(hdf5_path, sensitivity_number):
     file_name_csv = '%s_%s_%s.csv' % (name, section, component)
     file_name_csv = file_name_csv.replace('-', 'minus')
 
+    file_name_xls = file_name_csv.replace('.csv', '.xlsx')
+
     if component == -1:
         component = "All"
     else:
@@ -51,18 +53,18 @@ def get_picture_id(hdf5_path, sensitivity_number):
     title = 'Sensitivity Name:%s  Component:%s  Section:%s' % (name.replace('_', ' ').title(), component, section)
     h5.close()
 
-    return file_name, file_name_csv, title
+    return file_name, file_name_csv, file_name_xls, title
 
 def run(hdf5_path, sensitivity_number):
     #generate a chromatogram
     parent, hdf5_name = os.path.split(hdf5_path)
 
-    file_name, file_name_csv, title = get_picture_id(hdf5_path, sensitivity_number)
+    file_name, file_name_csv, file_name_xls, title = get_picture_id(hdf5_path, sensitivity_number)
 
     generate_plot(file_name, title, hdf5_path, sensitivity_number, parent)
-    generate_csv(file_name_csv, hdf5_path, sensitivity_number, parent)
+    generate_csv(file_name_csv, file_name_xls, hdf5_path, sensitivity_number, parent)
 
-def generate_csv(file_name, hdf5_path, sensivitity_number, parent):
+def generate_csv(file_name, file_name_xls, hdf5_path, sensivitity_number, parent):
     h5 = h5py.File(hdf5_path, 'r')
     
     data = pd.DataFrame()
@@ -77,8 +79,8 @@ def generate_csv(file_name, hdf5_path, sensivitity_number, parent):
         columns.append(comp)
         data[comp] = h5['/output/sensitivity/param_%03d/SENS_COLUMN_OUTLET_COMP_%03d' % (sensivitity_number, idx)]
 
-    dst = os.path.join(parent, file_name)
-    data.to_csv(dst, columns=columns, index=False)
+    data.to_csv(os.path.join(parent, file_name), columns=columns, index=False)
+    data.to_excel(os.path.join(parent, file_name_xls), columns=columns, index=False)
     h5.close()
 
 
@@ -119,11 +121,11 @@ def get_data(hdf5_path, sensitivity_number):
     parent, hdf5_name = os.path.split(hdf5_path)
     data = []
 
-    file_name, file_name_csv, title = get_picture_id(hdf5_path, sensitivity_number)
+    file_name, file_name_csv, file_name_xls, title = get_picture_id(hdf5_path, sensitivity_number)
 
     dst = os.path.join(parent, file_name_csv)
     if not os.path.exists(dst):
-        generate_csv(file_name_csv, hdf5_path, sensitivity_number, parent)
+        generate_csv(file_name_csv, file_name_xls, hdf5_path, sensitivity_number, parent)
 
     h5 = h5py.File(hdf5_path, 'r')
 
