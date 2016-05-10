@@ -909,6 +909,7 @@ def draw_comparison(request):
     selected = request.GET.getlist('selected')
 
     temp = []
+    all_graphs = []
 
     for item in selected:
         id = item
@@ -924,11 +925,14 @@ def draw_comparison(request):
             rel_path = ''
 
         json_path, hdf5_path, graphs, json_data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
+        graphs_available = set([(name, human_name) for name, human_name, png, csv in graphs])
+        all_graphs.append(graphs_available)
         hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
-        temp.append(  (id, tag, hdf5_path) )
+        temp.append(  (id, tag, hdf5_path, graphs_available) )
 
     data = {}
     data['selected'] = temp
+    data['graphs_common'] = set.intersection(*all_graphs)
     return render(request, 'simulation/draw_comparison.html', data)
 
 def generate_batch_choice(json_data, simulation, request, path):
