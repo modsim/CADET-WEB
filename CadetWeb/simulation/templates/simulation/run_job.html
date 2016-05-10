@@ -195,10 +195,19 @@
         $('#' + base_id + 'download').click(function (e) {
             var link = $('#' + base_id + 'download');
             var search = element + ' > canvas:first';
-            console.log(search);
+
             //link.href = $("'" + element + ' > canvas:first' + "'")[0].toDataURL();
-            link.attr('href', $(search)[0].toDataURL());
-            link.attr('download', base_id + '.png');
+
+            if ($(search)[0].msToBlob) { //for IE
+                var blob = $(search)[0].msToBlob();
+                window.navigator.msSaveBlob(blob, base_id + '.png');
+            } else {
+                //other browsers
+                link.attr('href', $(search)[0].toDataURL("image/png"));
+                link.attr('download', base_id + '.png');
+            }
+
+            
             //e.preventDefault();
         });
 
