@@ -38,7 +38,7 @@
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-default">Save</button>
+                    <button type="submit" class="btn btn-default">Save Notes and Rating</button>
                 </div>
             </div>
         </div>
@@ -232,11 +232,13 @@
             var plot = $.plot(element, data, {
                 canvas: true,
                 yaxis: {
+                    tickFormatter: function (v, axis) { return v.toExponential(2);},
                     //min: 0,
                     //zoomRange: null,
                     //panRange: [0, maxY]
                 },
                 y2axis: {
+                    tickFormatter: function (v, axis) { return v.toExponential(2); },
                     //min: 0,
                     //zoomRange: null,
                     //panRange: [0, maxY]
@@ -318,7 +320,7 @@
                     $("#progress").load("{{ progress }}");
                     setTimeout(fetchData, 5000);
                 } else {
-                    $("#failed").remove();
+                    $("#failure").remove();
                     $("body").removeClass("loading");
 
                     document.getElementById("stdout").innerHTML = ansi_up.ansi_to_html(json_data['stdout']);
