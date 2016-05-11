@@ -186,10 +186,10 @@
         choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
 
         for (var key in datasets) {
-            choiceContainer.prepend("<div class='row'><div class='col-sm-2'><input type='checkbox' name='" + key +
+            choiceContainer.prepend("<div class='row'><div class='col-sm-4'><input type='checkbox' name='" + key +
 				"' checked='checked' id='id" + key + "'></input>" +
 				"<label for='id" + key + "'>"
-				+ datasets[key].label + "</label></div><div class='col-sm-1' style='background-color: " + datasets[key].color + ";'></div></div>");
+				+ datasets[key].label + "</label></div><div class='col-sm-1' style='background-color: " + datasets[key].color + ";'>&nbsp;</div></div>");
         };
 
         choiceContainer.find("input").click(plotAccordingToChoices);
