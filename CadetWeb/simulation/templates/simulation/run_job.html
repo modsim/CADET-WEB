@@ -164,13 +164,18 @@
 
     $("body").addClass("loading");
 
+    var colors = ['Black', 'Red', 'Blue', 'Lime', 'Cyan', 'BlueViolet', 'Crimson', 'DeepPink', 'DarkMagenta', 'Green',
+        'Indigo', 'Magenta', 'MidnightBlue', 'Orange', 'Purple', 'Silver', 'Tan'];
+
+
+
     function start_plot(datasets, element, choices, overview_id, base_id) {
         // hard-code color indices to prevent them from shifting as
         // countries are turned on/off
         var datasets = datasets;
         var i = 0;
         $.each(datasets, function (key, val) {
-            val.color = i;
+            val.color = colors[i%colors.length];
             ++i;
         });
 
@@ -181,10 +186,10 @@
         choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
 
         for (var key in datasets) {
-            choiceContainer.prepend("<br/><input type='checkbox' name='" + key +
+            choiceContainer.prepend("<div class='row'><div class='col-sm-2'><input type='checkbox' name='" + key +
 				"' checked='checked' id='id" + key + "'></input>" +
 				"<label for='id" + key + "'>"
-				+ datasets[key].label + "</label>");
+				+ datasets[key].label + "</label></div><div class='col-sm-1' style='background-color: " + datasets[key].color + ";'></div></div>");
         };
 
         choiceContainer.find("input").click(plotAccordingToChoices);
