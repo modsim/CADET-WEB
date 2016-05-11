@@ -885,6 +885,7 @@ def run_job_get(request):
         rating = 0
         notes = ''
 
+    data['advanced_ui'] = json_data['advanced_ui']
     data['download_url'] = hdf5_path
     data['new_simulation'] = url_new
     data['batch_simulation'] = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % path

@@ -3,6 +3,20 @@
 {% block body %}
 <form class="form-horizontal" role="form" style="" action="{% url 'simulation:simulation_rate' %}" method="POST">
     {% csrf_token %}
+    <div class="row">
+    <div class="form-group">
+        <div class="col-sm-12">
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default {% if advanced_ui == 'normal' %} active {% endif %} " {% if advanced_ui == 'normal' %} checked {% endif %} onclick="$('body').removeClass('advanced').addClass('normal');">
+                    <input type="radio" name="advanced_ui" value="normal" id="option1" autocomplete="off"> Normal User Interface
+                </label>
+                <label class="btn btn-default {% if advanced_ui == 'advanced' %} active {% endif %}" {% if advanced_ui == 'advanced' %} checked {% endif %} onclick="$('body').addClass('advanced').removeClass('normal');">
+                    <input type="radio" name="advanced_ui" value="advanced" id="option2" autocomplete="off"> Advanced User Interface
+                </label>
+            </div>
+        </div>
+    </div>
+        </div>
 
     <div class="row">
         <input type="hidden" name="json" value="{{ json }}">
@@ -149,12 +163,14 @@
 
     {% endfor %}
 </div>
-
-<h1>Output</h1>
+<div class="advanced">
+    <p><strong>The following pieces of information are mostly used for debugging and only shown if Advanced is selected.</strong></p>
+<p><strong data-toggle="tooltip" data-placement="bottom" title="All the STDOUT output from the simulation are put here. This include the CADET output and anything generated during python processing.">Simulation Output</strong></p>
 <pre id="stdout"></pre>
 
-<h1>Errors</h1>
+<p><strong data-toggle="tooltip" data-placement="bottom" title="All the STDERR output from the simulation are put here. This include the CADET output and anything generated during python processing.">Simulation Errors</strong></p>
 <pre id="stderr"></pre>
+    </div>
 
 <div id="failure">The simulation has failed to complete. It has either run out of time, run out of memory or crashed. You can change settings and try again.</div>
 
