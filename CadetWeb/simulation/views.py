@@ -850,6 +850,10 @@ def generate_other_graphs(request):
     context = {}
     return render(request, 'simulation/generate_other_graphs.html', context)
 
+def about_us(request):
+    context = {}
+    return render(request, 'simulation/about_us.html', context)
+
 @login_required
 def run_job_get(request):
     path = request.GET['path']

@@ -1,0 +1,64 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+
+<div>
+    <h1 class="isFirstInSlot">Chromatography Analysis and Design Toolkit</h1>
+
+    The Chromatography Analysis and  Design Toolkit (CADET) is developed at the
+    Institute of Bio- and Geosciences 1 (IBG-1) under supervision of Dr. Eric von Lieres.
+    The core of the CADET software is a fast and accurate solver for the General Rate Model (GRM)
+    of packed bed liquid chromatography, which can be used through this web-interface.
+    The CADET solver covers a wide range of GRM variants, combining different transport
+    and binding models with state-of-the-art mathematical algorithms and scientific computing techniques.
+
+    <ul style="list-style-type:disc;">
+
+        <li>
+            The governing partial differential algebraic equations (PDAE) are discretized in
+            space and time using mass preserving finite volumes (FV) and a backward difference
+            formula (BDF).
+        </li>
+        <li>
+            The weighted essentially non-oscillatory (WENO) scheme is applied
+            for minimizing numerical dissipation.
+        </li>
+        <li>Parameter sensitivities are computed using algorithmic differentiation.</li>
+        <li>
+            The code is parallelized for efficiently utilizing the computational power of modern
+            multicore processors.
+        </li>
+    </ul>
+    The CADET framework also comprises a MATLAB interface and standard routines for
+    parameter estimation, process optimization and experimental design (not accessible through
+    this web-interface). The full version can be downloaded on
+    <a href="https://github.com/modsim/CADET/releases">GitHub</a>.
+    CADET is freely distributed as a contribution to the scientific community.
+    If you find it useful for your own work, we would appreciate acknowledgements
+    of the CADET software and citations of our papers.
+    <ul style="list-style-type:disc;">
+        <li>von Lieres, E.; Andersson, J.: <a style="background: none; display:inline; padding:0 0 0 0px; " href="http://dx.doi.org/10.1016/j.compchemeng.2010.03.008">A fast and accurate solver for the general rate model of column liquid chromatography</a>, Computers and Chemical Engineering 34,8 (2010), 1180-1191.</li>
+        <li>P&uuml;ttmann, A.; Schnittert, S.; Naumann, U.; von Lieres, E.: <a style="background: none; display:inline; padding:0 0 0 0px; " href="http://dx.doi.org/10.1016/j.compchemeng.2013.04.021">Fast and accurate parameter sensitivities for the general rate model of column liquid chromatography</a>, Computers and Chemical Engineering 56,13 (2013), 46-57</li>
+    </ul>
+
+
+    <h1 class="isFirstInSlot">Documents</h1>
+    The full version can be downloaded on <a href="https://github.com/modsim/CADET/releases">GitHub</a>.
+    CADET is freely distributed as a contribution to the scientific community.
+    <!-- The fields in this web interface are defined by the CADET <a href="http://sourceforge.net/projects/cadet/files/documentation/cadet_file_format.pdf/download">file format</a>. -->
+    The CADET simulator is documented using <a href="https://www.cadet-web.de/cadetcs_WSclient/Documentation/">doxygen</a>.
+    Additional documentation is provided on the project  <a href="https://github.com/modsim/cadet/wiki">wiki</a>.
+    If you find it useful for your own work, we would appreciate
+    acknowledgements of the CADET software and citations of our papers.
+
+    <ul>
+        <li>von Lieres, E.; Andersson, J.: <a style="background: none; display:inline; padding:0 0 0 0px; " href="http://dx.doi.org/10.1016/j.compchemeng.2010.03.008">A fast and accurate solver for the general rate model of column liquid chromatography</a>, Computers and Chemical Engineering 34,8 (2010), 1180-1191.</li>
+        <li>P&uuml;ttmann, A.; Schnittert, S.; Naumann, U.; von Lieres, E.: <a style="background: none; display:inline; padding:0 0 0 0px; " href="http://dx.doi.org/10.1016/j.compchemeng.2013.04.021">Fast and accurate parameter sensitivities for the general rate model of column liquid chromatography</a>, Computers and Chemical Engineering 56,13 (2013), 46-57</li>
+    </ul>
+
+</div>
+
+
+
+
+{% endblock %}
