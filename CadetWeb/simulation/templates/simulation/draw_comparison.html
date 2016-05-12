@@ -45,19 +45,19 @@
         choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
         console.log(3);
         for (var key in datasets['components']) {
-            choiceContainer.prepend("<br/><input type='checkbox' name='" + key +
+            choiceContainer.prepend("<div class='row'><div class='col-sm-4'><input type='checkbox' name='" + key +
 				"' checked='checked' id='id" + base_id + key + "'></input>" +
 				"<label for='id" + base_id + key + "'>"
-				+ key + "</label>");
+				+ key + "</label></div><div class='col-sm-1' style='background-color: " + datasets['components'][key].color + ";'>&nbsp;</div></div>");
         };
-        console.log(4);
+
         choiceContainer.find("input").click(plotAccordingToChoices);
-        console.log(5);
+
         $('#' + base_id + 'zoom').click(function (e) {
             plotAccordingToChoices();
             e.preventDefault();
         });
-        console.log(6);
+
         $('#' + base_id + 'download').click(function (e) {
             var link = $('#' + base_id + 'download');
             var search = element + ' > canvas:first';
@@ -67,7 +67,7 @@
             link.attr('download', base_id + '.png');
             //e.preventDefault();
         });
-        console.log(7);
+
         function plotAccordingToChoices() {
 
             var data = [];
@@ -146,7 +146,7 @@
             });
 
         }
-        console.log(8);
+
         //plotAccordingToChoices();
     }
 
