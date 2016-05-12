@@ -31,35 +31,33 @@
         'Indigo', 'Magenta', 'MidnightBlue', 'Orange', 'Purple', 'Silver', 'Tan'];
 
     function start_plot(datasets, element, choices, overview_id, base_id) {
-        // hard-code color indices to prevent them from shifting as
-        // countries are turned on/off
+        // hard-code color indices to prevent them from shifting
         var datasets = datasets;
         var i = 0;
-        $.each(datasets, function (key, val) {
-            val.color = colors[i % colors.length];
+        $.each(datasets.components, function (key, val) {
+            val.color = colors[i%colors.length];
             ++i;
         });
 
         // insert checkboxes
         var choiceContainer = $(choices);
-
-        choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "download'>Download Current Graph</a>");
+        //choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "download'>Download Current Graph</a>");
         choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
-
-        for (var key in datasets) {
+        console.log(3);
+        for (var key in datasets['components']) {
             choiceContainer.prepend("<br/><input type='checkbox' name='" + key +
-				"' checked='checked' id='id" + key + "'></input>" +
-				"<label for='id" + key + "'>"
-				+ datasets[key].label + "</label>");
+				"' checked='checked' id='id" + base_id + key + "'></input>" +
+				"<label for='id" + base_id + key + "'>"
+				+ key + "</label>");
         };
-
+        console.log(4);
         choiceContainer.find("input").click(plotAccordingToChoices);
-
+        console.log(5);
         $('#' + base_id + 'zoom').click(function (e) {
             plotAccordingToChoices();
             e.preventDefault();
         });
-
+        console.log(6);
         $('#' + base_id + 'download').click(function (e) {
             var link = $('#' + base_id + 'download');
             var search = element + ' > canvas:first';
@@ -69,7 +67,7 @@
             link.attr('download', base_id + '.png');
             //e.preventDefault();
         });
-
+        console.log(7);
         function plotAccordingToChoices() {
 
             var data = [];
@@ -148,8 +146,8 @@
             });
 
         }
-
-        plotAccordingToChoices();
+        console.log(8);
+        //plotAccordingToChoices();
     }
 
     $(document).ready(function () {
@@ -158,16 +156,11 @@
         function fetchData() {
 
             function onDataReceived(json_data) {
-
-                // Load all the data in one pass; if we only got partial
-                // data we could merge it with what we already have.
-                data = json_data;
+                data = json_data.comparison_data;
 
                 $("body").removeClass("loading");
-                for (var key in json_data['data']) {
-                    if (json_data['data'].hasOwnProperty(key)) {
-                        start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
-                    }
+                for (var key in data) {
+                    start_plot(data[key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
                 }
 
                 

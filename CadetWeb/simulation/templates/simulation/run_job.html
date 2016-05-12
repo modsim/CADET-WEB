@@ -203,8 +203,8 @@
 
         for (var key in datasets) {
             choiceContainer.prepend("<div class='row'><div class='col-sm-4'><input type='checkbox' name='" + key +
-				"' checked='checked' id='id" + key + "'></input>" +
-				"<label for='id" + key + "'>"
+				"' checked='checked' id='id" + base_id + key + "'></input>" +
+				"<label for='id" + base_id + key + "'>"
 				+ datasets[key].label + "</label></div><div class='col-sm-1' style='background-color: " + datasets[key].color + ";'>&nbsp;</div></div>");
         };
 

@@ -1430,7 +1430,7 @@ def get_data_comparison(request):
 
     #find all components
     for key, values in all_components.items():
-        all_components[key] = sorted(list(set.intersection(*values)))
+        all_components[key] = dict.fromkeys(set.intersection(*values), {})
 
     #rearrange by graph type instead of by comparison for simpler graphing
     comparison_data = {}
