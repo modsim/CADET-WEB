@@ -173,12 +173,6 @@
                     $("#failed").remove();
                     $("body").removeClass("loading");
 
-                    document.getElementById("stdout").innerHTML = ansi_up.ansi_to_html(json_data['stdout']);
-                    document.getElementById("stderr").innerHTML = ansi_up.ansi_to_html(json_data['stderr']);
-
-                    $('#cadet_version').text(json_data['cadet_version']);
-                    $('#cadet_git_version').prop('title', 'Git Version Commit String: ' + json_data['cadet_git_version']);
-
                     for (var key in json_data['data']) {
                         if (json_data['data'].hasOwnProperty(key)) {
                             start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
@@ -193,7 +187,7 @@
                 type: "GET",
                 dataType: "json",
                 cache: false,
-                data: { 'path': '{{ path }}', 'sim_id': '{{ sim_id }}' },
+                data: { 'selected': '{{ selected_jobs }}'  },
                 success: onDataReceived
             });
         }

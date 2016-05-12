@@ -930,13 +930,15 @@ def draw_comparison(request):
             rel_path = ''
 
         json_path, hdf5_path, graphs, json_data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
-        graphs_available = set([(name, human_name) for name, human_name, png, csv in graphs])
+        graphs_available = set([(name, human_name) for name, human_name, png, csv, csv_excel in graphs])
         all_graphs.append(graphs_available)
         hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
         temp.append(  (id, tag, hdf5_path, graphs_available) )
 
     data = {}
     data['selected'] = temp
+    data['selected_jobs'] = ','.join(selected)
+    data['json_url'] = reverse('simulation:get_data_comparison', None, None)
     data['graphs_common'] = set.intersection(*all_graphs)
     return render(request, 'simulation/draw_comparison.html', data)
 
@@ -1287,27 +1289,13 @@ def sync_db():
         except ObjectDoesNotExist:
             models.Parameters.objects.create(name=name, units=units, description=description)
 
-@login_required
-@gzip.gzip_page
-def get_data(request):
-    """This function has to call an external process because of scipy. DO NOT MERGE that code into here. It causes apache
-    to deadlock and go into some kind of memory allocation loop. I tried many different options but none worked. Instead
-    will pass the needed json to an external process and then read the result back."""
-    json_data = {}
-    path = request.GET['path']
-    sim_id = request.GET['sim_id']
-
-    if sim_id:
-        rel_path = models.Simulation.objects.get(id=int(sim_id)).Rel_Path
-    else:
-        rel_path = ''
-
+def get_graph_data(path, rel_path):
     json_path, hdf5_path, graphs, data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
     parent, hdf5_name = os.path.split(hdf5_path)
     json_cache = os.path.join(parent, 'json_cache')
     if not os.path.exists(json_cache):
         h5 = h5py.File(hdf5_path, 'r')
-
+        json_data = {}
         #check for success by seeing if we have output created
         json_data['success'] = int(complete)
         json_data['failed'] = int(failure)
@@ -1363,6 +1351,97 @@ def get_data(request):
         json_data = open(json_cache, 'rb').read()
         json_data = json.loads(json_data)
         json_data = utils.encode_to_ascii(json_data)
+    return json_data
+
+@login_required
+@gzip.gzip_page
+def get_data(request):
+    """This function has to call an external process because of scipy. DO NOT MERGE that code into here. It causes apache
+    to deadlock and go into some kind of memory allocation loop. I tried many different options but none worked. Instead
+    will pass the needed json to an external process and then read the result back."""
+    path = request.GET['path']
+    sim_id = request.GET['sim_id']
+
+    if sim_id:
+        rel_path = models.Simulation.objects.get(id=int(sim_id)).Rel_Path
+    else:
+        rel_path = ''
+
+    json_data = get_graph_data(path, rel_path)
+
+    return JsonResponse(json_data, safe=False)
+
+@login_required
+@gzip.gzip_page
+def get_data_comparison(request):
+    """This function has to call an external process because of scipy. DO NOT MERGE that code into here. It causes apache
+    to deadlock and go into some kind of memory allocation loop. I tried many different options but none worked. Instead
+    will pass the needed json to an external process and then read the result back."""
+    selected = request.GET.get('selected').split(',')
+
+    temp = []
+    job_ids = []
+    filename_parts = []
+    for i in selected:
+        tag = request.session['comparison'][i]
+        try:
+            (job_id, sim_id) = map(int, i.split('_'))
+            filename_parts.append('%s_%s' % (job_id, sim_id))
+        except ValueError:
+            (job_id, sim_id) = (int(i), None)
+            filename_parts.append(str(job_id))
+        temp.append( (job_id, sim_id, tag) )
+        job_ids.append(job_id)
+    
+    temp.sort()
+
+    JOBS = models.Job.objects.filter(id__in = job_ids)
+
+    job_lookup = {}
+    for job in JOBS:
+        job_lookup[job.id] = job.uid
+
+    all_graphs = []
+    all_data = {}
+    for job_id, sim_id, tag in temp:
+        if sim_id:
+            rel_path = models.Simulation.objects.get(id=int(sim_id)).Rel_Path
+        else:
+            rel_path = ''
+        path = job_lookup[job_id]
+        
+        json_data = get_graph_data(path, rel_path)
+        all_data[tag] = json_data
+        all_graphs.append(set(json_data['data'].keys()))
+
+    common_graphs = set.intersection(*all_graphs)
+
+    #Filter data
+    all_components = {}
+    for key, value in all_data.items():
+        local_graphs = set(value['data'].keys())
+        to_remove = local_graphs - common_graphs
+        for i in to_remove:
+            del value['data'][i]
+        for i in common_graphs:
+            if i not in all_components:
+                all_components[i] = []
+            all_components[i].append(set( [data['label'] for data in value['data'][i]] ))
+
+    for key, values in all_components.items():
+        all_components[key] = sorted(list(set.intersection(*values)))
+
+    path = JOBS[0].uid
+    filename = '__'.join(sorted(filename_parts)) + '.json'
+
+    json_data = {}
+    json_data['path'] = path
+    json_data['filename'] = filename
+    json_data['selected_items'] = temp
+    json_data['job_lookup'] = job_lookup
+    json_data['common_graphs'] = list(common_graphs)
+    json_data['all_data'] = all_data
+    json_data['components'] = all_components
 
     return JsonResponse(json_data, safe=False)
 
