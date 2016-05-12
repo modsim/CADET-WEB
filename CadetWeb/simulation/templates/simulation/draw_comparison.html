@@ -2,10 +2,7 @@
 
 {% block body %}
 
-{% for item, tag, hdf5_path, graphs_available in selected %}
-<p> {{ item }}  {{ tag }}  {{ hdf5_path }}  {{graphs_available}}</p>
-                        {% endfor %}
-    {% for id, name in graphs_common %}
+{% for id, name in graphs_common %}
 
 <div class="jumbotron graph_wide">
     <h3>{{ name }}</h3>
@@ -22,7 +19,7 @@
     </div>
 </div>
 
-    {% endfor %}
+{% endfor %}
 
 
 
@@ -30,13 +27,16 @@
 
     $("body").addClass("loading");
 
+    var colors = ['Black', 'Red', 'Blue', 'Lime', 'Cyan', 'BlueViolet', 'Crimson', 'DeepPink', 'DarkMagenta', 'Green',
+        'Indigo', 'Magenta', 'MidnightBlue', 'Orange', 'Purple', 'Silver', 'Tan'];
+
     function start_plot(datasets, element, choices, overview_id, base_id) {
         // hard-code color indices to prevent them from shifting as
         // countries are turned on/off
         var datasets = datasets;
         var i = 0;
         $.each(datasets, function (key, val) {
-            val.color = i;
+            val.color = colors[i % colors.length];
             ++i;
         });
 
@@ -163,23 +163,14 @@
                 // data we could merge it with what we already have.
                 data = json_data;
 
-                if (1 == json_data['failed']) {
-                    $("#success").remove();
-                    $("body").removeClass("loading");
-                } else if (0 == json_data['success']) {
-                    $("#progress").load("{{ progress }}");
-                    setTimeout(fetchData, 5000);
-                } else {
-                    $("#failed").remove();
-                    $("body").removeClass("loading");
-
-                    for (var key in json_data['data']) {
-                        if (json_data['data'].hasOwnProperty(key)) {
-                            start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
-                        }
+                $("body").removeClass("loading");
+                for (var key in json_data['data']) {
+                    if (json_data['data'].hasOwnProperty(key)) {
+                        start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
                     }
-
                 }
+
+                
             }
 
             $.ajax({

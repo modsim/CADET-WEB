@@ -1428,20 +1428,29 @@ def get_data_comparison(request):
                 all_components[i] = []
             all_components[i].append(set( [data['label'] for data in value['data'][i]] ))
 
+    #find all components
     for key, values in all_components.items():
         all_components[key] = sorted(list(set.intersection(*values)))
+
+    #rearrange by graph type instead of by comparison for simpler graphing
+    comparison_data = {}
+    for tag, job_data in all_data.items():
+        for graph_name, graph_data in job_data['data'].items():
+            if graph_name not in comparison_data:
+                comparison_data[graph_name] = {}
+                comparison_data[graph_name]['data'] = {}
+            comparison_data[graph_name]['data'][tag] = graph_data
+            comparison_data[graph_name]['components'] = all_components[graph_name]
+
+
+
+
 
     path = JOBS[0].uid
     filename = '__'.join(sorted(filename_parts)) + '.json'
 
     json_data = {}
-    json_data['path'] = path
-    json_data['filename'] = filename
-    json_data['selected_items'] = temp
-    json_data['job_lookup'] = job_lookup
-    json_data['common_graphs'] = list(common_graphs)
-    json_data['all_data'] = all_data
-    json_data['components'] = all_components
+    json_data['comparison_data'] = comparison_data
 
     return JsonResponse(json_data, safe=False)
 
