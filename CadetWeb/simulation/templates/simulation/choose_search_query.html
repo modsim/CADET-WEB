@@ -13,18 +13,18 @@
 
     <div class="tabs">
         <ul>
-            {% for name, form_id, form_data in queries %}
+            {% for name, form_id, form_data, search_name in queries %}
             <li><a href="#{{ form_id }}">{{ name }}</a></li>
             {% endfor %}
         </ul>
 
 
-        {% for name, form_id, form_data in queries %}
+        {% for name, form_id, form_data, search_name in queries %}
         <div id="{{ form_id }}">
             {{ form_data|safe }}
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-default" name="search_query" value="{{ name }}">Search</button>
+                    <button type="submit" class="btn btn-default" name="search_query" value="{{ name }}">{{ search_name }}</button>
                 </div>
                 <br><br>
             </div>

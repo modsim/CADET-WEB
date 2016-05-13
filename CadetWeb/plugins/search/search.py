@@ -1,6 +1,7 @@
 __author__ = 'kosh_000'
 name = "Search"
 form_id = "Search"
+search_name = "Search Now"
 
 from simulation import models
 
@@ -24,4 +25,4 @@ def process_search(request, search_dict):
     return headers, search_results
 
 def get_form(request):
-    return name, form_id, run(request)
+    return name, form_id, run(request), search_name

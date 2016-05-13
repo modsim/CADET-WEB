@@ -1,17 +1,12 @@
 __author__ = 'kosh_000'
 name = "Browse"
 form_id = "Browse"
+search_name ='Browse Now'
 
 from simulation import models
 
 def run(request):
-    html_string = '''
-    <div class="row">
-        <div class="col-md-12">
-           <p>Browse all simulations.</p>
-        </div>
-      </div>
-      '''
+    html_string = ''
     return html_string
 
 def process_search(request, search_dict):
@@ -25,4 +20,4 @@ def process_search(request, search_dict):
     return headers, search_results
 
 def get_form(request):
-    return name, form_id, run(request)
+    return name, form_id, run(request), search_name

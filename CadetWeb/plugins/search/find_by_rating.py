@@ -1,6 +1,7 @@
 __author__ = 'kosh_000'
 name = "Find by Rating"
 form_id = "FindByRating"
+search_name = 'Find Simulations'
 
 from simulation import models
 
@@ -42,4 +43,4 @@ def process_search(request, search_dict):
     return headers, search_results
 
 def get_form(request):
-    return name, form_id, run(request)
+    return name, form_id, run(request), search_name
