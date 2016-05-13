@@ -140,13 +140,14 @@ $.fn.serializeObject = function()
     return o;
 };
 
-
-  $(".star_rating").rating();
-  $( ".checkbox" ).button();
-  $(".form-horizontal").validate();
-  $( ".radio" ).buttonset();
-  $( ".accordion" ).accordion({collapsible: true});
-  $( ".tabs" ).tabs();
+  $(function() {
+      $(".star_rating").rating();
+      $( ".checkbox" ).button();
+      $(".form-horizontal").validate();
+      $( ".radio" ).buttonset();
+      $( ".accordion" ).accordion({collapsible: true});
+      $( ".tabs" ).tabs();
+  });
 
   $( ".back" ).click(function() {
      var post = $(this).data( "post" );
