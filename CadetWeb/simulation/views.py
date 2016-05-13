@@ -790,7 +790,8 @@ def confirm_job(request):
 @login_required
 def choose_search_query(request):
     data = {}
-    data['queries'] = utils.get_plugin_names('search')
+    #data['queries'] = utils.get_plugin_names('search')
+    data['queries'] = utils.call_plugins_by_name('search', 'get_form', request)
     return render(request, 'simulation/choose_search_query.html', data)
 
 @login_required

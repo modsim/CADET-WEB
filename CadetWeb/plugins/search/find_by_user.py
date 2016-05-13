@@ -1,5 +1,6 @@
 __author__ = 'kosh_000'
 name = "Find by User"
+form_id = "FindByUser"
 
 from simulation import models
 
@@ -35,3 +36,6 @@ def process_search(request, search_dict):
     for result in results:
         search_results.append( (result.id, ))
     return headers, search_results
+
+def get_form(request):
+    return name, form_id, run(request)

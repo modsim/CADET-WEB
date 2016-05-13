@@ -160,6 +160,12 @@ def call_plugin_by_name(name, directory, attribute_name, *args, **kwargs):
         if plugin_name == name:
             return call_plugin_function(path, attribute_name, *args, **kwargs)
 
+def call_plugins_by_name(directory, attribute_name, *args, **kwargs):
+    temp = []
+    for path in get_files(os.path.join(plugins, directory, '*.py')):
+        temp.append( call_plugin_function(path, attribute_name, *args, **kwargs) )
+    return temp
+
 def get_attribute_by_name(name, directory, attribute_name):
     for path in get_files(os.path.join(plugins, directory, '*.py')):
         plugin_name = get_plugin_attribute(path, 'name')
