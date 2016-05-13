@@ -190,8 +190,11 @@
         // countries are turned on/off
         var datasets = datasets;
         var i = 0;
+        var all_data = [];
+
         $.each(datasets, function (key, val) {
-            val.color = colors[i%colors.length];
+            val.color = colors[i % colors.length];
+            all_data.push(val);
             ++i;
         });
 
@@ -270,13 +273,16 @@
                 pan: {
                     interactive: false
                 },
+                legend: {
+                    position: 'nw'
+                },
                 selection: {
                     mode: "xy"
                 },
                 yaxes: [{}, { position: "right" }]
             });
 
-            var overview = $.plot(overview_id, data, {
+            var overview = $.plot(overview_id, all_data, {
                 canvas: true,
                 xaxis: {
                     ticks: [],
@@ -284,6 +290,9 @@
                 yaxis: {
                     ticks: [],
                     autoscaleMargin: 0.1
+                },
+                legend: {
+                    show: false
                 },
                 selection: {
                     mode: "x"
