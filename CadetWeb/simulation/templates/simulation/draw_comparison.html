@@ -30,23 +30,26 @@
     var colors = ['Black', 'Red', 'Blue', 'Lime', 'Cyan', 'BlueViolet', 'Crimson', 'DeepPink', 'DarkMagenta', 'Green',
         'Indigo', 'Magenta', 'MidnightBlue', 'Orange', 'Purple', 'Silver', 'Tan'];
 
+    var symbols = ['circle', 'square', 'diamond', 'triangle', 'cross']
+
     function start_plot(datasets, element, choices, overview_id, base_id) {
         // hard-code color indices to prevent them from shifting
         var datasets = datasets;
         var i = 0;
         var lookup = {};
-        $.each(datasets.components, function (key, val) {
-            val.color = colors[i % colors.length];
-            lookup[val.label] = val.color;
-            ++i;
-        });
+
+        var i = 0;
+        var all_data = [];
 
         $.each(datasets.data, function (key, val) {
             $.each(val, function (label, obj) {
-                obj.color =lookup[obj.label];
+                obj.color = colors[i % colors.length];
+                obj.shadowSize = 0;
+                all_data.push(obj);
+                ++i;
             });
         });
-
+        console.log(datasets);
         // insert checkboxes
         var choiceContainer = $(choices);
                 
@@ -54,7 +57,7 @@
             choiceContainer.append("<div class='row'><div class='col-sm-4'><input type='checkbox' name='" + datasets['components'][key].label +
 				"' checked='checked' id='id" + base_id + key + "'></input>" +
 				"<label for='id" + base_id + key + "'>"
-				+ datasets['components'][key].label + "</label></div><div class='col-sm-1' style='background-color: " + datasets['components'][key].color + ";'>&nbsp;</div></div>");
+				+ datasets['components'][key].label + "</label></div></div>");
         };
 
         choiceContainer.append("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
@@ -95,7 +98,7 @@
 
                 $.each(datasets.data, function (data_set_name, val) {
                     $.each(val, function (label, obj) {
-                        if (key == obj.label) {
+                        if (key == obj.comp_type) {
                             data.push(obj);
                         }
                     });
@@ -128,10 +131,13 @@
                 selection: {
                     mode: "xy"
                 },
+                legend: {
+                    position: 'nw'
+                },
                 yaxes: [{}, { position: "right" }]
             });
 
-            var overview = $.plot(overview_id, data, {
+            var overview = $.plot(overview_id, all_data, {
                 canvas: true,
                 xaxis: {
                     ticks: [],
@@ -139,6 +145,9 @@
                 yaxis: {
                     ticks: [],
                     autoscaleMargin: 0.1
+                },
+                legend: {
+                    show: false
                 },
                 selection: {
                     mode: "x"

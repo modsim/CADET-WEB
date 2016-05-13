@@ -1445,6 +1445,11 @@ def get_data_comparison(request):
             if graph_name not in comparison_data:
                 comparison_data[graph_name] = {}
                 comparison_data[graph_name]['data'] = {}
+
+            for value in graph_data:
+                value['comp_type'] = value['label']
+                value['label'] = '%s %s' % (tag, value['label'])
+
             comparison_data[graph_name]['data'][tag] = graph_data
             comparison_data[graph_name]['components'] = all_components[graph_name]
 
