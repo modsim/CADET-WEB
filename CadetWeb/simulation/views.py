@@ -27,6 +27,7 @@ import resource
 from django.http import HttpResponse
 from datetime import datetime, timedelta
 import shutil
+from collections import OrderedDict
 
 class HttpResponseTemporaryRedirect(HttpResponse):
     status_code = 307
@@ -1426,11 +1427,16 @@ def get_data_comparison(request):
         for i in common_graphs:
             if i not in all_components:
                 all_components[i] = []
-            all_components[i].append(set( [data['label'] for data in value['data'][i]] ))
+            all_components[i].append([data['label'] for data in value['data'][i]])
 
     #find all components
     for key, values in all_components.items():
-        all_components[key] = dict.fromkeys(set.intersection(*values), {})
+        unique_components = list(OrderedDict.fromkeys(itertools.chain.from_iterable(values)))
+        comps = {}
+        for idx, val in enumerate(unique_components):
+            comps[idx] = {'label':val}
+
+        all_components[key] = comps
 
     #rearrange by graph type instead of by comparison for simpler graphing
     comparison_data = {}
