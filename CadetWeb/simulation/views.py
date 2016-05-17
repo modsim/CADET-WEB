@@ -907,10 +907,22 @@ def run_job_get(request):
     data['sim_id'] = sim_id
 
     if 'comparison' in request.session:
-        data['comparison'] = request.session['comparison'].items()
+        data['comparison'] = format_comparison(request.session['comparison'].items())
 
     return render(request, 'simulation/run_job.html', data)
 
+def format_comparison(seq):
+    "reformat the comparison information from the cookie"
+    temp = []
+    for comparison_id, name in seq:
+        try:
+            job_id, sim_id = comparison_id.split('_')
+        except ValueError:
+            job_id = comparison_id
+            sim_id = ''
+        temp.append( (comparison_id, name, job_id, sim_id) )
+    return temp
+    
 @login_required
 def draw_comparison(request):
     selected = request.GET.getlist('selected')
@@ -1061,7 +1073,7 @@ def process_comparison(request):
         comparison_name = request.POST.get('comparison_name')
         simulation_id = request.POST.get('simulation_id')
     
-        if simulation_id not in request.session['comparison']:
+        if simulation_id not in request.session['comparison'] and comparison_name:
             request.session['comparison'][simulation_id] = comparison_name
             request.session.modified = True
         return redirect(request.META.get('HTTP_REFERER'))

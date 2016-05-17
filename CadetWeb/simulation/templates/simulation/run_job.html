@@ -90,11 +90,11 @@
                     <div class="modal-body">
 
                         {% csrf_token %}
-                        {% for comp_id, name in comparison %}
+                        {% for comp_id, name, job_id, sim_id in comparison %}
                         <div class="form-group">
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" name="selected" value="{{ comp_id }}">{{ name }}
+                                    <input type="checkbox" name="selected" value="{{ comp_id }}">{{ name }}  (Job ID: {{ job_id }}  {% if sim_id %} Sim ID:  {{ sim_id}} {% endif %} )
                                 </label>
                             </div>
                         </div>
@@ -115,7 +115,7 @@
         {% csrf_token %}
         <div class="form-group">
             <label class="sr-only" for="comparision_name">Comparison Name</label>
-            <input type="text" class="form-control" id="comparision_name" name="comparison_name" placeholder="Comparison Name">
+            <input type="text" class="form-control" id="comparision_name" name="comparison_name" placeholder="Comparison Name" required>
             {% if sim_id %}
             <input type="hidden" name="simulation_id" value="{{ job_id }}_{{ sim_id }}">
             {% else %}
