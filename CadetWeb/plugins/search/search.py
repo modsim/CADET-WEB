@@ -89,10 +89,20 @@ def process_search(request, search_dict):
 
 
     # job_notes__notes__icontains = notes, 
-    results = models.Job.objects.filter(study_name__icontains = study_name,
-                                        username__icontains = username,
-                                        Model_ID__model__icontains = model_name,
-                                        Product_ID__product__icontains = product_name)
+    
+    search = {}
+    search['study_name__icontains'] = study_name
+    search['username__icontains'] = username
+    search['Model_ID__model__icontains'] = model_name
+    search['Product_ID__product__icontains'] = product_name
+    if lb:
+        search['created__gt'] = lb
+    if ub:
+        search['created__lt'] = ub
+    if notes:
+        search['job_notes__notes__icontains'] = notes
+    
+    results = models.Job.objects.filter(**search)
 
     headers = ('JOBID',)
     search_results = []
