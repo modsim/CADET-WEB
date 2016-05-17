@@ -35,9 +35,9 @@
         </tfoot>
         <tbody>
 
-         {% for name, component, section, description, modify, checked_1, checked_2, checked_3 in modifies %}
+         {% for name, tip, component, section, description, modify, checked_1, checked_2, checked_3 in modifies %}
              <tr>
-             <td>{{ name }}</td>
+             <td data-toggle="tooltip" data-placement="bottom" title="{{ tip }}">{{ name }}</td>
              <td>{{ component }}</td>
              <td>{{ section }}</td>
              <td>{{ description }}</td>

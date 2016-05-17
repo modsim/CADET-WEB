@@ -1567,19 +1567,22 @@ def choose_attributes_to_modify(request):
                         key = '%s:%s:%s' % (step, comp, name)
                         if key in data:
                             checked_1, checked_2, checked_3 = get_checked(key, data)
-                            modify.append( (name, comp, step, description, key, checked_1, checked_2, checked_3) )
+                            human_name, tool_tip, units = name_lookup_python[name]
+                            modify.append( (human_name, tool_tip, comp, step, description, key, checked_1, checked_2, checked_3) )
             elif per_component and not per_section:
                 for comp in comps:
                     key = '%s:%s' % (comp, name)
                     if key in data:
                         checked_1, checked_2, checked_3 = get_checked(key, data)
-                        modify.append( (name, comp, '', description, key, checked_1, checked_2, checked_3) )
+                        human_name, tool_tip, units = name_lookup_python[name]
+                        modify.append( (human_name, tool_tip, comp, '', description, key, checked_1, checked_2, checked_3) )
             elif per_section and not per_component:
                 pass #we don't have any of these but leave this here in case it happens later
             else:
                 if name in data:
                     checked_1, checked_2, checked_3 = get_checked(name, data)
-                    modify.append( (name, '', '', description, name, checked_1, checked_2, checked_3) )
+                    human_name, tool_tip, units = name_lookup_python[name]
+                    modify.append( (human_name, tool_tip, '', '', description, name, checked_1, checked_2, checked_3) )
 
     data['json'] = get_json_string(data)
     data['modifies'] = modify
