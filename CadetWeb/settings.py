@@ -20,5 +20,4 @@ batch_limit = 45
 keep_time = 0
 
 #users to keep records for
-#users_keep = set(['cadet',])
-users_keep = set()
+users_keep = set(['cadet',])
