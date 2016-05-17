@@ -89,9 +89,9 @@
               </tr>
             </thead>
             <tbody>
-            {% for choice, value, text in choices %}
+            {% for human_name, tool_tip, choice, value, text in choices %}
               <tr>
-                <td>{{ choice }}</td>
+                <td data-toggle="tooltip" data-placement="bottom" title="{{ tool_tip }}">{{ human_name }}</td>
                 <td>{{ value }}</td>
                 <td>
                   <input type="text" class="form-control required" name="modify_choice:{{ choice }}" id="choice_{{ choice }}" value="{{ text }}">

@@ -1644,7 +1644,7 @@ def modify_attributes(request):
     context = {'json':get_json_string(data)}
     choose_attributes = [(key,value) for (key,value) in data.items() if 'choose_attributes:' in key]
     context['choices'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'choose']
-    context['choices'] = [(key, data[key], data.get('modify_choice:%s' % key, '')) for key in context['choices']]
+    context['choices'] = format_choices(context['choices'], data)
 
     context['distributions'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'distribution']
     context['distributions'] = [(key, data[key], data.get("modify_dist_lb:%s" % key, ''), data.get("modify_dist_ub:%s" % key, ''),
@@ -1662,3 +1662,29 @@ def modify_attributes(request):
         context['message'] = 'Too many combinations where chosen. Only %d are allowed and %s where chosen' % (settings.batch_limit, request.GET.get('batch_limit'))
 
     return render(request, 'simulation/modify_attributes.html', context)
+
+def format_choices(seq, data):
+    "format the choices to include a tooltip"
+    temp = []
+    for key in seq:
+        choice = key
+        
+        parts = choice.split(':')
+        if len(parts) == 1:
+            name = parts[0]
+            human_name, tool_tip, units = name_lookup_python[name]
+        elif len(parts) == 2:
+            comp, name = parts
+            human_name, tool_tip, units = name_lookup_python[name]
+            human_name = '%s %s' % (comp, human_name)
+            tool_tip = '%s for component %s' % (tool_tip, comp)            
+        elif len(parts) == 3:
+            step, comp, name = parts
+            human_name, tool_tip, units = name_lookup_python[name]
+            human_name = '%s %s %s' % (step, comp, human_name)
+            tool_tip = '%s for component %s during step %s' % (tool_tip, comp, step)
+        value = data[key]
+        text = data.get('modify_choice:%s' % key, '')
+        temp.append(( human_name, tool_tip, choice, value, text) )
+    return temp    
+    
