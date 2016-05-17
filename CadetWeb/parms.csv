@@ -136,3 +136,9 @@ EXTSMA_LAMBDA_T,,double,0,0,1,Stationary phase capacity (monovalent salt counter
 EXTSMA_LAMBDA_TT,,double,0,0,1,Stationary phase capacity (monovalent salt counterions) in the thermal steric mass action model,Lambda Quadratic
 EXTSMA_LAMBDA_TTT,,double,0,0,1,Stationary phase capacity (monovalent salt counterions) in the thermal steric mass action model,Lambda Cubic
 NTHREADS,,int,0,0,0,Number of OpenMP threads to use for each simulation,Number of Threads
+MCBL_KA1,m^3_MP mol^-1 s^-1,double,1,0,1,A vector with adsorption rate constants of the first binding site type in the multi component Bi-Langmuir model,KA1
+MCBL_KA2,m^3_MP mol^-1 s^-1,double,1,0,1,A vector with adsorption rate constants of the second binding site type in the multi component Bi-Langmuir model,KA2
+MCBL_KD1,s^-1,double,1,0,1,A vector with desorption rate constants of the first binding site type in the multi component Bi-Langmuir model,KD1
+MCBL_KD2,s^-1,double,1,0,1,A vector with desorption rate constants of the second binding site type in the multi component Bi-Langmuir model,KD2
+MCBL_QMAX1,mol m^-3_MP,double,1,0,1,A vector with with maximum adsorption capacities of the first binding site type,QMAX1
+MCBL_QMAX2,mol m^-3_MP,double,1,0,1,A vector with with maximum adsorption capacities of the second binding site type,QMAX2
