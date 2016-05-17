@@ -359,11 +359,10 @@ def component_and_step_setup(request):
     post = request.POST
     data = default_value.copy()
     data.update(get_json(post))
-    components = int(data.get('NCOMP', ''))
     steps = int(data.get('NSEC', ''))
 
 
-    comps = [(i, data.get('component%s' % i, '')) for i in range(2, int(data.get('NCOMP', ''))+1)]
+    comps = [(i, data.get('component%s' % i, '')) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     steps = [(i, data.get('step%s' % i, '')) for i in range(1, int(data.get('NSEC', ''))+1)]
 
     data['json'] = get_json_string(data)
