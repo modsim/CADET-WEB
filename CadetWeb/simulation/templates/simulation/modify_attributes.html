@@ -7,7 +7,7 @@
 <div class="row">
 <input type="hidden" name="json" value="{{ json }}">
         <div class="col-md-12">
-            <h2 class="ui-state-error">{{ message }}</h2>
+            {% if message %}<h2 class="ui-state-error">{{ message }}</h2>{% endif %}
             <br>
             <h2 class="ui-state-highlight">Only {{ combinations }} combinations are allowed.</h2>
 
