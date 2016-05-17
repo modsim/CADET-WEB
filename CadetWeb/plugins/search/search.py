@@ -64,14 +64,6 @@ def run(request):
                 <input type="text" class="form-control" name="notes" id="notes">
               </div>
             </div>
-            <div class="form-group">
-              <div class="col-sm-2">
-                <label for="isotherm" class="control-label">Isotherm</label>
-              </div>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" name="isotherm" id="isotherm">
-              </div>
-            </div>
         </div>
       </div>
       '''
@@ -85,7 +77,6 @@ def process_search(request, search_dict):
     product_name = search_dict['product_name']
     model_name = search_dict['model_name']
     notes = search_dict['notes']
-    isotherm = search_dict['isotherm']
 
 
     # job_notes__notes__icontains = notes, 
