@@ -1647,9 +1647,7 @@ def modify_attributes(request):
     context['choices'] = format_choices(context['choices'], data)
 
     context['distributions'] = [key.replace('choose_attributes:', '') for key, value in choose_attributes if value == 'distribution']
-    context['distributions'] = [(key, data[key], data.get("modify_dist_lb:%s" % key, ''), data.get("modify_dist_ub:%s" % key, ''),
-                                 data.get("modify_dist_number:%s" % key, ''), data.get("modify_dist_stdev:%s" % key, '1'),
-                                 data.get("modify_dist_type:%s" % key, '')) for key in context['distributions']]
+    context['distributions'] = format_distributions(context['distributions'], data)
 
     context['back'] = reverse('simulation:choose_attributes_to_modify', None, None)
     context['back_text'] = 'Choose Attributes to Modify'
@@ -1663,6 +1661,38 @@ def modify_attributes(request):
 
     return render(request, 'simulation/modify_attributes.html', context)
 
+def format_distributions(seq, data):
+    "format distributions"
+    temp = []
+    
+    for key in seq:
+        choice = key
+        value = data[key]
+        lb = data.get("modify_dist_lb:%s" % key, '')
+        ub = data.get("modify_dist_ub:%s" % key, '')
+        dist_points = data.get("modify_dist_number:%s" % key, '')
+        dist_stdev = data.get("modify_dist_stdev:%s" % key, '1')
+        dist_type = data.get("modify_dist_type:%s" % key, '')
+    
+        parts = choice.split(':')
+        if len(parts) == 1:
+            name = parts[0]
+            human_name, tool_tip, units = name_lookup_python[name]
+        elif len(parts) == 2:
+            comp, name = parts
+            human_name, tool_tip, units = name_lookup_python[name]
+            human_name = '%s %s' % (comp, human_name)
+            tool_tip = '%s for component %s' % (tool_tip, comp)            
+        elif len(parts) == 3:
+            step, comp, name = parts
+            human_name, tool_tip, units = name_lookup_python[name]
+            human_name = '%s %s %s' % (step, comp, human_name)
+            tool_tip = '%s for component %s during step %s' % (tool_tip, comp, step)
+            
+        temp.append( (human_name, tool_tip, choice, lb, ub, dist_points, dist_stdev, dist_type) )
+    
+    return temp    
+    
 def format_choices(seq, data):
     "format the choices to include a tooltip"
     temp = []

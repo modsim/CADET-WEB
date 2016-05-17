@@ -41,9 +41,9 @@
             </thead>
             <tbody>
 
-            {% for dist, value, lb, ub, number, stdev, selected in distributions %}
+            {% for human_name, tool_tip, dist, value, lb, ub, number, stdev, selected in distributions %}
               <tr>
-                 <td>{{ dist }}</td>
+                 <td data-toggle="tooltip" data-placement="bottom" title="{{ tool_tip }}">{{ human_name }}</td>
                 <td>{{ value }}</td>
                 <td>
                   <input type="text" class="form-control required" name="modify_dist_lb:{{ dist }}" id="dist_lb:{{ dist }}" value="{{ lb }}">
