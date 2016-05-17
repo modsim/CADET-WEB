@@ -1689,7 +1689,7 @@ def format_distributions(seq, data):
             human_name = '%s %s %s' % (step, comp, human_name)
             tool_tip = '%s for component %s during step %s' % (tool_tip, comp, step)
             
-        temp.append( (human_name, tool_tip, choice, lb, ub, dist_points, dist_stdev, dist_type) )
+        temp.append( (human_name, tool_tip, choice, value, lb, ub, dist_points, dist_stdev, dist_type) )
     
     return temp    
     
