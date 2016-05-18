@@ -309,6 +309,7 @@ def model(input, data):
 
     adsorption(model, data)
     inlet(model,data)
+    external(model, data)
 
 def adsorption(model, data):
     "handle the adsorption node"
@@ -325,6 +326,24 @@ def adsorption(model, data):
         except TypeError:
             #handles list case
             set_value(adsorption, key, dtype, map(func, value))
+
+def external(model, data):
+    "handle the adsorption node"
+
+    ext_velocity = data.get('ext_velocity')
+    ext_profile = data.get('ext_profile')
+    ext_delta = data.get('ext_profile_delta')
+
+    if ext_velocity and ext_profile and ext_delta:
+        ext_profile = map(float, ext_profile.split(','))
+        ext_delta = map(float, ext_delta.split(','))
+        ext_velocity = float(ext_velocity)
+
+        external = model.create_group("external")
+
+        set_value(external, 'EXT_VELOCITY', 'f8', ext_velocity)
+        set_value(external, 'EXT_PROFILE', 'f8', ext_profile)
+        set_value(external, 'EXT_PROF_DELTA', 'f8', ext_delta)
 
 def inlet(model, data):
     "handle the inlet node"
