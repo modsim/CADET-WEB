@@ -365,7 +365,7 @@ def component_and_step_setup(request):
     isotherm = data['ADSORPTION_TYPE']
     comps = []
 
-    if isotherm in ('EXTERNAL_STERIC_MASS_ACTION', 'STERIC_MASS_ACTION'):
+    if isotherm in ('EXTERNAL_STERIC_MASS_ACTION', 'STERIC_MASS_ACTION', 'SELF_ASSOCIATION'):
         start = 2
         comps = [(1, 'Salt', 'readonly')]
 

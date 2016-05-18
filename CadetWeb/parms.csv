@@ -68,7 +68,7 @@ MCL_KA,m^3/(mol s),double,1,0,1,A vector with adsorption rate constants in the m
 MCL_KD,1/s,double,1,0,1,A vector with desorption rate constants in the multi component langmuir model,KD
 MCL_QMAX,mol/m^3,double,1,0,1,A vector with maximum adsorption capacities in the multi component langmuir model,Qmax
 MPM_KA,m^3/(mol s),double,1,0,1,A vector with adsorption rate constants in the mobile phase modulator model,KA
-MPM_KDE,m^3/(mol s),double,1,0,1,A vector with desorption rate constants in the mobile phase modulator model,KDE
+MPM_KD,m^3/(mol s),double,1,0,1,A vector with desorption rate constants in the mobile phase modulator model,KD
 MPM_QMAX,mol/m^3,double,1,0,1,A vector with maximum adsorption capacities in the mobile phase modulator model,Qmax
 MPM_BETA,,double,1,0,1,A vector with parameters describing the ion-exchange characteristics (IEX),Beta
 MPM_GAMMA,m^3/mol,double,1,0,1,A vector with parameters describing the hydrophobicity (HIC),Gamma
