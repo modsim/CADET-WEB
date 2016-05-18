@@ -84,7 +84,7 @@ def create_web(h5, data):
         set_value_enum(STEPS, step_id, step_name)
 
     COMPONENTS = web.create_group("COMPONENTS")
-    list_of_names = [('COMP_%03d' % (i-1), data.get('component%s' % i)) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    list_of_names = [('COMP_%03d' % (i-1), data.get('component%s' % i)) for i in range(1, int(data['numberOfComponents'])+1)]
     for comp_id, comp_name in list_of_names:
         set_value_enum(COMPONENTS, comp_id, comp_name)
 
@@ -218,7 +218,7 @@ def weno(discretization, data):
 
 def get_components_in_order(data):
     "return the names of components in order"
-    number_of_components = int(data['NCOMP'])
+    number_of_components = int(data['numberOfComponents'])
     return [data['component%d' % i] for i in xrange(1, number_of_components+1)]
 
 def get_step_names(data):
@@ -284,7 +284,15 @@ def model(input, data):
     "handle the model node"
     model = input.create_group("model")
 
-    set_value_enum(model, 'ADSORPTION_TYPE', data['CADET_ISOTHERM']['ISOTHERM'])
+    isotherm = data['CADET_ISOTHERM']['ISOTHERM']
+
+    set_value_enum(model, 'ADSORPTION_TYPE', isotherm)
+
+    no_change_isotherms = set(['LINEAR', 'MULTI_COMPONENT_LANGMUIR', 'MOBILE_PHASE_MODULATORS', 'EXTERNAL_MOBILE_PHASE_MODULATORS', 'EXTERNAL_LANGMUIR',
+                               'STERIC_MASS_ACTION', 'SELF_ASSOCIATION', 'EXTERNAL_STERIC_MASS_ACTION', ])
+
+    if isotherm in no_change_isotherms:
+        NCOMP = int(data['numberOfComponents'])
 
     set_value(model, 'COL_DISPERSION', 'f8', float(data['COL_DISPERSION']))
     set_value(model, 'COL_LENGTH', 'f8', float(data['COL_LENGTH']))
@@ -292,7 +300,7 @@ def model(input, data):
     set_value(model, 'FILM_DIFFUSION', 'f8', get_film_diffusion(data))
     set_value(model, 'INIT_C', 'f8', get_init_c_diffusion(data))
     set_value(model, 'INIT_Q', 'f8', get_init_q_diffusion(data))
-    set_value(model, 'NCOMP', 'i4', int(data['NCOMP']))
+    set_value(model, 'NCOMP', 'i4', NCOMP)
     set_value(model, 'PAR_DIFFUSION', 'f8', get_particle_diffusion(data))
     set_value(model, 'PAR_POROSITY', 'f8', float(data['PAR_POROSITY']))
     set_value(model, 'PAR_RADIUS', 'f8', float(data['PAR_RADIUS']))
