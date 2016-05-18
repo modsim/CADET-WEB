@@ -40,8 +40,8 @@ class HttpResponseTemporaryRedirect(HttpResponse):
 
 #These are the default values for CADET that are put into the forms as a default
 default_value = {}
-default_value['NCOMP'] ='4'
-default_value['NSEC'] = '4'
+default_value['numberOfComponents'] ='1'
+default_value['NSEC'] = '1'
 default_value['GS_TYPE'] = '1'
 default_value['MAX_KRYLOV'] = '0'
 default_value['MAX_RESTARTS'] = '0'
@@ -349,8 +349,8 @@ def single_start(request):
     isotherms = isotherm_set.keys()
 
     isotherms = [(isotherm.replace('_', ' ').title(), isotherm, 'selected' if isotherm == data.get('ADSORPTION_TYPE', None) else '') for isotherm in isotherms]
-    data['isotherms'] = isotherms
     data['json'] = get_json_string(data)
+    data['isotherms'] = isotherms
     data.update(name_lookup_template)
     return render(request, 'simulation/single_start.html', data)
 
@@ -361,10 +361,19 @@ def component_and_step_setup(request):
     data.update(get_json(post))
     steps = int(data.get('NSEC', ''))
 
+    start = 1
+    isotherm = data['ADSORPTION_TYPE']
+    comps = []
 
-    comps = [(i, data.get('component%s' % i, '')) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
-    steps = [(i, data.get('step%s' % i, '')) for i in range(1, int(data.get('NSEC', ''))+1)]
+    if isotherm in ('EXTERNAL_STERIC_MASS_ACTION', 'STERIC_MASS_ACTION'):
+        start = 2
+        comps = [(1, 'Salt', 'readonly')]
 
+
+    comps = comps + [(i, data.get('component%s' % i, ''), '') for i in range(start, int(data.get('numberOfComponents', 0))+1+len(comps))]
+    steps = [(i, data.get('step%s' % i, ''), '') for i in range(1, int(data.get('NSEC', ''))+1)]
+
+    data['numberOfComponents'] = len(comps)
     data['json'] = get_json_string(data)
     data['comps'] = comps
     data['steps'] = steps
@@ -374,7 +383,7 @@ def component_and_step_setup(request):
     return render(request, 'simulation/component_and_step_setup.html', data)
 
 def draw_isotherm(data, isotherm):
-    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     html = ['<div class="row"><div class="col-md-12"><table class="table"><thead><tr><th>#</th>']
     for name in list_of_names:
         html.append('<th>%s</th>' % name)
@@ -426,7 +435,7 @@ def get_suffix_data(suffix, components, data):
     return [data['%s:%s' % (component, suffix)] for component in components]
 
 def process_isotherm(data, isotherm_name):
-    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     processed_dict = {}
     processed_dict['ISOTHERM'] = isotherm_name
 
@@ -466,7 +475,7 @@ def column_setup(request):
 
 
     data['json'] = get_json_string(data)
-    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     data['column_table'] = generate_column_table(list_of_names, data)
     data['back'] = reverse('simulation:component_and_step_setup', None, None)
     data['back_text'] = 'Component and Step Setup'
@@ -485,7 +494,7 @@ def loading_setup(request):
     
     data['CADET_ISOTHERM'] = process_isotherm(data, isotherm_name)
     
-    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
     #This will remove all whitespace
@@ -592,7 +601,7 @@ def sensitivity_setup(request):
     data.update(get_json(post))
     
 
-    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
     sensitivities = []
@@ -666,7 +675,7 @@ def job_setup(request):
     keep = set()
     sensitivities = []
 
-    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
     for key,value in data.items():
@@ -730,7 +739,7 @@ def confirm_job(request):
     keep = set()
     sensitivities = []
 
-    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
     for key,value in data.items():
@@ -783,7 +792,7 @@ def confirm_job(request):
     data['back'] = reverse('simulation:sensitivity_setup', None, None)
     data['back_text'] = 'Sensitivity Setup'
     data['steps'] = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
-    data['comps'] = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    data['comps'] = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     return render(request, 'simulation/confirm_job.html', data)
 
 @login_required
@@ -1181,7 +1190,7 @@ def write_job_to_db(data, json_data, check_sum, username):
              model = models.Models.objects.create(model=data['model_name'])
 
 
-        list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+        list_of_names = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
         list_of_steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
         #create job
@@ -1484,7 +1493,7 @@ def inlet_graph(request):
     data = get_json(post)
 
     section_times = cadet_runner.get_section_times(data)
-    components = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    components = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
     json_data = []
@@ -1552,7 +1561,7 @@ def choose_attributes_to_modify(request):
         json_data = utils.encode_to_ascii(json_data)
         data.update(json_data)
 
-    comps = [data.get('component%s' % i) for i in range(1, int(data.get('NCOMP', ''))+1)]
+    comps = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
     modify = []
