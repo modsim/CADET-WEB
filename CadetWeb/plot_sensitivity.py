@@ -27,6 +27,7 @@ def get_picture_id(hdf5_path, sensitivity_number):
     section = h5['/input/sensitivity/param_%03d/SENS_SECTION' % sensitivity_number].value
 
     number_of_components = h5['/input/model/NCOMP'].value
+
     components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
 
     number_of_sections = h5['/input/model/inlet/NSEC'].value

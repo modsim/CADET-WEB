@@ -84,7 +84,16 @@ def create_web(h5, data):
         set_value_enum(STEPS, step_id, step_name)
 
     COMPONENTS = web.create_group("COMPONENTS")
-    list_of_names = [('COMP_%03d' % (i-1), data.get('component%s' % i)) for i in range(1, int(data['numberOfComponents'])+1)]
+
+    component_names = [data.get('component%s' % i) for i in range(1, int(data['numberOfComponents'])+1)]
+
+    #add virtual names
+    if data['CADET_ISOTHERM']['ISOTHERM'] == 'MULTI_COMPONENT_BILANGMUIR':
+        component_names = list(itertools.chain.from_iterable(zip(component_names, [i + ' Virtual' for i in component_names])))
+
+    #add id
+    list_of_names = [('COMP_%03d' % idx, name) for idx, name in enumerate(component_names)]
+
     for comp_id, comp_name in list_of_names:
         set_value_enum(COMPONENTS, comp_id, comp_name)
 
@@ -238,6 +247,14 @@ def get_inlet_data(step_name, data):
     linear =  [data['%s:%s:%s' % (step_name, component, 'LIN_COEFF')] for component in components]
     quadratic =  [data['%s:%s:%s' % (step_name, component, 'QUAD_COEFF')] for component in components]
     cubic =  [data['%s:%s:%s' % (step_name, component, 'CUBE_COEFF')] for component in components]
+
+    if data['CADET_ISOTHERM']['ISOTHERM'] == 'MULTI_COMPONENT_BILANGMUIR':
+        constant = list(itertools.chain.from_iterable(zip(constant, [0 for i in components])))
+        linear = list(itertools.chain.from_iterable(zip(linear, [0 for i in components])))
+        quadratic = list(itertools.chain.from_iterable(zip(quadratic, [0 for i in components])))
+        cubic = list(itertools.chain.from_iterable(zip(cubic, [0 for i in components])))
+
+
     return constant, linear, quadratic, cubic
     
 def get_section_times(data):
@@ -258,27 +275,49 @@ def get_section_continuity(data):
 def get_film_diffusion(data):
     "return the vector of film diffusions"
     components = get_components_in_order(data)
-    return map(float, get_suffix_data('FILM_DIFFUSION', components, data))
+
+    film_diffusion = map(float, get_suffix_data('FILM_DIFFUSION', components, data))
+    
+    if data['CADET_ISOTHERM']['ISOTHERM'] == 'MULTI_COMPONENT_BILANGMUIR':
+        film_diffusion = list(itertools.chain.from_iterable(zip(film_diffusion, film_diffusion)))
+    return film_diffusion
 
 def get_particle_diffusion(data):
     "return the vector of film diffusions"
     components = get_components_in_order(data)
-    return map(float, get_suffix_data('PAR_DIFFUSION', components, data))
+
+    par_diffusion = map(float, get_suffix_data('PAR_DIFFUSION', components, data))
+    
+    if data['CADET_ISOTHERM']['ISOTHERM'] == 'MULTI_COMPONENT_BILANGMUIR':
+        par_diffusion = list(itertools.chain.from_iterable(zip(par_diffusion, par_diffusion)))
+    return par_diffusion
 
 def get_surface_diffusion(data):
     "return the vector of film diffusions"
     components = get_components_in_order(data)
-    return map(float, get_suffix_data('PAR_SURFDIFFUSION', components, data))
+    surface_diffusion = map(float, get_suffix_data('PAR_SURFDIFFUSION', components, data))
+    
+    if data['CADET_ISOTHERM']['ISOTHERM'] == 'MULTI_COMPONENT_BILANGMUIR':
+        surface_diffusion = list(itertools.chain.from_iterable(zip(surface_diffusion, surface_diffusion)))
+    return surface_diffusion
 
 def get_init_c_diffusion(data):
     "return the vector of film diffusions"
     components = get_components_in_order(data)
-    return map(float, get_suffix_data('INIT_C', components, data))
+    init_c = map(float, get_suffix_data('INIT_C', components, data))
+
+    if data['CADET_ISOTHERM']['ISOTHERM'] == 'MULTI_COMPONENT_BILANGMUIR':
+        init_c = list(itertools.chain.from_iterable(zip(init_c, [0 for i in components])))
+    return init_c
 
 def get_init_q_diffusion(data):
     "return the vector of film diffusions"
     components = get_components_in_order(data)
-    return map(float, get_suffix_data('INIT_Q', components, data))
+    init_q = map(float, get_suffix_data('INIT_Q', components, data))
+
+    if data['CADET_ISOTHERM']['ISOTHERM'] == 'MULTI_COMPONENT_BILANGMUIR':
+        init_q = list(itertools.chain.from_iterable(zip(init_q, [0 for i in components])))
+    return init_q
 
 def model(input, data):
     "handle the model node"
@@ -293,6 +332,8 @@ def model(input, data):
 
     if isotherm in no_change_isotherms:
         NCOMP = int(data['numberOfComponents'])
+    elif isotherm == 'MULTI_COMPONENT_BILANGMUIR':
+        NCOMP = int(data['numberOfComponents']) * 2
 
     set_value(model, 'COL_DISPERSION', 'f8', float(data['COL_DISPERSION']))
     set_value(model, 'COL_LENGTH', 'f8', float(data['COL_LENGTH']))
