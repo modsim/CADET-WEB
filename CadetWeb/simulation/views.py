@@ -1114,7 +1114,10 @@ def simulation_rate(request):
 
     try:
         job = models.Job.objects.get(uid=path)
-        notes, created = models.Job_Notes.objects.update_or_create(Job_ID=job, defaults={'rating':rating, 'notes':notes})
+
+        if request.user.username == job.username:
+            notes, created = models.Job_Notes.objects.update_or_create(Job_ID=job, defaults={'rating':rating, 'notes':notes})
+
     except ObjectDoesNotExist:
         #create job type if it dies not exist
         pass
