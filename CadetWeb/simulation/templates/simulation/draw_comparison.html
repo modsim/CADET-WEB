@@ -203,7 +203,7 @@
                 type: "GET",
                 dataType: "json",
                 cache: false,
-                data: { 'selected': '{{ selected_jobs }}'  },
+                data: { 'selected': '{{ selected_jobs }}',  {% for id, name in session_lookup %} '{{ id }}': '{{ name }}',  {% endfor %}  },
                 success: onDataReceived
             });
         }

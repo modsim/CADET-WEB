@@ -899,6 +899,9 @@ def run_job_get(request):
         rating = 0
         notes = ''
 
+    data['read_only'] = '' if request.user.username == models.Job.objects.get(uid = path).username else 'readonly'
+    print(request.user.username, models.Job.objects.get(uid = path).username)
+
     data['advanced_ui'] = json_data['advanced_ui']
     data['download_url'] = hdf5_path
     data['new_simulation'] = url_new
@@ -940,7 +943,7 @@ def draw_comparison(request):
 
     for item in selected:
         id = item
-        tag = request.session['comparison'][item]
+        tag = request.GET[item]
         if '_' in item:
             job_id, sim_id = item.split('_')
             path = models.Job.objects.get(pk=int(job_id)).uid
@@ -959,6 +962,9 @@ def draw_comparison(request):
 
     data = {}
     data['selected'] = temp
+
+    data['session_lookup'] = [(i, request.GET[i]) for i in selected]
+
     data['selected_jobs'] = ','.join(selected)
     data['json_url'] = reverse('simulation:get_data_comparison', None, None)
     data['graphs_common'] = set.intersection(*all_graphs)
@@ -1093,6 +1099,7 @@ def process_comparison(request):
         return redirect(request.META.get('HTTP_REFERER'))
     elif type == 'graph':
         query = [('selected', item) for item in request.POST.getlist('selected')]
+        query = query + [(item, request.session['comparison'][item]) for key,item in query]
         query = urllib.urlencode(query)
         base = reverse('simulation:draw_comparison', None, None)
         return redirect('%s?%s' % (base, query))
@@ -1405,7 +1412,7 @@ def get_data_comparison(request):
     job_ids = []
     filename_parts = []
     for i in selected:
-        tag = request.session['comparison'][i]
+        tag = request.GET[i]
         try:
             (job_id, sim_id) = map(int, i.split('_'))
             filename_parts.append('%s_%s' % (job_id, sim_id))
