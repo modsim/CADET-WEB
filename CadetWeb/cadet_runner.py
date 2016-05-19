@@ -588,8 +588,6 @@ if __name__ == '__main__':
     stdout = proc.stdout.read()
     stderr = proc.stderr.read()
 
-    print stdout
-
     h5 = h5py.File(args.sim, 'a')
     web = h5["web"]
     set_value_enum(web, 'STDOUT', stdout)
