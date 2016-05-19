@@ -62,7 +62,7 @@ def run(hdf5_path, sensitivity_number):
 
     file_name, file_name_csv, file_name_xls, title = get_picture_id(hdf5_path, sensitivity_number)
 
-    generate_plot(file_name, title, hdf5_path, sensitivity_number, parent)
+    #generate_plot(file_name, title, hdf5_path, sensitivity_number, parent)
     generate_csv(file_name_csv, file_name_xls, hdf5_path, sensitivity_number, parent)
 
 def generate_csv(file_name, file_name_xls, hdf5_path, sensivitity_number, parent):

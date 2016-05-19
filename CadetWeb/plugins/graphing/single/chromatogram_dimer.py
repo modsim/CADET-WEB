@@ -19,7 +19,7 @@ file_name_csv = 'chromatogram_10x.csv'
 file_name_xls = 'chromatogram_10x.xlsx'
 
 def run(hdf5_path):
-    generate_plot(hdf5_path)
+    #generate_plot(hdf5_path)
     generate_csv(hdf5_path)
 
 def generate_csv(hdf5_path):
