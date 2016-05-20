@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from CadetWeb import private_settings
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -17,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '30)ab*0)@z++4qpr_0m-=bk)_iie^cs2y^(!k&*s)0r2%*1x8o'
+SECRET_KEY = private_settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -142,7 +143,13 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = private_settings.EMAIL_BACKEND
+EMAIL_HOST = private_settings.EMAIL_HOST
+EMAIL_HOST_PASSWORD = private_settings.EMAIL_HOST_PASSWORD
+EMAIL_HOST_USER = private_settings.EMAIL_HOST_USER
+EMAIL_SUBJECT_PREFIX = private_settings.EMAIL_SUBJECT_PREFIX
+EMAIL_USE_TLS = private_settings.EMAIL_USE_TLS
+EMAIL_PORT = private_settings.EMAIL_PORT
 
 LOGIN_REDIRECT_URL = '/simulation'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/simulation'
