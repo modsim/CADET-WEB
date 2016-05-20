@@ -150,6 +150,8 @@ EMAIL_HOST_USER = private_settings.EMAIL_HOST_USER
 EMAIL_SUBJECT_PREFIX = private_settings.EMAIL_SUBJECT_PREFIX
 EMAIL_USE_TLS = private_settings.EMAIL_USE_TLS
 EMAIL_PORT = private_settings.EMAIL_PORT
+DEFAULT_FROM_EMAIL = private_settings.DEFAULT_FROM_EMAIL
+SERVER_EMAIL = private_settings.SERVER_EMAIL
 
 LOGIN_REDIRECT_URL = '/simulation'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/simulation'
