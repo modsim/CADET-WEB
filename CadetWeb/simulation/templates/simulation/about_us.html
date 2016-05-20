@@ -5,30 +5,39 @@
 <div>
     <h1>Chromatography Analysis and Design Toolkit</h1>
 
+    <p class="text_max">
     The Chromatography Analysis and  Design Toolkit (CADET) is developed at the
     Institute of Bio- and Geosciences 1 (IBG-1) under supervision of Dr. Eric von Lieres.
     The core of the CADET software is a fast and accurate solver for the General Rate Model (GRM)
     of packed bed liquid chromatography, which can be used through this web-interface.
     The CADET solver covers a wide range of GRM variants, combining different transport
     and binding models with state-of-the-art mathematical algorithms and scientific computing techniques.
+    </p>
 
     <ul style="list-style-type:disc;">
 
         <li>
+        <p class="text_max">
             The governing partial differential algebraic equations (PDAE) are discretized in
             space and time using mass preserving finite volumes (FV) and a backward difference
             formula (BDF).
+            </p>
         </li>
         <li>
+        <p class="text_max">
             The weighted essentially non-oscillatory (WENO) scheme is applied
             for minimizing numerical dissipation.
+            </p>
         </li>
-        <li>Parameter sensitivities are computed using algorithmic differentiation.</li>
+        <li><p class="text_max">Parameter sensitivities are computed using algorithmic differentiation.</p></li>
         <li>
+        <p class="text_max">
             The code is parallelized for efficiently utilizing the computational power of modern
             multicore processors.
+            </p>
         </li>
     </ul>
+    <p class="text_max">
     The CADET framework also comprises a MATLAB interface and standard routines for
     parameter estimation, process optimization and experimental design (not accessible through
     this web-interface). The full version can be downloaded on <a href="https://github.com/modsim/CADET/releases">GitHub</a>.
@@ -37,16 +46,23 @@
     Additional documentation is provided on the project  <a href="https://github.com/modsim/cadet/wiki">wiki</a>.
     If you find it useful for your own work, we would appreciate
     acknowledgements of the CADET software and citations of our papers.
+    </p>
 
     <ul>
-        <li>von Lieres, E.; Andersson, J.: <a href="http://dx.doi.org/10.1016/j.compchemeng.2010.03.008">
-            A fast and accurate solver for the general rate model of column liquid chromatography</a>, Computers and Chemical Engineering 34,8 (2010), 1180-1191.</li>
-        <li>P&uuml;ttmann, A.; Schnittert, S.; Naumann, U.; von Lieres, E.: <a href="http://dx.doi.org/10.1016/j.compchemeng.2013.04.021">
-            Fast and accurate parameter sensitivities for the general rate model of column liquid chromatography</a>, Computers and Chemical Engineering 56,13 (2013), 46-57</li>
-        <li>P&uuml;ttmann, A.; Schnittert, S.; Leweke, S.; von Lieres, E.: <a href="http://dx.doi.org/10.1016/j.ces.2015.08.050">
-            Utilizing algorithmic differentiation to efficiently compute chromatograms and parameter sensitivities</a>, Chemical Engineering Science 139 (2016), 152-162.</li>
-        <li>Leweke, S.; von Lieres, E.: <a href="http://dx.doi.org/10.1016/j.compchemeng.2015.09.009">
-            Fast arbitrary order moments and arbitrary precision solution of the general rate model of column liquid chromatography with linear isotherm</a>, Computers and Chemical Engineering 84 (2016), 350-362.</li>
+        <li><p class="text_max">von Lieres, E.; Andersson, J.: <a href="http://dx.doi.org/10.1016/j.compchemeng.2010.03.008">
+            A fast and accurate solver for the general rate model of column liquid chromatography</a>, 
+            Computers and Chemical Engineering 34,8 (2010), 1180-1191.</p></li>
+        <li><p class="text_max">P&uuml;ttmann, A.; Schnittert, S.; Naumann, U.; von Lieres, E.: 
+	    <a href="http://dx.doi.org/10.1016/j.compchemeng.2013.04.021">
+            Fast and accurate parameter sensitivities for the general rate model of column liquid chromatography</a>, 
+            Computers and Chemical Engineering 56,13 (2013), 46-57</p></li>
+        <li><p class="text_max">P&uuml;ttmann, A.; Schnittert, S.; Leweke, S.; von Lieres, E.: 
+	    <a href="http://dx.doi.org/10.1016/j.ces.2015.08.050">
+            Utilizing algorithmic differentiation to efficiently compute chromatograms and parameter sensitivities</a>, 
+            Chemical Engineering Science 139 (2016), 152-162.</p></li>
+        <li><p class="text_max">Leweke, S.; von Lieres, E.: <a href="http://dx.doi.org/10.1016/j.compchemeng.2015.09.009">
+            Fast arbitrary order moments and arbitrary precision solution of the general rate model of column liquid 
+            chromatography with linear isotherm</a>, Computers and Chemical Engineering 84 (2016), 350-362.</p></li>
     </ul>
 
 </div>
