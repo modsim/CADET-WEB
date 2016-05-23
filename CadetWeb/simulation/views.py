@@ -1324,10 +1324,16 @@ def sync_db():
         except ObjectDoesNotExist:
             models.Parameters.objects.create(name=name, units=units, description=description)
 
-def get_graph_data(path, rel_path):
+def get_graph_data(path, rel_path, job_id, sim_id):
     json_path, hdf5_path, graphs, data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
     parent, hdf5_name = os.path.split(hdf5_path)
     json_cache = os.path.join(parent, 'json_cache')
+
+    if job_id and sim_id:
+        prefix = 'Job %s Sim: %s' % (job_id, sim_id)
+    else:
+        prefix = 'Job %s ' % job_id
+
     if not os.path.exists(json_cache):
         h5 = h5py.File(hdf5_path, 'r')
         json_data = {}
@@ -1336,6 +1342,7 @@ def get_graph_data(path, rel_path):
         json_data['failed'] = int(failure)
         json_data['stdout'] = stdout
         json_data['stderr'] = stderr
+        json_data['prefix'] = prefix
 
         if json_data['success']:
             json_data['cadet_version'] = str(np.array(h5['/meta/CADET_VERSION']))
@@ -1396,13 +1403,14 @@ def get_data(request):
     will pass the needed json to an external process and then read the result back."""
     path = request.GET['path']
     sim_id = request.GET['sim_id']
+    job_id = models.Job.objects.get(uid=path).id
 
     if sim_id:
         rel_path = models.Simulation.objects.get(id=int(sim_id)).Rel_Path
     else:
         rel_path = ''
 
-    json_data = get_graph_data(path, rel_path)
+    json_data = get_graph_data(path, rel_path, job_id, sim_id)
 
     return JsonResponse(json_data, safe=False)
 

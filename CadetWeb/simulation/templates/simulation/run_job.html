@@ -145,8 +145,6 @@
         <div>
             {% comment %} <p><a href="{{ url }}" role='button' class='btn btn-default'>Download {{ name }} image</a></p> {% endcomment %}
             <div class="row graph_row">
-                <div class="x_label">Time(s)</div>
-                <div class="y_label">Concentration (mMol)</div>
                 <div class="col-md-9 tall" id="{{ id }}"></div>
                 <div class="col-md-3 tall" id="{{ id }}choice">
                     <a href="{{ url_download }}" role="button" class="btn btn-default"
@@ -185,12 +183,14 @@
 
 
 
-    function start_plot(datasets, element, choices, overview_id, base_id) {
+    function start_plot(datasets, element, choices, overview_id, base_id, prefix) {
         // hard-code color indices to prevent them from shifting as
         // countries are turned on/off
         var datasets = datasets;
         var i = 0;
         var all_data = [];
+        console.log(datasets);
+        var prefix = prefix;
 
         $.each(datasets, function (key, val) {
             val.color = colors[i % colors.length];
@@ -226,11 +226,11 @@
 
             if ($(search)[0].msToBlob) { //for IE
                 var blob = $(search)[0].msToBlob();
-                window.navigator.msSaveBlob(blob, base_id + '.png');
+                window.navigator.msSaveBlob(blob, prefix + base_id + '.png');
             } else {
                 //other browsers
                 link.attr('href', $(search)[0].toDataURL("image/png"));
-                link.attr('download', base_id + '.png');
+                link.attr('download', prefix + base_id + '.png');
             }
 
             
@@ -250,22 +250,25 @@
 
             var plot = $.plot(element, data, {
                 canvas: true,
+                axisLabels: {
+                    show: true,
+                },
                 yaxis: {
                     tickFormatter: function (v, axis) { return v.toExponential(2);},
-                    //min: 0,
-                    //zoomRange: null,
-                    //panRange: [0, maxY]
+                    position: 'left',
+                    axisLabel: 'Concentration Protein (mMol)',
+                    axisLabelUseCanvas: true
                 },
                 y2axis: {
                     tickFormatter: function (v, axis) { return v.toExponential(2); },
-                    //min: 0,
-                    //zoomRange: null,
-                    //panRange: [0, maxY]
+                    position: 'right',
+                    axisLabel: 'Concentration Salt (mMol)',
+                    axisLabelUseCanvas: true
                 },
                 xaxis: {
-                    //tickDecimals: 0,
-                    //zoomRange: null,
-                    //panRange: [0, maxX]
+                    axisLabel: 'Time(s)',
+                    axisLabelUseCanvas: true,
+                    axisLabelPadding: 8,
                 },
                 zoom: {
                     interactive: true
@@ -274,7 +277,7 @@
                     interactive: false
                 },
                 legend: {
-                    position: 'nw'
+                    position: 'ne'
                 },
                 selection: {
                     mode: "xy"
@@ -329,6 +332,7 @@
 
     $(document).ready(function () {
         var data;
+        var prefix;
 
         function fetchData() {
 
@@ -354,9 +358,11 @@
                     $('#cadet_version').text(json_data['cadet_version']);
                     $('#cadet_git_version').prop('title', 'Git Version Commit String: ' + json_data['cadet_git_version']);
 
+                    prefix = json_data['prefix'];
+
                     for (var key in json_data['data']) {
                         if (json_data['data'].hasOwnProperty(key)) {
-                            start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
+                            start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key, prefix);
                         }
                     }
 
