@@ -346,6 +346,14 @@ def single_start(request):
         json_data = utils.encode_to_ascii(json_data)
         data.update(json_data)
 
+
+    isotherm = data.get('ADSORPTION_TYPE', None)
+    numberOfComponents = data.get('numberOfComponents', None)
+
+    if isotherm in ('EXTERNAL_STERIC_MASS_ACTION', 'STERIC_MASS_ACTION', 'SELF_ASSOCIATION') and numberOfComponents > 1:
+        data['numberOfComponents'] = numberOfComponents - 1
+
+
     isotherms = isotherm_set.keys()
 
     isotherms = [(isotherm.replace('_', ' ').title(), isotherm, 'selected' if isotherm == data.get('ADSORPTION_TYPE', None) else '') for isotherm in isotherms]
@@ -879,6 +887,13 @@ def run_job_get(request):
         simulation = None
         rel_path = ''
 
+    job_id = models.Job.objects.get(uid=path).id
+
+    if sim_id and job_id:
+        prefix = 'job_%s_sim_%s' % (job_id, sim_id)
+    else:
+        prefix = 'job_%s' % job_id
+
     json_path, hdf5_path, graphs, json_data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     query = request.GET.dict()
@@ -905,6 +920,8 @@ def run_job_get(request):
     data['read_only'] = '' if request.user.username == models.Job.objects.get(uid = path).username else 'readonly'
     print(request.user.username, models.Job.objects.get(uid = path).username)
 
+
+    data['prefix'] = prefix
     data['advanced_ui'] = json_data['advanced_ui']
     data['download_url'] = hdf5_path
     data['new_simulation'] = url_new
@@ -916,7 +933,7 @@ def run_job_get(request):
     data['notes'] = notes
     data['json_url'] = reverse('simulation:get_data', None, None)
     data['progress'] = progress_path
-    data['job_id'] = models.Job.objects.get(uid=path).id
+    data['job_id'] = job_id
     data['dropdown'] = generate_batch_choice(json_data, simulation, request, path)
     data['sim_id'] = sim_id
 
