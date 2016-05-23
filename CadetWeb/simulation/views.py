@@ -1168,7 +1168,7 @@ def run_job(request):
     simulation_path = cadet_runner.create_simulation_file(relative_path, data)
 
     try:
-        open(os.path.join(relative_path, 'status'), 'r')
+        open(os.path.join(relative_path, 'pid'), 'r')
         run_job = 0
     except IOError:
         run_job = 1
