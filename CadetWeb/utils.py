@@ -63,18 +63,15 @@ def check_pid(pid):
     except OSError as err:
         if err.errno == errno.ESRCH:
             # ESRCH == No such process
-            print('no such process')
             return False
         elif err.errno == errno.EPERM:
             # EPERM clearly means there's a process to deny access to
-            print('access denied')
             return True
         else:
             # According to "man 2 kill" possible error values are
             # (EINVAL, EPERM, ESRCH)
             raise
     else:
-        print('process exists')
         return True
 
 def get_hdf5_path(path, chunk_size, rel_path):

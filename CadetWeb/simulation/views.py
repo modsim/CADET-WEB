@@ -284,7 +284,6 @@ def get_examples(limit):
 
     temp = []
     for result in results:
-        print(result)
         study_name= result.study_name
         model_name = result.Model_ID.model
         isotherm = models.Job_String.objects.get(Job_ID=result, Parameter_ID=parameter).Data.replace('_', ' ').title()
@@ -826,10 +825,7 @@ def query_results(request, name=None):
     data = get_json(post)
     data['user_name'] = request.user.username
     name = name if name is not None else data['search_query']
-    print(name)
-    print(post.items())
     headers, results = utils.call_plugin_by_id(name, 'process_search', request, data)
-    print(headers, results)
     search_results = []
 
     job_ids = [result[0] for result in results]
@@ -919,8 +915,6 @@ def run_job_get(request):
         notes = ''
 
     data['read_only'] = '' if request.user.username == models.Job.objects.get(uid = path).username else 'readonly'
-    print(request.user.username, models.Job.objects.get(uid = path).username)
-
 
     data['prefix'] = prefix
     data['advanced_ui'] = json_data['advanced_ui']
