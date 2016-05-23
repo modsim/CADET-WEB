@@ -24,12 +24,17 @@ def run(request):
     return html_string
 
 def process_search(request, search_dict):
-    job_id = int(search_dict['job_id'])
+    headers = ('JOBID',)
+    search_results = []
+
+    try:
+        job_id = int(search_dict['job_id'])
+    except ValueError:
+        return headers, search_results
 
     results = models.Job.objects.filter(id=job_id)
 
-    headers = ('JOBID',)
-    search_results = []
+
     for result in results:
         search_results.append( (result.id, ))
     return headers, search_results

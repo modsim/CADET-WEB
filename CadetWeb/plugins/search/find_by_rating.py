@@ -31,13 +31,18 @@ def run(request):
     return html_string
 
 def process_search(request, search_dict):
-    lb = float(search_dict['lb'])
-    ub = float(search_dict['ub'])
+    headers = ('JOBID',)
+    search_results = []
+
+    try:
+        lb = float(search_dict['lb'])
+        ub = float(search_dict['ub'])
+    except ValueError:
+        return headers, search_results
 
     results = models.Job_Notes.objects.filter(rating__range=(lb, ub))
 
-    headers = ('JOBID',)
-    search_results = []
+    
     for result in results:
         search_results.append( (result.Job_ID.id, ))
     return headers, search_results
