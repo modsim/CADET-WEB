@@ -28,6 +28,7 @@ from django.http import HttpResponse
 from datetime import datetime, timedelta
 import shutil
 from collections import OrderedDict
+import glob
 
 class HttpResponseTemporaryRedirect(HttpResponse):
     status_code = 307
@@ -894,7 +895,7 @@ def run_job_get(request):
     else:
         prefix = 'job_%s' % job_id
 
-    json_path, hdf5_path, graphs, json_data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
+    json_path, hdf5_path, graphs, json_data, alive, complete, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     query = request.GET.dict()
     query = urllib.urlencode(query)
@@ -974,7 +975,7 @@ def draw_comparison(request):
             path = models.Job.objects.get(pk=int(job_id)).uid
             rel_path = ''
 
-        json_path, hdf5_path, graphs, json_data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
+        json_path, hdf5_path, graphs, json_data, alive, complete, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
         graphs_available = set([(name, human_name) for name, human_name, png, csv, csv_excel in graphs])
         all_graphs.append(graphs_available)
         hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
@@ -1163,7 +1164,7 @@ def run_job(request):
     try:
         os.makedirs(relative_path)
     except OSError:
-        print "The simulation has already been run."
+        print('Simulation directory already exists')
 
     path = os.path.join(relative_path, 'setup.json')
 
@@ -1173,11 +1174,75 @@ def run_job(request):
     simulation_path = cadet_runner.create_simulation_file(relative_path, data)
 
     try:
-        open(os.path.join(relative_path, 'complete'), 'r')
+        open(os.path.join(relative_path, 'status'), 'r')
+        run_job = 0
     except IOError:
+        run_job = 1
+
+    if run_job:
         write_job_to_db(data, json_data, check_sum, request.user.username)
 
-        subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
+        popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
+
+        with open(os.path.join(relative_path,'pid'), 'w') as pid:
+            pid.write(str(popen.pid))
+
+    query = {}
+    query['path'] = check_sum
+    query = urllib.urlencode(query)
+    base = reverse('simulation:run_job_get', None, None)
+    return redirect('%s?%s' % (base, query))
+
+def remove_without_error(path):
+    try:
+        os.remove(path)
+    except OSError:
+        pass
+
+@login_required
+def force_rerun(request):
+    "force rerun the simulation"
+    check_sum = request.POST['path']
+
+    relative_parts = [storage_path,] + [''.join(i for i in seq if i is not None) for seq in utils.grouper(check_sum, settings.chunk_size)]
+    relative_path = os.path.join(*relative_parts)
+
+    reset_sim = ['progress', 'status', 'stderr', 'json_cache', 'pid']
+    reset_sim = [os.path.join(relative_path, i) for i in reset_sim]
+
+    map(remove_without_error, reset_sim)
+
+    reset_sim_wildcards = ['*.csv', '*.xlsx', '.png']
+    reset_sim_wildcards = [os.path.join(relative_path, i) for i in reset_sim_wildcards]
+
+    for path in reset_sim_wildcards:
+        map(remove_without_error, glob.glob(path))
+
+
+    path = os.path.join(relative_path, 'setup.json')
+
+    #second arg is not needed since the simulation file already exists and we don't delete that
+    simulation_path = cadet_runner.create_simulation_file(relative_path, None)
+
+    h5 = h5py.File(simulation_path, 'a')
+
+    remove = ['/output', '/meta', '/web/STDERR', '/web/STDOUT', '/web/CADET_SIMULATION_TIME', '/web/TOTAL_RUN_TIME', '/web/compress']
+
+    for key in remove:
+        try:
+            del h5[key]
+        except KeyError:
+            pass
+
+    h5.close()
+
+    out = open(os.path.join(relative_path, 'stdout'), 'w')
+    err = open(os.path.join(relative_path, 'stderr'), 'w')
+
+    popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
+
+    with open(os.path.join(relative_path,'pid'), 'w') as pid:
+        pid.write(str(popen.pid))
 
     query = {}
     query['path'] = check_sum
@@ -1188,11 +1253,8 @@ def run_job(request):
 def write_job_to_db(data, json_data, check_sum, username):
     #first check if we already have this entry
 
-    #FIXME: ONLY FOR TESTING WIPES THE DB ENTRY EACH TIME
     try:
         job = models.Job.objects.get(uid=check_sum)
-        #job.delete()
-        #[job.delete() for job in models.Job.objects.all()]
     except ObjectDoesNotExist:
         #create job type if it dies not exist
         pass
@@ -1342,7 +1404,7 @@ def sync_db():
             models.Parameters.objects.create(name=name, units=units, description=description)
 
 def get_graph_data(path, rel_path, job_id, sim_id):
-    json_path, hdf5_path, graphs, data, alive, complete, failure, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
+    json_path, hdf5_path, graphs, data, alive, complete, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
     parent, hdf5_name = os.path.split(hdf5_path)
     json_cache = os.path.join(parent, 'json_cache')
 
@@ -1356,7 +1418,7 @@ def get_graph_data(path, rel_path, job_id, sim_id):
         json_data = {}
         #check for success by seeing if we have output created
         json_data['success'] = int(complete)
-        json_data['failed'] = int(failure)
+        json_data['failed'] = int(alive) == 0
         json_data['stdout'] = stdout
         json_data['stderr'] = stderr
         json_data['prefix'] = prefix

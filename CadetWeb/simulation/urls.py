@@ -34,5 +34,6 @@ urlpatterns = patterns('',
     url(r'^batch_choose/$', views.batch_choose, name='batch_choose'),
     url(r'^process_comparison/$', views.process_comparison, name='process_comparison'),
     url(r'^draw_comparison/$', views.draw_comparison, name='draw_comparison'),
+    url(r'^force_rerun/$', views.force_rerun, name='force_rerun'),
     url(r'^about_us/$', views.about_us, name='about_us'),
 )

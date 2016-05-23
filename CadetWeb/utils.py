@@ -7,6 +7,7 @@ import os
 import json
 import plot_sensitivity
 import types
+import errno
 
 current_path = __file__
 simulation_path, current_file_name = os.path.split(current_path)
@@ -43,13 +44,37 @@ def encode_to_ascii_list(data):
             temp.append(key)
     return temp
 
+
+#new version from http://stackoverflow.com/questions/568271/how-to-check-if-there-exists-a-process-with-a-given-pid
 def check_pid(pid):
-    """ Check For the existence of a unix pid. """
+    """Check whether pid exists in the current process table.
+    UNIX only.
+    """
+    if pid < 0:
+        return False
+    if pid == 0:
+        # According to "man 2 kill" PID 0 refers to every process
+        # in the process group of the calling process.
+        # On certain systems 0 is a valid PID but we have no way
+        # to know that in a portable fashion.
+        raise ValueError('invalid PID 0')
     try:
         os.kill(pid, 0)
-    except OSError:
-        return False
+    except OSError as err:
+        if err.errno == errno.ESRCH:
+            # ESRCH == No such process
+            print('no such process')
+            return False
+        elif err.errno == errno.EPERM:
+            # EPERM clearly means there's a process to deny access to
+            print('access denied')
+            return True
+        else:
+            # According to "man 2 kill" possible error values are
+            # (EINVAL, EPERM, ESRCH)
+            raise
     else:
+        print('process exists')
         return True
 
 def get_hdf5_path(path, chunk_size, rel_path):
@@ -69,8 +94,9 @@ def get_graph_data(path, chunk_size, rel_path):
     relative_parts = [''.join(i for i in seq if i is not None) for seq in grouper(path, chunk_size)]
     relative_path = os.path.join(*relative_parts)
 
+
     try:
-        pid = int(open(os.path.join(storage_path, relative_path, 'pid')).read())
+        pid = int(open(os.path.join(storage_path, relative_path, 'pid'), 'r').read())
         alive = check_pid(pid)
     except IOError:
         alive = False
@@ -80,10 +106,10 @@ def get_graph_data(path, chunk_size, rel_path):
     except IOError:
         complete = False
 
-    try:
-        failure = open(os.path.join(storage_path, relative_path, 'status')).read() == 'failure'
-    except IOError:
-        failure = False
+    #try:
+    #    failure = open(os.path.join(storage_path, relative_path, 'status')).read() == 'failure'
+    #except IOError:
+    #    failure = False
 
     json_path = os.path.join(storage_path, relative_path, 'setup.json')
 
@@ -138,7 +164,7 @@ def get_graph_data(path, chunk_size, rel_path):
     except IOError:
         stderr = ''
 
-    return json_path, hdf5_path, graphs, json_data, alive, complete, failure, stdout, stderr
+    return json_path, hdf5_path, graphs, json_data, alive, complete, stdout, stderr
 
 #from https://docs.python.org/2/library/itertools.html
 def grouper(iterable, n, fillvalue=None):

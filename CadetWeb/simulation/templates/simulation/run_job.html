@@ -59,7 +59,19 @@
     </div>
 </form>
 
+<div class="row advanced">
+    <form class="form-horizontal" role="form" action="{% url 'simulation:force_rerun' %}" method="POST">
+        <div class="col-md-12">
+            {% csrf_token %}
+            <input type="hidden" name="path" value="{{ path }}">
+            <button type="submit" class="btn btn-warning">Force Rerun Simulation</button>
+        </div>
+    </form>
+</div>
+
 <div id="success">
+
+
 
     <div class="row">
         <div class="col-md-12">

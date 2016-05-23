@@ -565,10 +565,7 @@ if __name__ == '__main__':
     parent_dir = os.path.dirname(args.sim)
 
     open(os.path.join(parent_dir, 'status'), 'w').write('working')
-
-    with open(os.path.join(parent_dir,'pid'), 'w') as pid:
-        pid.write(str(os.getpid()))
-
+    
     if 'batch' not in args.sim:
         if json_data['job_type'] == 'batch':
             generate_simulations(parent_dir, json_data)
