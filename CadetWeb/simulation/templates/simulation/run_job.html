@@ -1,0 +1,379 @@
+{% extends 'simulation/base.html' %}
+
+{% block body %}
+<form class="form-horizontal" role="form" style="" action="{% url 'simulation:simulation_rate' %}" method="POST">
+    {% csrf_token %}
+    <div class="row">
+    <div class="form-group">
+        <div class="col-sm-12">
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default {% if advanced_ui == 'normal' %} active {% endif %} " {% if advanced_ui == 'normal' %} checked {% endif %} onclick="$('body').removeClass('advanced').addClass('normal');">
+                    <input type="radio" name="advanced_ui" value="normal" id="option1" autocomplete="off"> Normal User Interface
+                </label>
+                <label class="btn btn-default {% if advanced_ui == 'advanced' %} active {% endif %}" {% if advanced_ui == 'advanced' %} checked {% endif %} onclick="$('body').addClass('advanced').removeClass('normal');">
+                    <input type="radio" name="advanced_ui" value="advanced" id="option2" autocomplete="off"> Advanced User Interface
+                </label>
+            </div>
+        </div>
+    </div>
+        </div>
+
+    <div class="row">
+        <input type="hidden" name="json" value="{{ json }}">
+        <div class="col-md-2">
+            <strong>Job #: {{ job_id }}</strong>
+        </div>
+        <div class="col-md-2">
+            <strong>Job Status: &nbsp;Complete</strong>
+        </div>
+        <div class="col-md-2">
+            <strong data-toggle="tooltip" data-placement="bottom" title="Git commit version:" id="cadet_git_version">CADET Version: <span id="cadet_version"></span></strong>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <strong>Star Rating System</strong>
+        </div>
+        <div class="col-md-6">
+            <input type="number" name="rating" class="star_rating" min=0 max=5 step=0.5 value="{{ rating }}" {{ read_only }}>
+            <input type="hidden" name="chunk_size" value="{{ chunk_size }}">
+            <input type="hidden" name="path" value="{{ path }}">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <div class="col-sm-2">
+                    <label for="inputEmail3" class="control-label">Notes</label>
+                </div>
+                <div class="col-sm-10">
+                    <textarea class="form-control" id="inputEmail3" name="notes" placeholder="Simulation Notes" {{ read_only }}>{{ notes }}</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default">Save Notes and Rating</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div id="success">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-toolbar" role="toolbar">
+                <div class="btn-group">
+                    <a type="button" class="btn btn-default" href="{{ download_url}}">Download Simulation</a>
+                    <a type="button" class="btn btn-default" href="{{ new_simulation }}">Create New Simulation From This Simulation</a>
+                    <a type="button" class="btn btn-default" href="{{ batch_simulation }}">Create DoE Based on this Simulation</a>
+
+                    {% if request.session.comparison %}
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#compare_simulations">Compare Simulations</button>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="modal fade" id="compare_simulations" tabindex="-1" role="dialog" aria-labelledby="compare_simulations">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Compare Simulations</h4>
+                </div>
+                <form class="form-horizontal" role="form" action="{% url 'simulation:process_comparison' %}" method="POST">
+                    <div class="modal-body">
+
+                        {% csrf_token %}
+                        {% for comp_id, name, job_id, sim_id in comparison %}
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="selected" value="{{ comp_id }}">{{ name }}  (Job ID: {{ job_id }}  {% if sim_id %} Sim ID:  {{ sim_id}} {% endif %} )
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary dom_submit" name="type" value="delete">Delete Selected</button>
+                        <button type="submit" class="btn btn-primary dom_submit" name="type" value="graph">Compare Selected</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <form class="form-inline" role="form" action="{% url 'simulation:process_comparison' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="sr-only" for="comparision_name">Comparison Name</label>
+            <input type="text" class="form-control" id="comparision_name" name="comparison_name" placeholder="Comparison Name" required>
+            {% if sim_id %}
+            <input type="hidden" name="simulation_id" value="{{ job_id }}_{{ sim_id }}">
+            {% else %}
+            <input type="hidden" name="simulation_id" value="{{ job_id }}">
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-default" name="type" value="add">Add Comparison</button>
+    </form>
+
+    <br>
+
+    <form class="form-horizontal" role="form" style="" action="{% url 'simulation:batch_choose' %}" method="POST">
+        <div class="row">
+            <input type="hidden" name="check_sum" value="{{ path }}">
+            <div class="col-md-12">
+                {% csrf_token %}
+                {{ dropdown|safe }}
+            </div>
+        </div>
+    </form>
+
+
+    {% for id, name, url, url_download, url_download_xls in graphs %}
+
+    <div class="jumbotron graph_wide">
+        <h3>{{ name }}</h3>
+        <div>
+            {% comment %} <p><a href="{{ url }}" role='button' class='btn btn-default'>Download {{ name }} image</a></p> {% endcomment %}
+            <div class="row graph_row">
+                <div class="x_label">Time(s)</div>
+                <div class="y_label">Concentration (mMol)</div>
+                <div class="col-md-9 tall" id="{{ id }}"></div>
+                <div class="col-md-3 tall" id="{{ id }}choice">
+                    <a href="{{ url_download }}" role="button" class="btn btn-default"
+                       data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in CSV format.">Download Data (CSV)</a>
+                    <a href="{{ url_download_xls }}" role="button" class="btn btn-default"
+                       data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in Microsoft Excel format.">Download Data (XLSX)</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-9 small" id="{{ id }}overview"></div>
+            </div>
+        </div>
+    </div>
+
+    {% endfor %}
+</div>
+<div class="advanced">
+    <p><strong>The following pieces of information are mostly used for debugging and only shown if Advanced is selected.</strong></p>
+<p><strong data-toggle="tooltip" data-placement="bottom" title="All the STDOUT output from the simulation are put here. This include the CADET output and anything generated during python processing.">Simulation Output</strong></p>
+<pre id="stdout"></pre>
+
+<p><strong data-toggle="tooltip" data-placement="bottom" title="All the STDERR output from the simulation are put here. This include the CADET output and anything generated during python processing.">Simulation Errors</strong></p>
+<pre id="stderr"></pre>
+    </div>
+
+<div id="failure">The simulation has failed to complete. It has either run out of time, run out of memory or crashed. You can change settings and try again.</div>
+
+
+
+<script type="text/javascript">
+
+    $("body").addClass("loading");
+
+    var colors = ['Black', 'Red', 'Blue', 'Lime', 'Cyan', 'BlueViolet', 'Crimson', 'DeepPink', 'DarkMagenta', 'Green',
+        'Indigo', 'Magenta', 'MidnightBlue', 'Orange', 'Purple', 'Silver', 'Tan'];
+
+
+
+    function start_plot(datasets, element, choices, overview_id, base_id) {
+        // hard-code color indices to prevent them from shifting as
+        // countries are turned on/off
+        var datasets = datasets;
+        var i = 0;
+        var all_data = [];
+
+        $.each(datasets, function (key, val) {
+            val.color = colors[i % colors.length];
+            all_data.push(val);
+            ++i;
+        });
+
+        // insert checkboxes
+        var choiceContainer = $(choices);
+
+        choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "download'>Download Current Graph</a>");
+        choiceContainer.prepend("<br/><a href='#' role='button' class='btn btn-default' id='" + base_id + "zoom'>Reset Zoom</a>");
+
+        for (var key in datasets) {
+            choiceContainer.prepend("<div class='row'><div class='col-sm-4'><input type='checkbox' name='" + key +
+				"' checked='checked' id='id" + base_id + key + "'></input>" +
+				"<label for='id" + base_id + key + "'>"
+				+ datasets[key].label + "</label></div><div class='col-sm-1' style='background-color: " + datasets[key].color + ";'>&nbsp;</div></div>");
+        };
+
+        choiceContainer.find("input").click(plotAccordingToChoices);
+
+        $('#' + base_id + 'zoom').click(function (e) {
+            plotAccordingToChoices();
+            e.preventDefault();
+        });
+
+        $('#' + base_id + 'download').click(function (e) {
+            var link = $('#' + base_id + 'download');
+            var search = element + ' > canvas:first';
+
+            //link.href = $("'" + element + ' > canvas:first' + "'")[0].toDataURL();
+
+            if ($(search)[0].msToBlob) { //for IE
+                var blob = $(search)[0].msToBlob();
+                window.navigator.msSaveBlob(blob, base_id + '.png');
+            } else {
+                //other browsers
+                link.attr('href', $(search)[0].toDataURL("image/png"));
+                link.attr('download', base_id + '.png');
+            }
+
+            
+            //e.preventDefault();
+        });
+
+        function plotAccordingToChoices() {
+
+            var data = [];
+
+            choiceContainer.find("input:checked").each(function () {
+                var key = $(this).attr("name");
+                if (key && datasets[key]) {
+                    data.push(datasets[key]);
+                }
+            });
+
+            var plot = $.plot(element, data, {
+                canvas: true,
+                yaxis: {
+                    tickFormatter: function (v, axis) { return v.toExponential(2);},
+                    //min: 0,
+                    //zoomRange: null,
+                    //panRange: [0, maxY]
+                },
+                y2axis: {
+                    tickFormatter: function (v, axis) { return v.toExponential(2); },
+                    //min: 0,
+                    //zoomRange: null,
+                    //panRange: [0, maxY]
+                },
+                xaxis: {
+                    //tickDecimals: 0,
+                    //zoomRange: null,
+                    //panRange: [0, maxX]
+                },
+                zoom: {
+                    interactive: true
+                },
+                pan: {
+                    interactive: false
+                },
+                legend: {
+                    position: 'nw'
+                },
+                selection: {
+                    mode: "xy"
+                },
+                yaxes: [{}, { position: "right" }]
+            });
+
+            var overview = $.plot(overview_id, all_data, {
+                canvas: true,
+                xaxis: {
+                    ticks: [],
+                },
+                yaxis: {
+                    ticks: [],
+                    autoscaleMargin: 0.1
+                },
+                legend: {
+                    show: false
+                },
+                selection: {
+                    mode: "x"
+                }
+            });
+
+            // now connect the two
+
+            $(element).bind("plotselected", function (event, ranges) {
+
+                // do the zooming
+                $.each(plot.getXAxes(), function (_, axis) {
+                    var opts = axis.options;
+                    opts.min = ranges.xaxis.from;
+                    opts.max = ranges.xaxis.to;
+                });
+                plot.setupGrid();
+                plot.draw();
+                plot.clearSelection();
+
+                // don't fire event on the overview to prevent eternal loop
+
+                overview.setSelection(ranges, true);
+            });
+
+            $(overview_id).bind("plotselected", function (event, ranges) {
+                plot.setSelection(ranges);
+            });
+
+        }
+
+        plotAccordingToChoices();
+    }
+
+    $(document).ready(function () {
+        var data;
+
+        function fetchData() {
+
+            function onDataReceived(json_data) {
+
+                // Load all the data in one pass; if we only got partial
+                // data we could merge it with what we already have.
+                data = json_data;
+
+                if (1 == json_data['failed']) {
+                    $("#success").remove();
+                    $("body").removeClass("loading");
+                } else if (0 == json_data['success']) {
+                    $("#progress").load("{{ progress }}");
+                    setTimeout(fetchData, 5000);
+                } else {
+                    $("#failure").remove();
+                    $("body").removeClass("loading");
+
+                    document.getElementById("stdout").innerHTML = ansi_up.ansi_to_html(json_data['stdout']);
+                    document.getElementById("stderr").innerHTML = ansi_up.ansi_to_html(json_data['stderr']);
+
+                    $('#cadet_version').text(json_data['cadet_version']);
+                    $('#cadet_git_version').prop('title', 'Git Version Commit String: ' + json_data['cadet_git_version']);
+
+                    for (var key in json_data['data']) {
+                        if (json_data['data'].hasOwnProperty(key)) {
+                            start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key);
+                        }
+                    }
+
+                }
+            }
+
+            $.ajax({
+                url: "{{ json_url }}",
+                type: "GET",
+                dataType: "json",
+                cache: false,
+                data: { 'path': '{{ path }}', 'sim_id': '{{ sim_id }}' },
+                success: onDataReceived
+            });
+        }
+
+        fetchData();
+    });
+</script>
+{% endblock %}
