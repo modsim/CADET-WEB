@@ -43,4 +43,4 @@ def process_search(request, search_dict):
     return headers, search_results
 
 def get_form(request):
-    return name, form_id, run(request), search_name
+    return name, form_id, run(request), search_name, __name__

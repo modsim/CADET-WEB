@@ -160,6 +160,10 @@ def call_plugin_by_name(name, directory, attribute_name, *args, **kwargs):
         if plugin_name == name:
             return call_plugin_function(path, attribute_name, *args, **kwargs)
 
+def call_plugin_by_id(name, attribute_name, *args, **kwargs):
+    module = importlib.import_module(name)
+    return getattr(module, attribute_name)(*args, **kwargs)
+
 def call_plugins_by_name(directory, attribute_name, *args, **kwargs):
     temp = []
     for path in get_files(os.path.join(plugins, directory, '*.py')):

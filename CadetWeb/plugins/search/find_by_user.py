@@ -45,4 +45,4 @@ def get_form(request):
     else:
         tab_name = "Browse My Simulations"
         search_button_name = 'Find My Simulations'
-    return tab_name, form_id, run(request), search_button_name
+    return tab_name, form_id, run(request), search_button_name, __name__

@@ -817,7 +817,10 @@ def query_results(request, name=None):
     data = get_json(post)
     data['user_name'] = request.user.username
     name = name if name is not None else data['search_query']
-    headers, results = utils.call_plugin_by_name(name, 'search', 'process_search', request, data)
+    print(name)
+    print(post.items())
+    headers, results = utils.call_plugin_by_id(name, 'process_search', request, data)
+    print(headers, results)
     search_results = []
 
     job_ids = [result[0] for result in results]
@@ -853,7 +856,7 @@ def query_results(request, name=None):
 
 @login_required
 def find_simulations(request):
-    return query_results(request, "Find by User")
+    return query_results(request, "plugins.search.find_by_user")
 
 @login_required
 def generate_other_graphs(request):
