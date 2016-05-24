@@ -100,7 +100,10 @@ def get_graph_data(path, chunk_size, rel_path):
         alive = False
 
     try:
-        complete = open(os.path.join(storage_path, relative_path, 'status')).read() == 'success'
+        if rel_path:
+            complete = open(os.path.join(storage_path, relative_path, 'batch', rel_path, 'status')).read() == 'success'
+        else:
+            complete = open(os.path.join(storage_path, relative_path, 'status')).read() == 'success'
     except IOError:
         complete = False
 

@@ -69,7 +69,7 @@
     </form>
 </div>
 
-<div id="success">
+
 
 
 
@@ -91,6 +91,7 @@
     </div>
     <br>
 
+<div class="success">
     <div class="modal fade" id="compare_simulations" tabindex="-1" role="dialog" aria-labelledby="compare_simulations">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -136,9 +137,10 @@
         </div>
         <button type="submit" class="btn btn-default" name="type" value="add">Add Comparison</button>
     </form>
+    </div>
 
     <br>
-
+<div>
     <form class="form-horizontal" role="form" style="" action="{% url 'simulation:batch_choose' %}" method="POST">
         <div class="row">
             <input type="hidden" name="check_sum" value="{{ path }}">
@@ -148,6 +150,9 @@
             </div>
         </div>
     </form>
+    </div>
+
+<div class="success">
 
 
     {% for id, name, url, url_download, url_download_xls, filename_csv, filename_xls in graphs %}
@@ -160,10 +165,10 @@
                 <div class="col-md-9 tall" id="{{ id }}"></div>
                 <div class="col-md-3 tall" id="{{ id }}choice">
                     <a href="{{ url_download }}" role="button" class="btn btn-default"
-                       data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in CSV format." 
+                       data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in CSV format."
                        download="{{ prefix }}_{{ filename_csv}}">Download Data (CSV)</a>
                     <a href="{{ url_download_xls }}" role="button" class="btn btn-default"
-                       data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in Microsoft Excel format." 
+                       data-toggle="tooltip" data-placement="bottom" title="Download the complete time series data for this graph in Microsoft Excel format."
                        download="{{ prefix }}_{{ filename_xls}}">Download Data (XLSX)</a>
                 </div>
             </div>
@@ -184,7 +189,7 @@
 <pre id="stderr"></pre>
     </div>
 
-<div id="failure">The simulation has failed to complete. It has either run out of time, run out of memory or crashed. You can change settings and try again.</div>
+<div class="failure">The simulation has failed to complete. It has either run out of time, run out of memory or crashed. You can change settings and try again.</div>
 
 
 
@@ -355,15 +360,15 @@
                 // Load all the data in one pass; if we only got partial
                 // data we could merge it with what we already have.
                 data = json_data;
-
-                if (1 == json_data['failed']) {
-                    $("#success").remove();
+                console.log(json_data);
+                if (1 == json_data['complete'] && 0 == json_data['ok']) {
+                    $(".success").remove();
                     $("body").removeClass("loading");
-                } else if (0 == json_data['success']) {
+                } else if (0 == json_data['complete']) {
                     $("#progress").load("{{ progress }}");
-                    setTimeout(fetchData, 5000);
+                    setTimeout(fetchData, 1000);
                 } else {
-                    $("#failure").remove();
+                    $(".failure").remove();
                     $("body").removeClass("loading");
 
                     document.getElementById("stdout").innerHTML = ansi_up.ansi_to_html(json_data['stdout']);
@@ -388,7 +393,6 @@
                 type: "GET",
                 dataType: "json",
                 cache: false,
-                data: { 'path': '{{ path }}', 'sim_id': '{{ sim_id }}' },
                 success: onDataReceived
             });
         }

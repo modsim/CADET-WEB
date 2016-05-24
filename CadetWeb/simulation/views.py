@@ -826,6 +826,7 @@ def run_job_get(request):
     else:
         prefix = 'job_%s' % job_id
 
+    print(path, rel_path)
     json_path, hdf5_path, graphs, json_data, alive, complete, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     query = request.GET.dict()
@@ -837,6 +838,7 @@ def run_job_get(request):
     data['graphs'] = graphs
 
     hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
+    json_cache = hdf5_path.replace('sim.h5', 'json_cache')
     progress_path = os.path.join(os.path.dirname(hdf5_path), 'progress')
 
     try:
@@ -861,7 +863,7 @@ def run_job_get(request):
     data['chunk_size'] = settings.chunk_size
     data['rating'] = '%.1f' % rating
     data['notes'] = notes
-    data['json_url'] = reverse('simulation:get_data', None, None)
+    data['json_url'] = json_cache
     data['progress'] = progress_path
     data['job_id'] = job_id
     data['dropdown'] = generate_batch_choice(json_data, simulation, request, path)
@@ -1111,6 +1113,13 @@ def run_job(request):
     if run_job:
         write_job_to_db(data, json_data, check_sum, request.user.username)
 
+        data = {}
+        data['complete'] = 0
+        data['ok'] = 0
+
+        json_cache = os.path.join(relative_path, 'json_cache')
+        open(json_cache, 'wb').write(json.dumps(data))
+
         popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
 
         with open(os.path.join(relative_path,'pid'), 'w') as pid:
@@ -1161,6 +1170,14 @@ def force_rerun(request):
     
     out = open(os.path.join(relative_path, 'stdout'), 'w')
     err = open(os.path.join(relative_path, 'stderr'), 'w')
+
+    data = {}
+    data['complete'] = 0
+    data['ok'] = 0
+
+    json_cache = os.path.join(relative_path, 'json_cache')
+    print(json_cache)
+    open(json_cache, 'wb').write(json.dumps(data))
 
     popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
 

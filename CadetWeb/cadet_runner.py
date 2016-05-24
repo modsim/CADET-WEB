@@ -566,16 +566,77 @@ def run_batch_simulations(parent_dir, json_path):
         proc.wait()
         write_progress(parent_dir, idx+1, dir_count+1)
 
-def failure():
-    open(os.path.join(parent_dir, 'status'), 'w').write('failure')
+def failure(parent_dir, stdin=None, stdout=None):
+    data = {}
+    data['complete'] = 1
+    data['ok'] = 0
+    
+    if stdout is not None:
+        data['stdout'] = stdout
+    if stderr is not None:
+        data['stderr'] = stderr
+
+    json_cache = os.path.join(parent, 'json_cache')
+    open(json_cache, 'wb').write(json.dumps(data))
+
     sys.exit()
+
+def gen_json_cache_init(parent_dir):
+    "generate initial json cache"
+    data = {}
+    data['complete'] = 0
+    data['ok'] = 0
+
+    json_cache = os.path.join(parent_dir, 'json_cache')
+    open(json_cache, 'wb').write(json.dumps(data))
+
+
+def gen_json_cache_complete(parent_dir, h5, hdf5_path):
+    "generate a finished json_cache"
+    data = {}
+
+    data['complete'] = 1
+    data['ok'] = 1
+    data['stdout'] = str(np.array(h5['/web/STDOUT']))
+    data['stderr'] = str(np.array(h5['/web/STDERR']))
+    data['prefix'] = ''
+        
+    data['data'] = {}
+
+    for key,value in h5['/web/GRAPHS/SINGLE'].items():
+        value = str(np.array(value))
+        print(key,value)
+        id, title, data_sets = utils.call_plugin_by_name(value, 'graphing/single', 'get_data', hdf5_path)
+        if data_sets:
+            data['data'][id] = data_sets
+
+    for key,value in h5['/web/GRAPHS/GROUP'].items():
+        value = str(np.array(value))
+        print(key,value)
+        id, title, data_sets = utils.call_plugin_by_name(value, 'graphing/group', 'get_data', hdf5_path)
+        if data_sets:
+            data['data'][id] = data_sets
+
+    for sensitivity_number in range(int(np.array(h5['/input/sensitivity/NSENS']))):
+        id, title, data_sets = plot_sensitivity.get_data(hdf5_path, sensitivity_number)
+        if data_sets:
+            data['data'][id] = data_sets
+
+    if data['data']:
+        #process the dictionary into the interleaved format needed
+        for id, data_sets in data['data'].items():
+            for data_set in data_sets:
+                time = list(data_set['data'][0])
+                values = list(data_set['data'][1])
+                data_set['data'] = zip(time, values)
+
+
+    json_cache = os.path.join(parent_dir, 'json_cache')
+    open(json_cache, 'wb').write(json.dumps(data))
 
 if __name__ == '__main__':
     total = settings.cpu
-    timer = Timer(total, failure)
-    timer.start()
-
-    start_processing = time.time()
+    
 
     args = run_args()
     json_data = open(args.json, 'rb').read()
@@ -583,6 +644,14 @@ if __name__ == '__main__':
     json_data = utils.encode_to_ascii(json_data)
 
     parent_dir = os.path.dirname(args.sim)
+
+    def fail():
+        return failure(parent_dir)
+
+    timer = Timer(total, fail)
+    timer.start()
+
+    start_processing = time.time()
 
     open(os.path.join(parent_dir, 'status'), 'w').write('working')
     
@@ -596,6 +665,7 @@ if __name__ == '__main__':
 
     #run simulation
     start = time.time()
+    #gen_json_cache_init(parent_dir)
     proc = subprocess.Popen([cadet_path, args.sim], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ)
 
     proc.wait()
@@ -612,9 +682,10 @@ if __name__ == '__main__':
 
     try:
         compress_data(h5)
+        gen_json_cache_complete(parent_dir, h5, args.sim)
     except KeyError:
         h5.close()
-        failure()
+        failure(parent_dir, stdout, stderr)
 
     h5.close()
     #run performance parameters
