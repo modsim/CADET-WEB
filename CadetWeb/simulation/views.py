@@ -1201,7 +1201,7 @@ def force_rerun(request):
     relative_parts = [storage_path,] + [''.join(i for i in seq if i is not None) for seq in utils.grouper(check_sum, settings.chunk_size)]
     relative_path = os.path.join(*relative_parts)
 
-    reset_sim = ['progress', 'status', 'stderr', 'json_cache', 'pid']
+    reset_sim = ['progress', 'status', 'stderr', 'json_cache', 'pid', 'sim.h5']
     reset_sim = [os.path.join(relative_path, i) for i in reset_sim]
 
     map(remove_without_error, reset_sim)
@@ -1211,25 +1211,19 @@ def force_rerun(request):
 
     for path in reset_sim_wildcards:
         map(remove_without_error, glob.glob(path))
+        
+    #remove all the batch stuff    
+    shutil.rmtree(os.path.join(relative_path, 'batch'), True)
 
 
     path = os.path.join(relative_path, 'setup.json')
+    
+    json_data = open(path, 'rb').read()
+    json_data = json.loads(json_data)
+    json_data = utils.encode_to_ascii(json_data)
 
-    #second arg is not needed since the simulation file already exists and we don't delete that
-    simulation_path = cadet_runner.create_simulation_file(relative_path, None)
-
-    h5 = h5py.File(simulation_path, 'a')
-
-    remove = ['/output', '/meta', '/web/STDERR', '/web/STDOUT', '/web/CADET_SIMULATION_TIME', '/web/TOTAL_RUN_TIME', '/web/compress']
-
-    for key in remove:
-        try:
-            del h5[key]
-        except KeyError:
-            pass
-
-    h5.close()
-
+    simulation_path = cadet_runner.create_simulation_file(relative_path, json_data)
+    
     out = open(os.path.join(relative_path, 'stdout'), 'w')
     err = open(os.path.join(relative_path, 'stderr'), 'w')
 

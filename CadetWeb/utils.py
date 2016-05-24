@@ -61,6 +61,8 @@ def check_pid(pid):
     try:
         os.kill(pid, 0)
     except OSError as err:
+        print(err.errno, err.message, err.strerror)
+        print(dir(err))
         if err.errno == errno.ESRCH:
             # ESRCH == No such process
             return False
@@ -72,6 +74,7 @@ def check_pid(pid):
             # (EINVAL, EPERM, ESRCH)
             raise
     else:
+        print("I am here")
         return True
 
 def get_hdf5_path(path, chunk_size, rel_path):
