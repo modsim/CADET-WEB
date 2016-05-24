@@ -208,7 +208,6 @@
         var datasets = datasets;
         var i = 0;
         var all_data = [];
-        console.log(datasets);
         var prefix = prefix;
 
         $.each(datasets, function (key, val) {
@@ -360,7 +359,6 @@
                 // Load all the data in one pass; if we only got partial
                 // data we could merge it with what we already have.
                 data = json_data;
-                console.log(json_data);
                 if (1 == json_data['complete'] && 0 == json_data['ok']) {
                     $(".success").remove();
                     $("body").removeClass("loading");
@@ -392,9 +390,15 @@
                 url: "{{ json_url }}",
                 type: "GET",
                 dataType: "json",
-                cache: false,
-                success: onDataReceived
-            });
+                cache: false})
+                .done( function(response) {
+                    onDataReceived(response);
+                })
+                .fail(function (xhr, ajaxOptions, thrownError) {
+                    $(".success").remove();
+                    $("body").removeClass("loading");
+                }
+            );
         }
 
         fetchData();
