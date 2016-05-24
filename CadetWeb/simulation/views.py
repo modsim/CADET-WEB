@@ -907,7 +907,7 @@ def draw_comparison(request):
             rel_path = ''
 
         json_path, hdf5_path, graphs, json_data, alive, complete, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
-        graphs_available = set([(name, human_name) for name, human_name, png, csv, csv_excel in graphs])
+        graphs_available = set([(name, human_name) for name, human_name, png, csv, csv_excel, filename_csv, filename_xls in graphs])
         all_graphs.append(graphs_available)
         hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
         temp.append(  (id, tag, hdf5_path, graphs_available) )
@@ -1397,7 +1397,7 @@ def get_data_comparison(request):
             rel_path = ''
         path = job_lookup[job_id]
         
-        json_data = get_graph_data(path, rel_path)
+        json_data = get_graph_data(path, rel_path, job_id, sim_id)
         all_data[tag] = json_data
         all_graphs.append(set(json_data['data'].keys()))
 
