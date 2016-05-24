@@ -8,6 +8,7 @@ import json
 import plot_sensitivity
 import types
 import errno
+import csv
 
 current_path = __file__
 simulation_path, current_file_name = os.path.split(current_path)
@@ -61,8 +62,6 @@ def check_pid(pid):
     try:
         os.kill(pid, 0)
     except OSError as err:
-        print(err.errno, err.message, err.strerror)
-        print(dir(err))
         if err.errno == errno.ESRCH:
             # ESRCH == No such process
             return False
@@ -74,7 +73,6 @@ def check_pid(pid):
             # (EINVAL, EPERM, ESRCH)
             raise
     else:
-        print("I am here")
         return True
 
 def get_hdf5_path(path, chunk_size, rel_path):
@@ -210,3 +208,68 @@ def get_files(path):
 
 def get_plugin_names(directory):
     return [get_plugin_attribute(path, 'name') for path in get_files(os.path.join(plugins, directory, '*.py'))]
+
+
+#cache the isotherm and parameters csv file and also do some processing with them.
+def get_parameters():
+    with open(os.path.join(simulation_path,'parms.csv'), 'rb') as csvfile:
+        temp = []
+        reader = csv.reader(csvfile)
+        #read the header and discard it
+        reader.next()
+        for name, units, type, per_component, per_section, sensitive, description, human_name  in reader:
+            per_component = int(per_component)
+            per_section = int(per_section)
+            sensitive = int(sensitive)
+            temp.append( (name, units, type, per_component, per_section, sensitive, description, human_name), )
+        return temp
+
+def get_isotherms():
+    with open(os.path.join(simulation_path,'iso.csv'), 'rb') as csvfile:
+        reader = csv.reader(csvfile)
+        #read the header and discard it
+        reader.next()
+        return list(reader)
+
+def isotherm_setup_cache(isotherms, parameters):
+    "make a dictionary that has a key of the isotherm name and then a list of all the isotherm values plus if it is per component"
+    "also make a dictionary of sets to allow quickly check if an item is part of an isotherm"
+    temp = {}
+    temp_set = {}
+    name_set = set()
+
+    for name, isotherm in isotherms:
+        section = temp.get(isotherm, [])
+        section_set = temp_set.get(isotherm, set())
+        section_set.add(name)
+        name_set.add(name)
+        for par_name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
+            if name == par_name:
+                section.append( (name, per_component), )
+        temp[isotherm] = section
+        temp_set[isotherm] = section_set
+    return temp, temp_set, name_set
+
+
+isotherms = get_isotherms()
+parameters = get_parameters()
+isotherm_settings, isotherm_set, isotherm_name_set = isotherm_setup_cache(isotherms, parameters)
+
+#create a lookup table to map the CADET name to a more user friendly name
+#the key is the CADET name and the value is a tuple of a name to display and the text for a tooltip
+
+def generate_name_lookup(paraemters):
+    "generate the dictionarys that maps CADET names to more human names"
+    "The first dictionary is used in python to quickly look up human names and tooltips"
+    "The second dictionary is used for django templates and the names are modified in a predictable way to make it easy to use in templates without conflicts"
+    temp_python = {}
+    temp_django = {}
+    for par_name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
+        temp_python[par_name] = (human_name, description, units)
+        temp_django[par_name+ '_human'] = human_name
+        temp_django[par_name+ '_tip'] = description
+        temp_django[par_name+ '_units'] = units
+    return temp_python, temp_django
+
+
+name_lookup_python, name_lookup_template = generate_name_lookup(parameters)

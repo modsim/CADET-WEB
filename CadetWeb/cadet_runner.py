@@ -482,7 +482,6 @@ def generate_ranges(json_data):
             if dist_type == 'Random Uniform':
                 values = random.uniform(lb, ub, size)
             elif dist_type == 'Linear':
-                print lb, type(lb), ub, type(lb), size, type(size)
                 values = np.linspace(lb, ub, size, endpoint=True)
             elif dist_type == 'Truncated Random Normal':
                 values = []
@@ -514,9 +513,30 @@ def generate_simulations(parent_dir, json_data):
     except OSError:
         pass
 
+    components = get_components_in_order(json_data)
+
+    print(keys, combos)
     for idx, value in enumerate(combos):
         temp = json_data.copy()
+        print('using this combo', dict(zip(keys, value)) )
+        print('before', [(temp[key], val) for key,val in zip(keys, value)])
         temp.update(dict(zip(keys, value)))
+
+        for key,val in zip(keys, value):
+            temp[key] = val
+
+            try:
+                comp, isotherm = key.split(':')
+            except ValueError:
+                comp, isotherm = (None, None)
+
+            if isotherm in utils.isotherm_name_set:
+                #this is part of an isotherm so we have to treat it specially
+
+                temp['CADET_ISOTHERM'][isotherm][components.index(comp)] = val
+
+        print('after', [(temp[key], val) for key,val in zip(keys, value)])
+        print('isotherm', temp['CADET_ISOTHERM'])
 
         try:
             os.mkdir(os.path.join(parent_dir, 'batch', str(idx)))

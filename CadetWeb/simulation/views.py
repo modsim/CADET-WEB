@@ -75,71 +75,6 @@ cadet_runner_path = os.path.join(parent_path, 'cadet_runner.py')
 cadet_plugin_path = '..'
 
 
-#cache the isotherm and parameters csv file and also do some processing with them.
-def get_parameters():
-    with open(os.path.join(parent_path,'parms.csv'), 'rb') as csvfile:
-        temp = []
-        reader = csv.reader(csvfile)
-        #read the header and discard it
-        reader.next()
-        for name, units, type, per_component, per_section, sensitive, description, human_name  in reader:
-            per_component = int(per_component)
-            per_section = int(per_section)
-            sensitive = int(sensitive)
-            temp.append( (name, units, type, per_component, per_section, sensitive, description, human_name), )
-        return temp
-
-def get_isotherms():
-    with open(os.path.join(parent_path,'iso.csv'), 'rb') as csvfile:
-        temp = []
-        reader = csv.reader(csvfile)
-        #read the header and discard it
-        reader.next()
-        return list(reader)
-
-def isotherm_setup_cache(isotherms, parameters):
-    "make a dictionary that has a key of the isotherm name and then a list of all the isotherm values plus if it is per component"
-    "also make a dictionary of sets to allow quickly check if an item is part of an isotherm"
-    temp = {}
-    temp_set = {}
-    name_set = set()
-
-    for name, isotherm in isotherms:
-        section = temp.get(isotherm, [])
-        section_set = temp_set.get(isotherm, set())
-        section_set.add(name)
-        name_set.add(name)
-        for par_name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
-            if name == par_name:
-                section.append( (name, per_component), )
-        temp[isotherm] = section
-        temp_set[isotherm] = section_set
-    return temp, temp_set, name_set
-
-
-isotherms = get_isotherms()
-parameters = get_parameters()
-isotherm_settings, isotherm_set, isotherm_name_set = isotherm_setup_cache(isotherms, parameters)
-
-#create a lookup table to map the CADET name to a more user friendly name
-#the key is the CADET name and the value is a tuple of a name to display and the text for a tooltip
-
-def generate_name_lookup(paraemters):
-    "generate the dictionarys that maps CADET names to more human names"
-    "The first dictionary is used in python to quickly look up human names and tooltips"
-    "The second dictionary is used for django templates and the names are modified in a predictable way to make it easy to use in templates without conflicts"
-    temp_python = {}
-    temp_django = {}
-    for par_name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
-        temp_python[par_name] = (human_name, description, units)
-        temp_django[par_name+ '_human'] = human_name
-        temp_django[par_name+ '_tip'] = description
-        temp_django[par_name+ '_units'] = units
-    return temp_python, temp_django
-
-
-name_lookup_python, name_lookup_template = generate_name_lookup(parameters)
-
 def get_json(post):
     temp = {}
     json_dict = get_json_dict(post)
@@ -191,7 +126,7 @@ def generate_column_table(list_of_names, data):
     vals = ( "INIT_C", 'INIT_Q', 'FILM_DIFFUSION', "PAR_DIFFUSION", 'PAR_SURFDIFFUSION' )
 
     for attribute in vals:
-        human_name, tooltip, units = name_lookup_python[attribute]
+        human_name, tooltip, units = utils.name_lookup_python[attribute]
         html.append('<tr><td data-toggle="tooltip" data-placement="bottom" title="%s">%s (%s) </td>' % (tooltip, human_name, units) )
         for name in list_of_names:
             value = data.get('%s:%s' % (name, attribute), '0')
@@ -215,7 +150,7 @@ def generate_step_settings(step, list_of_names, data):
              ('CUBE_COEFF', 'advanced'), )
 
     for attribute, cssClass in vals:
-        human_name, tooltip, units = name_lookup_python[attribute]
+        human_name, tooltip, units = utils.name_lookup_python[attribute]
 
         html.append('<tr class="%s"><td data-toggle="tooltip" data-placement="bottom" title="%s">%s </td>' % (cssClass, tooltip, human_name) )
         for name in list_of_names:
@@ -354,12 +289,12 @@ def single_start(request):
         data['numberOfComponents'] = numberOfComponents - 1
 
 
-    isotherms = isotherm_set.keys()
+    isotherms = utils.isotherm_set.keys()
 
     isotherms = [(isotherm.replace('_', ' ').title(), isotherm, 'selected' if isotherm == data.get('ADSORPTION_TYPE', None) else '') for isotherm in isotherms]
     data['json'] = get_json_string(data)
     data['isotherms'] = isotherms
-    data.update(name_lookup_template)
+    data.update(utils.name_lookup_template)
     return render(request, 'simulation/single_start.html', data)
 
 @login_required
@@ -387,7 +322,7 @@ def component_and_step_setup(request):
     data['steps'] = steps
     data['back'] = reverse('simulation:single_start', None, None)
     data['back_text'] = 'The Beginning'
-    data.update(name_lookup_template)
+    data.update(utils.name_lookup_template)
     return render(request, 'simulation/component_and_step_setup.html', data)
 
 def draw_isotherm(data, isotherm):
@@ -397,9 +332,9 @@ def draw_isotherm(data, isotherm):
         html.append('<th>%s</th>' % name)
 
     html.append('</tr></thead><tbody>')
-    for (attribute, per_component) in isotherm_settings[isotherm]:
+    for (attribute, per_component) in utils.isotherm_settings[isotherm]:
         if per_component:
-            human_name, tooltip, units = name_lookup_python[attribute]
+            human_name, tooltip, units = utils.name_lookup_python[attribute]
             html.append('<tr><td data-toggle="tooltip" data-placement="bottom" title="%s">%s</td>' % (tooltip, human_name))
             for name in list_of_names:
                 value = data.get('%s:%s' % (name, attribute), '0')
@@ -407,9 +342,9 @@ def draw_isotherm(data, isotherm):
             html.append('</tr>')
     html.append('</tbody></table></div></div>')
 
-    for (attribute, per_component) in isotherm_settings[isotherm]:
+    for (attribute, per_component) in utils.isotherm_settings[isotherm]:
         if not per_component:
-            human_name, tooltip, units = name_lookup_python[attribute]
+            human_name, tooltip, units = utils.name_lookup_python[attribute]
             html.append('''<div class="row"><div class="col-md-12">
                 <div class="form-group">
                   <div class="col-sm-2">
@@ -447,11 +382,11 @@ def process_isotherm(data, isotherm_name):
     processed_dict = {}
     processed_dict['ISOTHERM'] = isotherm_name
 
-    for (attribute, per_component) in isotherm_settings[isotherm_name]:
+    for (attribute, per_component) in utils.isotherm_settings[isotherm_name]:
         if per_component:
             processed_dict[attribute] = get_suffix_data(attribute, list_of_names, data)
 
-    for (attribute, per_component) in isotherm_settings[isotherm_name]:
+    for (attribute, per_component) in utils.isotherm_settings[isotherm_name]:
         if not per_component:
             processed_dict[attribute] = data[attribute]
 
@@ -471,7 +406,7 @@ def isotherm_setup(request):
     data['isotherm'] = draw_isotherm(data, isotherm_name)
     data['back'] = reverse('simulation:column_setup', None, None)
     data['back_text'] = 'Column Setup'
-    data.update(name_lookup_template)
+    data.update(utils.name_lookup_template)
     return render(request, 'simulation/isotherm_setup.html', data)
 
 @login_required
@@ -487,7 +422,7 @@ def column_setup(request):
     data['column_table'] = generate_column_table(list_of_names, data)
     data['back'] = reverse('simulation:component_and_step_setup', None, None)
     data['back_text'] = 'Component and Step Setup'
-    data.update(name_lookup_template)
+    data.update(utils.name_lookup_template)
     return render(request, 'simulation/column_setup.html', data)
 
 @login_required
@@ -521,7 +456,7 @@ def loading_setup(request):
     data['step_times'] = [(name.replace(':', ' '), name, data.get(name, '0')) for name in step_times]
     data['back'] = reverse('simulation:isotherm_setup', None, None)
     data['back_text'] = 'Isotherm Setup'
-    data.update(name_lookup_template)
+    data.update(utils.name_lookup_template)
     return render(request, 'simulation/loading_setup.html', data)
 
 @login_required
@@ -551,7 +486,7 @@ def simulation_setup(request):
                         ('WRITE_SOLUTION_TIMES','1')], data)
     data['back'] = reverse('simulation:loading_setup', None, None)
     data['back_text'] = 'Loading Setup'
-    data.update(name_lookup_template)
+    data.update(utils.name_lookup_template)
     return render(request, 'simulation/simulation_setup.html', data)
 
 @login_required
@@ -583,7 +518,7 @@ def graph_setup(request):
     else:
         data['back'] = reverse('simulation:simulation_setup', None, None)
         data['back_text'] = 'Simulation Setup'
-    data.update(name_lookup_template)
+    data.update(utils.name_lookup_template)
     return render(request, 'simulation/graph_setup.html', data)
 
 @login_required
@@ -599,7 +534,7 @@ def performance_parameters(request):
     data['job_type'] = data['job_type']
     data['back'] = reverse('simulation:graph_setup', None, None)
     data['back_text'] = 'Graph Setup'
-    data.update(name_lookup_template)
+    data.update(utils.name_lookup_template)
     return render(request, 'simulation/performance_parameters.html', data)
 
 @login_required
@@ -615,9 +550,9 @@ def sensitivity_setup(request):
     sensitivities = []
     isotherm_name = data.get('ADSORPTION_TYPE').upper().replace(' ', '_')
 
-    for name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
+    for name, units, type, per_component, per_section, sensitive, description, human_name in utils.parameters:
         if sensitive:
-            if name not in isotherm_name_set or name in isotherm_name_set and name in isotherm_set[isotherm_name]:
+            if name not in utils.isotherm_name_set or name in utils.isotherm_name_set and name in utils.isotherm_set[isotherm_name]:
                 sensitivities.append( (name, per_component, per_section, description), )
 
     ABS_TOL = float(data['ABSTOL'])
@@ -647,7 +582,7 @@ def sensitivity_setup(request):
             except ZeroDivisionError:
                 default = 0
             form_name = ':'.join([i for i in name, component, section])
-            human_name, tool_tip, units = name_lookup_python[name]
+            human_name, tool_tip, units = utils.name_lookup_python[name]
             entry.append( (
                 'choice:%s' % (form_name),
                 'checked' if data.get('choice:%s' % (form_name), '') == '1' else '',
@@ -670,7 +605,7 @@ def sensitivity_setup(request):
     #data['back_text'] = 'Performance Parameters Setup'
     data['back'] = reverse('simulation:graph_setup', None, None)
     data['back_text'] = 'Graph Setup'
-    data.update(name_lookup_template)
+    data.update(utils.name_lookup_template)
     return render(request, 'simulation/sensitivity_setup.html', data)
 
 @login_required
@@ -1318,7 +1253,7 @@ def write_job_values(job, data, comps, steps, settings):
 
 def serialization_settings():
     temp = []
-    for name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
+    for name, units, type, per_component, per_section, sensitive, description, human_name in utils.parameters:
         temp.append( (name, type, per_component, per_section), )
     return temp
 
@@ -1379,13 +1314,13 @@ def db_add_var(lookup, name, type, data, step, comp, job):
         pass
 
 def sync_db():
-    for name,isotherm in isotherms:
+    for name,isotherm in utils.isotherms:
         try:
             models.Isotherms.objects.get(Name = name, Isotherm=isotherm)
         except ObjectDoesNotExist:
             models.Isotherms.objects.create(Name = name, Isotherm=isotherm)
 
-    for name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
+    for name, units, type, per_component, per_section, sensitive, description, human_name in utils.parameters:
         try:
             models.Parameters.objects.get(name=name, units=units, description=description)
         except ObjectDoesNotExist:
@@ -1620,7 +1555,7 @@ def fix_radio(seq, data):
     temp = []
     for name, value in seq:
 
-        human_name, tool_tip, units = name_lookup_python[name]
+        human_name, tool_tip, units = utils.name_lookup_python[name]
 
         value = data.get(name, value)
         if value == '1':
@@ -1654,7 +1589,7 @@ def choose_attributes_to_modify(request):
 
     modify = []
     #every attribute can be modified except for strings, blobs, number of steps and number of components, sensitivities and checkbox settings
-    for name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
+    for name, units, type, per_component, per_section, sensitive, description, human_name in utils.parameters:
 
         if name not in ('NCOMP', 'NSEC') and type in ('int', 'double'):
             if per_component and per_section:
@@ -1663,21 +1598,21 @@ def choose_attributes_to_modify(request):
                         key = '%s:%s:%s' % (step, comp, name)
                         if key in data:
                             checked_1, checked_2, checked_3 = get_checked(key, data)
-                            human_name, tool_tip, units = name_lookup_python[name]
+                            human_name, tool_tip, units = utils.name_lookup_python[name]
                             modify.append( (human_name, tool_tip, comp, step, description, key, checked_1, checked_2, checked_3) )
             elif per_component and not per_section:
                 for comp in comps:
                     key = '%s:%s' % (comp, name)
                     if key in data:
                         checked_1, checked_2, checked_3 = get_checked(key, data)
-                        human_name, tool_tip, units = name_lookup_python[name]
+                        human_name, tool_tip, units = utils.name_lookup_python[name]
                         modify.append( (human_name, tool_tip, comp, '', description, key, checked_1, checked_2, checked_3) )
             elif per_section and not per_component:
                 pass #we don't have any of these but leave this here in case it happens later
             else:
                 if name in data:
                     checked_1, checked_2, checked_3 = get_checked(name, data)
-                    human_name, tool_tip, units = name_lookup_python[name]
+                    human_name, tool_tip, units = utils.name_lookup_python[name]
                     modify.append( (human_name, tool_tip, '', '', description, name, checked_1, checked_2, checked_3) )
 
     data['json'] = get_json_string(data)
@@ -1773,15 +1708,15 @@ def format_distributions(seq, data):
         parts = choice.split(':')
         if len(parts) == 1:
             name = parts[0]
-            human_name, tool_tip, units = name_lookup_python[name]
+            human_name, tool_tip, units = utils.name_lookup_python[name]
         elif len(parts) == 2:
             comp, name = parts
-            human_name, tool_tip, units = name_lookup_python[name]
+            human_name, tool_tip, units = utils.name_lookup_python[name]
             human_name = '%s %s' % (comp, human_name)
             tool_tip = '%s for component %s' % (tool_tip, comp)            
         elif len(parts) == 3:
             step, comp, name = parts
-            human_name, tool_tip, units = name_lookup_python[name]
+            human_name, tool_tip, units = utils.name_lookup_python[name]
             human_name = '%s %s %s' % (step, comp, human_name)
             tool_tip = '%s for component %s during step %s' % (tool_tip, comp, step)
             
@@ -1798,15 +1733,15 @@ def format_choices(seq, data):
         parts = choice.split(':')
         if len(parts) == 1:
             name = parts[0]
-            human_name, tool_tip, units = name_lookup_python[name]
+            human_name, tool_tip, units = utils.name_lookup_python[name]
         elif len(parts) == 2:
             comp, name = parts
-            human_name, tool_tip, units = name_lookup_python[name]
+            human_name, tool_tip, units = utils.name_lookup_python[name]
             human_name = '%s %s' % (comp, human_name)
             tool_tip = '%s for component %s' % (tool_tip, comp)            
         elif len(parts) == 3:
             step, comp, name = parts
-            human_name, tool_tip, units = name_lookup_python[name]
+            human_name, tool_tip, units = utils.name_lookup_python[name]
             human_name = '%s %s %s' % (step, comp, human_name)
             tool_tip = '%s for component %s during step %s' % (tool_tip, comp, step)
         value = data[key]
