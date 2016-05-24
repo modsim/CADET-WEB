@@ -1353,85 +1353,10 @@ def get_graph_data(path, rel_path, job_id, sim_id):
     else:
         prefix = 'Job %s ' % job_id
 
-    if not os.path.exists(json_cache):
-        h5 = h5py.File(hdf5_path, 'r')
-        json_data = {}
-        #check for success by seeing if we have output created
-        json_data['success'] = int(complete)
-        json_data['failed'] = int(alive) == 0
-        json_data['stdout'] = stdout
-        json_data['stderr'] = stderr
-        json_data['prefix'] = prefix
-
-        if json_data['success']:
-            json_data['cadet_version'] = str(np.array(h5['/meta/CADET_VERSION']))
-            json_data['cadet_git_version'] = str(np.array(h5['/meta/CADET_COMMIT']))
-
-        #close the hdf5 file
-        h5.close()
-
-        if json_data['success']:
-            #if success get the step names and times
-            section_times = cadet_runner.get_section_times(data)
-            section_names = cadet_runner.get_step_names(data)
-            times = zip(section_names, section_times[:-1])
-            times.append( ('End', section_times[-1]), )
-            json_data['times'] = times
-        
-            json_data['data'] = {}
-            #run graphs
-            for key,value in data.items():
-                if key.startswith('graph_single') and value == '1':
-                    _, name = key.split(':')
-                    id, title, data_sets = utils.call_plugin_by_name(name, 'graphing/single', 'get_data', hdf5_path)
-                    if data_sets:
-                        json_data['data'][id] = data_sets
-
-                if key.startswith('graph_group') and value == '1':
-                    _, name = key.split(':')
-                    id, title, data_sets = utils.call_plugin_by_name(name, 'graphing/group', 'get_data', hdf5_path)
-                    if data_sets:
-                        json_data['data'][id] = data_sets
-
-            for sensitivity_number in range(len(data.get("sensitivities", []))):
-                id, title, data_sets = plot_sensitivity.get_data(hdf5_path, sensitivity_number)
-                if data_sets:
-                    json_data['data'][id] = data_sets
-
-            if json_data['data']:
-                #process the dictionary into the interleaved format needed
-                for id, data_sets in json_data['data'].items():
-                    for data_set in data_sets:
-                        time = list(data_set['data'][0])
-                        values = list(data_set['data'][1])
-                        data_set['data'] = zip(time, values)
-
-            open(json_cache, 'wb').write(json.dumps(json_data))
-
-    else:
-        json_data = open(json_cache, 'rb').read()
-        json_data = json.loads(json_data)
-        json_data = utils.encode_to_ascii(json_data)
+    json_data = open(json_cache, 'rb').read()
+    json_data = json.loads(json_data)
+    json_data = utils.encode_to_ascii(json_data)
     return json_data
-
-@login_required
-@gzip.gzip_page
-def get_data(request):
-    """This function has to call an external process because of scipy. DO NOT MERGE that code into here. It causes apache
-    to deadlock and go into some kind of memory allocation loop. I tried many different options but none worked. Instead
-    will pass the needed json to an external process and then read the result back."""
-    path = request.GET['path']
-    sim_id = request.GET['sim_id']
-    job_id = models.Job.objects.get(uid=path).id
-
-    if sim_id:
-        rel_path = models.Simulation.objects.get(id=int(sim_id)).Rel_Path
-    else:
-        rel_path = ''
-
-    json_data = get_graph_data(path, rel_path, job_id, sim_id)
-
-    return JsonResponse(json_data, safe=False)
 
 @login_required
 @gzip.gzip_page
