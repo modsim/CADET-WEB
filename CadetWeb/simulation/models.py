@@ -173,3 +173,15 @@ class Job_Notes(models.Model):
 
     class Meta:
         ordering = ['id']
+
+
+class Job_Status(models.Model):
+    Job_ID = models.OneToOneField('Job')
+    seen = models.BooleanField()
+    successful = models.BooleanField()
+    running = models.BooleanField()
+    start = models.DateTimeField(auto_now_add=True)
+    end = models.DateTimeField()
+
+    class Meta:
+        ordering = ['id']

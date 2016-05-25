@@ -244,11 +244,11 @@
 
             if ($(search)[0].msToBlob) { //for IE
                 var blob = $(search)[0].msToBlob();
-                window.navigator.msSaveBlob(blob, prefix + base_id + '.png');
+                window.navigator.msSaveBlob(blob, prefix + '_' + base_id + '.png');
             } else {
                 //other browsers
                 link.attr('href', $(search)[0].toDataURL("image/png"));
-                link.attr('download', prefix + base_id + '.png');
+                link.attr('download', prefix + '_' + base_id + '.png');
             }
 
             
@@ -375,11 +375,9 @@
                     $('#cadet_version').text(json_data['cadet_version']);
                     $('#cadet_git_version').prop('title', 'Git Version Commit String: ' + json_data['cadet_git_version']);
 
-                    prefix = json_data['prefix'];
-
                     for (var key in json_data['data']) {
                         if (json_data['data'].hasOwnProperty(key)) {
-                            start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key, prefix);
+                            start_plot(json_data['data'][key], "#" + key, "#" + key + 'choice', "#" + key + 'overview', key, '{{ prefix }}' );
                         }
                     }
 
