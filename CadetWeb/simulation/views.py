@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from django.views.decorators import gzip
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.contrib.sites.shortcuts import get_current_site
+from django.views.decorators.csrf import csrf_exempt
 
 import settings
 
@@ -1123,7 +1125,13 @@ def run_job(request):
         job = job = models.Job.objects.get(uid=check_sum)
         models.Job_Status.objects.update_or_create(Job_ID = job, defaults={'seen': 0, 'successful':0, 'running':1, 'start':datetime.now(), 'end':None})
 
-        popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
+        #FIXME
+        #current_site = get_current_site(request).domain 
+        current_site = 'http://ibt761.ibt.kfa-juelich.de' 
+        url_pass = current_site + reverse('simulation:job_completed_ok', None, None).encode('ascii')
+        url_fail = current_site + reverse('simulation:job_completed_failure', None, None).encode('ascii')
+
+        popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail], stdout=out, stderr=err)
 
         with open(os.path.join(relative_path,'pid'), 'w') as pid:
             pid.write(str(popen.pid))
@@ -1185,7 +1193,14 @@ def force_rerun(request):
     job = job = models.Job.objects.get(uid=check_sum)
     models.Job_Status.objects.update_or_create(Job_ID = job, defaults={'seen': 0, 'successful':0, 'running':1, 'start':datetime.now(), 'end':None})
 
-    popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
+
+    #FIXME
+    #current_site = get_current_site(request).domain 
+    current_site = 'http://ibt761.ibt.kfa-juelich.de'
+    url_pass = current_site + reverse('simulation:job_completed_ok', None, None).encode('ascii')
+    url_fail = current_site + reverse('simulation:job_completed_failure', None, None).encode('ascii')
+
+    popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail], stdout=out, stderr=err)
 
     with open(os.path.join(relative_path,'pid'), 'w') as pid:
         pid.write(str(popen.pid))
@@ -1196,17 +1211,21 @@ def force_rerun(request):
     base = reverse('simulation:run_job_get', None, None)
     return redirect('%s?%s' % (base, query))
 
+@csrf_exempt
 def job_completed_ok(request):
     "This method probably should be security restricted in some way but the only thing it can do is update the status on a job to completed which is visual only"
-    check_sum = request.POST['path']
-    job = job = models.Job.objects.get(uid=check_sum)
+    job_id = int(request.POST['job_id'])
+    job = job = models.Job.objects.get(id = job_id)
     models.Job_Status.objects.update_or_create(Job_ID = job, defaults={'successful':1, 'running':0, 'end':datetime.now()})
+    return HttpResponse('')
 
+@csrf_exempt
 def job_completed_failure(request):
     "This method probably should be security restricted in some way but the only thing it can do is update the status on a job to completed which is visual only"
-    check_sum = request.POST['path']
-    job = job = models.Job.objects.get(uid=check_sum)
+    job_id = int(request.POST['job_id'])
+    job = job = models.Job.objects.get(id = job_id)
     models.Job_Status.objects.update_or_create(Job_ID = job, defaults={'successful':0, 'running':0, 'end':datetime.now()})
+    return HttpResponse('')
 
 def write_job_to_db(data, json_data, check_sum, username):
     #first check if we already have this entry

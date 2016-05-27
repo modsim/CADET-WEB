@@ -18,6 +18,8 @@ from threading import Timer
 import time
 import settings
 import sys
+import urllib2
+import urllib
 
 current_path = __file__
 parent_path, current_file_name = os.path.split(current_path)
@@ -41,6 +43,9 @@ def run_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-j", "--json", help="Enter path to JSON file")
     parser.add_argument("-p", "--sim", help="Enter the path to the h5 file")
+    parser.add_argument("-J", "--job", help="Enter the Job ID")
+    parser.add_argument('-F', "--url_fail", help="Enter the feailure URL")
+    parser.add_argument('-P', "--url_pass", help="Enter the pass url")
     args = parser.parse_args()
     return args
 
@@ -566,7 +571,7 @@ def run_batch_simulations(parent_dir, json_path):
         proc.wait()
         write_progress(parent_dir, idx+1, dir_count+1)
 
-def failure(parent_dir, stdin=None, stdout=None):
+def failure(parent_dir, isBatch, job, url, stdin=None, stdout=None):
     data = {}
     data['complete'] = 1
     data['ok'] = 0
@@ -578,6 +583,10 @@ def failure(parent_dir, stdin=None, stdout=None):
 
     json_cache = os.path.join(parent, 'json_cache')
     open(json_cache, 'wb').write(json.dumps(data))
+
+    if not isBatch:
+        data = urllib.urlencode({'job_id':args.job})
+        urllib2.urlopen(url, data)
 
     sys.exit()
 
@@ -643,10 +652,12 @@ if __name__ == '__main__':
     json_data = json.loads(json_data)
     json_data = utils.encode_to_ascii(json_data)
 
+    isBatch = 'batch' in args.sim
+
     parent_dir = os.path.dirname(args.sim)
 
     def fail():
-        return failure(parent_dir)
+        return failure(parent_dir, isBatch, args.job, args.url_fail)
 
     timer = Timer(total, fail)
     timer.start()
@@ -655,12 +666,12 @@ if __name__ == '__main__':
 
     open(os.path.join(parent_dir, 'status'), 'w').write('working')
     
-    if 'batch' not in args.sim:
+    if not isBatch:
         if json_data['job_type'] == 'batch':
             generate_simulations(parent_dir, json_data)
             run_batch_simulations(parent_dir, args.json)
 
-    if 'batch' not in args.sim:
+    if not isBatch:
         write_progress(parent_dir, 0, 1)
 
     #run simulation
@@ -685,7 +696,7 @@ if __name__ == '__main__':
         gen_json_cache_complete(parent_dir, h5, args.sim)
     except KeyError:
         h5.close()
-        failure(parent_dir, stdout, stderr)
+        failure(parent_dir, isBatch, args.job, args.url_fail, stdout, stderr)
 
     h5.close()
     #run performance parameters
@@ -703,7 +714,7 @@ if __name__ == '__main__':
     for sensitivty_number in range(len(json_data.get("sensitivities", []))):
         plot_sensitivity.run(args.sim, sensitivty_number)
 
-    if 'batch' not in args.sim:
+    if not isBatch:
         write_progress(parent_dir, 1, 1)
 
     processing_time = time.time() - start_processing
@@ -713,5 +724,10 @@ if __name__ == '__main__':
     set_value(web, 'CADET_SIMULATION_TIME', 'f8', simulation_time)
     set_value(web, 'TOTAL_RUN_TIME', 'f8', processing_time)
     h5.close()
+
+    if not isBatch:
+        data = urllib.urlencode({'job_id':args.job})
+        print(args.url_pass)
+        urllib2.urlopen(args.url_pass, data)
 
     open(os.path.join(parent_dir, 'status'), 'w').write('success')
