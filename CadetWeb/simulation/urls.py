@@ -37,4 +37,5 @@ urlpatterns = patterns('',
     url(r'^about_us/$', views.about_us, name='about_us'),
     url(r'^job_completed_ok/$', views.job_completed_ok, name='job_completed_ok'),
     url(r'^job_completed_failure/$', views.job_completed_failure, name='job_completed_failure'),
+    url(r'^job_seen/$', views.job_seen, name='job_seen'),
 )

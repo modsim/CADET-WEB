@@ -860,6 +860,7 @@ def run_job_get(request):
     data['download_url'] = hdf5_path
     data['new_simulation'] = url_new
     data['batch_simulation'] = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % path
+    data['seen_url'] = reverse('simulation:job_seen', None, None)
     #data['new_simulation_batch'] = url_new_batch
     data['path'] = path
     data['chunk_size'] = settings.chunk_size
@@ -1225,6 +1226,15 @@ def job_completed_failure(request):
     job_id = int(request.POST['job_id'])
     job = job = models.Job.objects.get(id = job_id)
     models.Job_Status.objects.update_or_create(Job_ID = job, defaults={'successful':0, 'running':0, 'end':datetime.now()})
+    return HttpResponse('')
+
+@login_required
+@csrf_exempt
+def job_seen(request):
+    "This method probably should be security restricted in some way but the only thing it can do is update the status on a job to completed which is visual only"
+    job_id = int(request.POST['job_id'])
+    job = job = models.Job.objects.get(id = job_id)
+    models.Job_Status.objects.update_or_create(Job_ID = job, defaults={'seen':1})
     return HttpResponse('')
 
 def write_job_to_db(data, json_data, check_sum, username):

@@ -395,8 +395,11 @@
                 .fail(function (xhr, ajaxOptions, thrownError) {
                     $(".success").remove();
                     $("body").removeClass("loading");
+                })
+                .complete(function (xhr, status) {
+                    $.post('{{ seen_url }}' , { 'job_id': '{{ job_id }}' })
                 }
-            );
+                );
         }
 
         fetchData();
