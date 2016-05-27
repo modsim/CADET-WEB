@@ -35,4 +35,6 @@ urlpatterns = patterns('',
     url(r'^draw_comparison/$', views.draw_comparison, name='draw_comparison'),
     url(r'^force_rerun/$', views.force_rerun, name='force_rerun'),
     url(r'^about_us/$', views.about_us, name='about_us'),
+    url(r'^job_completed_ok/$', views.job_completed_ok, name='job_completed_ok'),
+    url(r'^job_completed_failure/$', views.job_completed_failure, name='job_completed_failure'),
 )
