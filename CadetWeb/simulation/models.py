@@ -181,7 +181,7 @@ class Job_Status(models.Model):
     successful = models.BooleanField()
     running = models.BooleanField()
     start = models.DateTimeField(auto_now_add=True)
-    end = models.DateTimeField()
+    end = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['id']

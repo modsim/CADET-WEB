@@ -1120,6 +1120,9 @@ def run_job(request):
         json_cache = os.path.join(relative_path, 'json_cache')
         open(json_cache, 'wb').write(json.dumps(data))
 
+
+        models.Job_Status.objects.update_or_create(Job_ID__uid=path, defaults={'seen': 0, 'successful':0, 'running':1, 'start':datetime.now(), 'end':None})
+
         popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
 
         with open(os.path.join(relative_path,'pid'), 'w') as pid:
@@ -1178,6 +1181,8 @@ def force_rerun(request):
     json_cache = os.path.join(relative_path, 'json_cache')
     print(json_cache)
     open(json_cache, 'wb').write(json.dumps(data))
+
+    models.Job_Status.objects.update_or_create(Job_ID__uid=path, defaults={'seen': 0, 'successful':0, 'running':1, 'start':datetime.now(), 'end':None})
 
     popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path,], stdout=out, stderr=err)
 
