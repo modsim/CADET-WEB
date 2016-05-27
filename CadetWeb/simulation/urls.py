@@ -38,4 +38,5 @@ urlpatterns = patterns('',
     url(r'^job_completed_ok/$', views.job_completed_ok, name='job_completed_ok'),
     url(r'^job_completed_failure/$', views.job_completed_failure, name='job_completed_failure'),
     url(r'^job_seen/$', views.job_seen, name='job_seen'),
+    url(r'^get_unseen/$', views.get_unseen, name='get_unseen'),
 )

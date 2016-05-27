@@ -21,3 +21,7 @@ keep_time = 0
 
 #users to keep records for
 users_keep = set(['cadet',])
+
+#time format string according to the python docs. I am defaulting to a time format that should be readable to everyone
+#Year Month Day Hour:Minutes:Seconds  with the Month spelled out and without timezone information
+time_format = '%Y %B %d  %H:%M:%S'

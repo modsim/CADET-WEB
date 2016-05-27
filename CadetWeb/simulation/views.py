@@ -170,6 +170,7 @@ def index(request):
 
     context['search_examples'] = get_examples(5)
     context['search_history'] = get_most_recent_simulations(request.user.username, 5)
+    context['get_unseen_url'] = reverse('simulation:get_unseen', None, None) 
 
     return render(request, 'simulation/index.html', context)
 
@@ -1236,6 +1237,30 @@ def job_seen(request):
     job = job = models.Job.objects.get(id = job_id)
     models.Job_Status.objects.update_or_create(Job_ID = job, defaults={'seen':1})
     return HttpResponse('')
+
+@login_required
+@gzip.gzip_page
+def get_unseen(request):
+    "shows jobs that have not been seen yet"
+    json_data = {}
+
+    username = request.user.username
+
+    temp = []
+    statuses = models.Job_Status.objects.filter(Job_ID__username=username, seen = 0)
+
+    for status in statuses:
+        if status.running:
+            simulation_status = 'Running'
+        else:
+            if status.successful:
+                simulation_status = 'Simulation Complete'
+            else:
+                simulation_status = 'Simulation Failed'
+        temp.append([status.Job_ID.id, simulation_status, status.start.strftime(settings.time_format), status.end.strftime(settings.time_format), ''])
+
+    json_data['data'] = temp
+    return JsonResponse(json_data, safe=False)
 
 def write_job_to_db(data, json_data, check_sum, username):
     #first check if we already have this entry

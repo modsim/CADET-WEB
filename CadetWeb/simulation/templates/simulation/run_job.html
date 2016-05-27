@@ -360,12 +360,14 @@
                 // data we could merge it with what we already have.
                 data = json_data;
                 if (1 == json_data['complete'] && 0 == json_data['ok']) {
+                    $.post('{{ seen_url }}', { 'job_id': '{{ job_id }}' });
                     $(".success").remove();
                     $("body").removeClass("loading");
                 } else if (0 == json_data['complete']) {
                     $("#progress").load("{{ progress }}");
                     setTimeout(fetchData, 1000);
                 } else {
+                    $.post('{{ seen_url }}', { 'job_id': '{{ job_id }}' });
                     $(".failure").remove();
                     $("body").removeClass("loading");
 
@@ -395,11 +397,7 @@
                 .fail(function (xhr, ajaxOptions, thrownError) {
                     $(".success").remove();
                     $("body").removeClass("loading");
-                })
-                .complete(function (xhr, status) {
-                    $.post('{{ seen_url }}' , { 'job_id': '{{ job_id }}' })
-                }
-                );
+                });
         }
 
         fetchData();
