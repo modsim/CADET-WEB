@@ -1257,7 +1257,14 @@ def get_unseen(request):
                 simulation_status = 'Simulation Complete'
             else:
                 simulation_status = 'Simulation Failed'
-        temp.append([status.Job_ID.id, simulation_status, status.start.strftime(settings.time_format), status.end.strftime(settings.time_format), ''])
+        results_link = reverse('simulation:run_job_get', None, None) + "?path=%s" % status.Job_ID.uid
+        start = status.start
+        if start:
+            start = status.start.strftime(settings.time_format)
+        end = status.end
+        if end:
+            end = status.end.strftime(settings.time_format)
+        temp.append([status.Job_ID.id, simulation_status, start, end, results_link])
 
     json_data['data'] = temp
     return JsonResponse(json_data, safe=False)

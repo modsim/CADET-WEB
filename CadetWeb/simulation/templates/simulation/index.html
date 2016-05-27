@@ -177,7 +177,15 @@
                 for (i = 0; i < json_data['data'].length; i++) {
                     var row = $('<tr></tr>');
                     for (j = 0; j < json_data['data'][i].length; j++) {
-                        var td = $('<td></td>').text(json_data['data'][i][j]);
+
+                        if (j == json_data['data'][i].length - 1) {
+                            var td = $('<td></td>');
+                            var a = $('<a class="btn btn-primary" href="' + json_data['data'][i][j] + 
+                                '"data-toggle="tooltip" data-placement="bottom" title="View the results of this simulation along with downloading the simulation file, images and results.">Results</a>');
+                            td.append(a);
+                        } else {
+                            var td = $('<td></td>').text(json_data['data'][i][j]);
+                        }
                         row.append(td);
                     }
                     table.append(row);
