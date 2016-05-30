@@ -581,7 +581,7 @@ def failure(parent_dir, isBatch, job, url, stdin=None, stdout=None):
     if stderr is not None:
         data['stderr'] = stderr
 
-    json_cache = os.path.join(parent, 'json_cache')
+    json_cache = os.path.join(parent_dir, 'json_cache')
     open(json_cache, 'wb').write(json.dumps(data))
 
     if not isBatch:
