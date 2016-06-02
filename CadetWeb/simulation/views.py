@@ -835,7 +835,6 @@ def run_job_get(request):
     else:
         prefix = 'job_%s' % job_id
 
-    print(path, rel_path)
     json_path, hdf5_path, graphs, json_data, alive, complete, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
 
     query = request.GET.dict()
@@ -1195,7 +1194,6 @@ def force_rerun(request):
     data['ok'] = 0
 
     json_cache = os.path.join(relative_path, 'json_cache')
-    print(json_cache)
     open(json_cache, 'wb').write(json.dumps(data))
 
     job = job = models.Job.objects.get(uid=check_sum)
