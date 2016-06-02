@@ -22,16 +22,19 @@ def get_picture_id(hdf5_path, sensitivity_number):
     "return the filename and html id of the picture"
     h5 = h5py.File(hdf5_path, 'r')
 
-    component =  h5['/input/sensitivity/param_%03d/SENS_COMP' % sensitivity_number].value
-    name = h5['/input/sensitivity/param_%03d/SENS_NAME' % sensitivity_number].value
-    section = h5['/input/sensitivity/param_%03d/SENS_SECTION' % sensitivity_number].value
+    try:
+        component =  h5['/input/sensitivity/param_%03d/SENS_COMP' % sensitivity_number].value
+        name = h5['/input/sensitivity/param_%03d/SENS_NAME' % sensitivity_number].value
+        section = h5['/input/sensitivity/param_%03d/SENS_SECTION' % sensitivity_number].value
 
-    number_of_components = h5['/input/model/NCOMP'].value
+        number_of_components = h5['/input/model/NCOMP'].value
 
-    components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
+        components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
 
-    number_of_sections = h5['/input/model/inlet/NSEC'].value
-    sections = [h5['/web/STEPS/STEP_%03d' % i].value for i in  range(number_of_sections)]
+        number_of_sections = h5['/input/model/inlet/NSEC'].value
+        sections = [h5['/web/STEPS/STEP_%03d' % i].value for i in  range(number_of_sections)]
+    except KeyError:
+        return '','','',''
 
     file_name = '%s_%s_%s.png' % (name, section, component)
     file_name = file_name.replace('-', 'minus')
