@@ -286,7 +286,7 @@ def single_start(request):
 
 
     isotherm = data.get('ADSORPTION_TYPE', None)
-    numberOfComponents = data.get('numberOfComponents', None)
+    numberOfComponents = int(data.get('numberOfComponents', None))
 
     if isotherm in ('EXTERNAL_STERIC_MASS_ACTION', 'STERIC_MASS_ACTION', 'SELF_ASSOCIATION') and numberOfComponents > 1:
         data['numberOfComponents'] = numberOfComponents - 1
@@ -733,6 +733,7 @@ def confirm_job(request):
         pass
 
     data['CADET_ISOTHERM'] = process_isotherm(data, data.get('ADSORPTION_TYPE'))
+    data['ADSORPTION_TYPE_HUMAN'] = data.get('ADSORPTION_TYPE').replace('_', ' ').title()
 
     data['json'] = get_json_string(data)
     data['back'] = reverse('simulation:sensitivity_setup', None, None)
