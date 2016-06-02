@@ -168,7 +168,7 @@ def generate_step_settings(step, list_of_names, data):
 def index(request):
     context = {}
 
-    context['search_examples'] = get_examples(5)
+    context['search_examples'] = get_examples(settings.examples)
     context['search_history'] = get_most_recent_simulations(request.user.username, 5)
     context['get_unseen_url'] = reverse('simulation:get_unseen', None, None) 
 
