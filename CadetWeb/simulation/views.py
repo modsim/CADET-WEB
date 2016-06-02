@@ -64,7 +64,12 @@ default_value['WENO_ORDER'] = '3'
 default_value['NTHREADS'] = '4'
 default_value['LOG_LEVEL'] = '4'
 default_value['advanced_ui'] = 'normal'
+default_value['WRITE_SOLUTION_COLUMN_OUTLET'] = 1
+default_value['WRITE_SOLUTION_COLUMN_INLET'] = 1
+default_value['WRITE_SENS_COLUMN_INLET'] = 1
+default_value['WRITE_SOLUTION_TIMES'] = 1
 default_value['graph_single:Chromatogram'] = '1'
+default_value['graph_single:Chromatogram Inlet'] = '1'
 
 current_path = __file__
 simulation_path, current_file_name = os.path.split(current_path)
