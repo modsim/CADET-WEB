@@ -335,10 +335,17 @@ def model(input, data):
     no_change_isotherms = set(['LINEAR', 'MULTI_COMPONENT_LANGMUIR', 'MOBILE_PHASE_MODULATORS', 'EXTERNAL_MOBILE_PHASE_MODULATORS', 'EXTERNAL_LANGMUIR',
                                'STERIC_MASS_ACTION', 'SELF_ASSOCIATION', 'EXTERNAL_STERIC_MASS_ACTION', ])
 
+    try:
+        numberOfComponents = int(data['numberOfComponents'])
+    except KeyError:
+        #must be an older file and that still has the CADET virtual components
+        numberOfComponents = int(data['NCOMP'])
+        data['numberOfComponents'] = numberOfComponents
+
     if isotherm in no_change_isotherms:
-        NCOMP = int(data['numberOfComponents'])
+        NCOMP = numberOfComponents
     elif isotherm == 'MULTI_COMPONENT_BILANGMUIR':
-        NCOMP = int(data['numberOfComponents']) * 2
+        NCOMP = numberOfComponents * 2
 
     set_value(model, 'COL_DISPERSION', 'f8', float(data['COL_DISPERSION']))
     set_value(model, 'COL_LENGTH', 'f8', float(data['COL_LENGTH']))
