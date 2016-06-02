@@ -1129,7 +1129,7 @@ def run_job(request):
 
         #FIXME
         #current_site = get_current_site(request).domain 
-        current_site = 'http://ibt761.ibt.kfa-juelich.de' 
+        current_site = 'https://ibt761.ibt.kfa-juelich.de' 
         url_pass = current_site + reverse('simulation:job_completed_ok', None, None).encode('ascii')
         url_fail = current_site + reverse('simulation:job_completed_failure', None, None).encode('ascii')
 
@@ -1163,7 +1163,7 @@ def force_rerun(request):
 
     map(remove_without_error, reset_sim)
 
-    reset_sim_wildcards = ['*.csv', '*.xlsx', '.png']
+    reset_sim_wildcards = ['*.csv', '*.xlsx', '*.png']
     reset_sim_wildcards = [os.path.join(relative_path, i) for i in reset_sim_wildcards]
 
     for path in reset_sim_wildcards:
@@ -1198,7 +1198,7 @@ def force_rerun(request):
 
     #FIXME
     #current_site = get_current_site(request).domain 
-    current_site = 'http://ibt761.ibt.kfa-juelich.de'
+    current_site = 'https://ibt761.ibt.kfa-juelich.de'
     url_pass = current_site + reverse('simulation:job_completed_ok', None, None).encode('ascii')
     url_fail = current_site + reverse('simulation:job_completed_failure', None, None).encode('ascii')
 
