@@ -527,11 +527,8 @@ def generate_simulations(parent_dir, json_data):
 
     components = get_components_in_order(json_data)
 
-    print(keys, combos)
     for idx, value in enumerate(combos):
         temp = json_data.copy()
-        print('using this combo', dict(zip(keys, value)) )
-        print('before', [(temp[key], val) for key,val in zip(keys, value)])
         temp.update(dict(zip(keys, value)))
 
         for key,val in zip(keys, value):
@@ -546,9 +543,6 @@ def generate_simulations(parent_dir, json_data):
                 #this is part of an isotherm so we have to treat it specially
 
                 temp['CADET_ISOTHERM'][isotherm][components.index(comp)] = val
-
-        print('after', [(temp[key], val) for key,val in zip(keys, value)])
-        print('isotherm', temp['CADET_ISOTHERM'])
 
         try:
             os.mkdir(os.path.join(parent_dir, 'batch', str(idx)))
@@ -621,14 +615,12 @@ def gen_json_cache_complete(parent_dir, h5, hdf5_path):
 
     for key,value in h5['/web/GRAPHS/SINGLE'].items():
         value = str(np.array(value))
-        print(key,value)
         id, title, data_sets = utils.call_plugin_by_name(value, 'graphing/single', 'get_data', hdf5_path)
         if data_sets:
             data['data'][id] = data_sets
 
     for key,value in h5['/web/GRAPHS/GROUP'].items():
         value = str(np.array(value))
-        print(key,value)
         id, title, data_sets = utils.call_plugin_by_name(value, 'graphing/group', 'get_data', hdf5_path)
         if data_sets:
             data['data'][id] = data_sets
@@ -734,7 +726,6 @@ if __name__ == '__main__':
 
     if not isBatch:
         data = urllib.urlencode({'job_id':args.job})
-        print(args.url_pass)
         urllib2.urlopen(args.url_pass, data)
 
     open(os.path.join(parent_dir, 'status'), 'w').write('success')
