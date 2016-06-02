@@ -923,7 +923,7 @@ def draw_comparison(request):
 
     data['selected_jobs'] = ','.join(selected)
     data['json_url'] = reverse('simulation:get_data_comparison', None, None)
-    data['graphs_common'] = set.intersection(*all_graphs)
+    data['graphs_common'] = sorted(set.intersection(*all_graphs))
     return render(request, 'simulation/draw_comparison.html', data)
 
 def generate_batch_choice(json_data, simulation, request, path):
