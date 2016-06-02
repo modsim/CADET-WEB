@@ -222,11 +222,12 @@ def get_parameters():
         reader = csv.reader(csvfile)
         #read the header and discard it
         reader.next()
-        for name, units, type, per_component, per_section, sensitive, description, human_name  in reader:
-            per_component = int(per_component)
-            per_section = int(per_section)
-            sensitive = int(sensitive)
-            temp.append( (name, units, type, per_component, per_section, sensitive, description, human_name), )
+        for name, units, type, per_component, per_section, sensitive, description, human_name, isotherm  in reader:
+            if isotherm == '' or (isotherm and isotherm in settings.isotherms):
+                per_component = int(per_component)
+                per_section = int(per_section)
+                sensitive = int(sensitive)
+                temp.append( (name, units, type, per_component, per_section, sensitive, description, human_name), )
         return temp
 
 def get_isotherms():
