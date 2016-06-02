@@ -9,6 +9,8 @@ import plot_sensitivity
 import types
 import errno
 import csv
+import settings
+from collections import OrderedDict
 
 current_path = __file__
 simulation_path, current_file_name = os.path.split(current_path)
@@ -232,20 +234,24 @@ def get_isotherms():
         reader = csv.reader(csvfile)
         #read the header and discard it
         reader.next()
-        return list(reader)
+
+        #decorate, sort, undecorate
+        dsu = [(settings.isotherms.index(isotherm), name, isotherm) for name, isotherm in list(reader) if isotherm in settings.isotherms] 
+        dsu.sort()
+        return [(name, isotherm) for (sort, name, isotherm) in dsu]
 
 def isotherm_setup_cache(isotherms, parameters):
     "make a dictionary that has a key of the isotherm name and then a list of all the isotherm values plus if it is per component"
     "also make a dictionary of sets to allow quickly check if an item is part of an isotherm"
-    temp = {}
-    temp_set = {}
-    name_set = set()
+    temp = OrderedDict()
+    temp_set = OrderedDict()
+    name_set = OrderedDict()
 
     for name, isotherm in isotherms:
         section = temp.get(isotherm, [])
         section_set = temp_set.get(isotherm, set())
         section_set.add(name)
-        name_set.add(name)
+        name_set[name] = None
         for par_name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
             if name == par_name:
                 section.append( (name, per_component), )
@@ -265,8 +271,8 @@ def generate_name_lookup(paraemters):
     "generate the dictionarys that maps CADET names to more human names"
     "The first dictionary is used in python to quickly look up human names and tooltips"
     "The second dictionary is used for django templates and the names are modified in a predictable way to make it easy to use in templates without conflicts"
-    temp_python = {}
-    temp_django = {}
+    temp_python = OrderedDict()
+    temp_django = OrderedDict()
     for par_name, units, type, per_component, per_section, sensitive, description, human_name in parameters:
         temp_python[par_name] = (human_name, description, units)
         temp_django[par_name+ '_human'] = human_name

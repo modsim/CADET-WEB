@@ -28,3 +28,6 @@ time_format = '%Y %B %d  %H:%M:%S'
 
 #how  many examples to show
 examples = 10
+
+#allowed isotherms and the order they shoudl be shown in
+isotherms = ('MULTI_COMPONENT_LANGMUIR', 'MULTI_COMPONENT_BILANGMUIR', 'EXTERNAL_LANGMUIR', 'STERIC_MASS_ACTION', 'EXTERNAL_STERIC_MASS_ACTION', 'SELF_ASSOCIATION', 'LINEAR')
