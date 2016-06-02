@@ -51,6 +51,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
 )
 
 ROOT_URLCONF = 'CadetWeb.urls'
@@ -155,3 +156,7 @@ SERVER_EMAIL = private_settings.SERVER_EMAIL
 
 LOGIN_REDIRECT_URL = '/simulation'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/simulation'
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True 
+CSRF_COOKIE_SECURE = True
