@@ -157,8 +157,7 @@
         function fetchData() {
 
             function onDataReceived(json_data) {
-
-                if (json_data.length) {
+                if (json_data.data.length) {
 
                     $("#unseen > table").remove();
                     $("#unseen > h2").remove();
