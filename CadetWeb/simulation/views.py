@@ -843,7 +843,7 @@ def run_job_get(request):
     url_new = '%s?%s' % (base, query)
 
     data = {}
-    data['graphs'] = graphs
+    data['graphs'] = sorted(graphs)
 
     hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
     json_cache = hdf5_path.replace('sim.h5', 'json_cache')
