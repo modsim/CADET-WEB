@@ -32,8 +32,6 @@
            <h3>Inlet Profile</h3>
         <div>
             <div class="row graph_row">
-                <div class="x_label">Time(s)</div>
-                <div class="y_label">Concentration (mMol)</div>
                 <div class="col-md-9 medium" id="graph"></div>
                 <div class="col-md-3 medium" id="graphchoice"></div>
             </div>
@@ -80,26 +78,37 @@
 
                     var plot = $.plot('#graph', data, {
                         canvas: true,
+                        axisLabels: {
+                            show: true,
+                        },
                         yaxis: {
-                            //min: 0,
-                            //zoomRange: null,
-                            //panRange: [0, maxY]
+                            tickFormatter: function (v, axis) { return v.toExponential(2); },
+                            position: 'left',
+                            axisLabel: 'Concentration Protein (mMol)',
+                            axisLabelUseCanvas: true
                         },
                         y2axis: {
-                            //min: 0,
-                            //zoomRange: null,
-                            //panRange: [0, maxY]
+                            tickFormatter: function (v, axis) { return v.toExponential(2); },
+                            position: 'right',
+                            axisLabel: 'Concentration Salt (mMol)',
+                            axisLabelUseCanvas: true
                         },
                         xaxis: {
-                            //tickDecimals: 0,
-                            //zoomRange: null,
-                            //panRange: [0, maxX]
+                            axisLabel: 'Time(s)',
+                            axisLabelUseCanvas: true,
+                            axisLabelPadding: 8,
                         },
                         zoom: {
                             interactive: false
                         },
                         pan: {
                             interactive: false
+                        },
+                        legend: {
+                            position: 'ne'
+                        },
+                        selection: {
+                            mode: "xy"
                         },
                         yaxes: [{}, { position: "right" }]
                     });

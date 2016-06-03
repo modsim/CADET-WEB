@@ -246,7 +246,6 @@ def get_examples(limit):
 def get_most_recent_simulations(username, limit):
     "return a list of the most recent simulations run by the user in username"
     "format is study name, model name, isotherm, results link, create link, create batch link"
-    print username, limit
     if username:
         results = models.Job.objects.filter(username=username).select_related('job_notes').order_by('-created')[:limit]
         parameter = models.Parameters.objects.get(name='ADSORPTION_TYPE')
