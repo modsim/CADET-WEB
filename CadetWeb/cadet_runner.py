@@ -442,10 +442,14 @@ def compress_data(h5):
 
     solution_times = np.array(h5['/output/solution/SOLUTION_TIMES'])
 
+    ABSTOL = h5['/input/solver/time_integrator/ABSTOL'].value
+
+    digits = int(np.floor(abs(max(np.log10(ABSTOL), -15)) - 2))
+
     for name in ('OUTLET', 'INLET'):
         data = [solution_times,]
         for idx in range(number_of_components):
-            data.append(np.around(np.array(h5['/output/solution/SOLUTION_COLUMN_%s_COMP_%03d' % (name, idx)]),6))
+            data.append(np.around(np.array(h5['/output/solution/SOLUTION_COLUMN_%s_COMP_%03d' % (name, idx)]),digits))
         data = np.transpose(np.vstack(data))
         data = compress_series.compress(data)
         set_value(compress, name, 'f8', data)
