@@ -1206,7 +1206,7 @@ def force_rerun(request):
     url_fail = current_site + reverse('simulation:job_completed_failure', None, None).encode('ascii')
 
     popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail], stdout=out, stderr=err)
-
+    open('/tmp/out', 'w').write(str(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail]))
     with open(os.path.join(relative_path,'pid'), 'w') as pid:
         pid.write(str(popen.pid))
 

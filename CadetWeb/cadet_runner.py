@@ -31,12 +31,16 @@ storage_path = os.path.join(parent_path, 'sims')
 def set_value(node, nameH5, dtype, value):
     "merge the values from parms into node of the hdf5 file"
     data = np.array(value, dtype=dtype)
+    if node.get(nameH5, None) is not None:
+        del node[nameH5]
     node.create_dataset(nameH5, data=data, maxshape=tuple(None for i in range(data.ndim)), fillvalue=[0])
 
 def set_value_enum(node, nameH5, value):
     "merge the values from parms into node of the hdf5 file"
     dtype = 'S' + str(len(value)+1)
     data = np.array(value, dtype=dtype)
+    if node.get(nameH5, None) is not None:
+        del node[nameH5]
     node.create_dataset(nameH5, data=data)
 
 def run_args():
@@ -426,6 +430,8 @@ def compress_data(h5):
     import compress_series
     #compress the data
     web = h5["web"]
+    if web.get("compress", None) is not None:
+        del web["compress"]
     compress = web.create_group("compress")
 
     #inlet
@@ -653,12 +659,6 @@ if __name__ == '__main__':
 
     parent_dir = os.path.dirname(args.sim)
 
-    def fail():
-        return failure(parent_dir, isBatch, args.job, args.url_fail)
-
-    timer = Timer(total, fail)
-    timer.start()
-
     start_processing = time.time()
 
     open(os.path.join(parent_dir, 'status'), 'w').write('working')
@@ -674,14 +674,27 @@ if __name__ == '__main__':
     #run simulation
     start = time.time()
     #gen_json_cache_init(parent_dir)
-    proc = subprocess.Popen([cadet_path, args.sim], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ)
+    cadet_stdout = open(os.path.join(parent_dir, 'cadet_stdout'), 'w')
+    cadet_stderr = open(os.path.join(parent_dir, 'cadet_stderr'), 'w')
+
+    proc = subprocess.Popen([cadet_path, args.sim], stdout=cadet_stdout, stderr=cadet_stderr, env=os.environ)
+
+    def fail():
+        proc.kill()
+        return failure(parent_dir, isBatch, args.job, args.url_fail)
+
+    timer = Timer(30, fail)
+    timer.start()
 
     proc.wait()
     timer.cancel()
     simulation_time = time.time() - start
 
-    stdout = proc.stdout.read()
-    stderr = proc.stderr.read()
+    cadet_stdout.close()
+    cadet_stderr.close()
+
+    stdout = open(os.path.join(parent_dir, 'cadet_stdout'), 'r').read()
+    stderr = open(os.path.join(parent_dir, 'cadet_stderr'), 'r').read()
 
     #open(os.path.join(parent_dir, 'stdout'), 'w').write(stdout)
     #open(os.path.join(parent_dir, 'stderr'), 'w').write(stderr)
