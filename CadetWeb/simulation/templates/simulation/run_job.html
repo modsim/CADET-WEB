@@ -363,6 +363,10 @@
                     $.post('{{ seen_url }}', { 'job_id': '{{ job_id }}' });
                     $(".success").remove();
                     $("body").removeClass("loading");
+
+                    document.getElementById("stdout").innerHTML = ansi_up.ansi_to_html(json_data['stdout']);
+                    document.getElementById("stderr").innerHTML = ansi_up.ansi_to_html(json_data['stderr']);
+
                 } else if (0 == json_data['complete']) {
                     $("#progress").load("{{ progress }}");
                     setTimeout(fetchData, 1000);

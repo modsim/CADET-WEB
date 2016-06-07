@@ -572,16 +572,14 @@ def run_batch_simulations(parent_dir, json_path):
         proc.wait()
         write_progress(parent_dir, idx+1, dir_count+1)
 
-def failure(parent_dir, isBatch, job, url, stdin=None, stdout=None):
+def failure(parent_dir, isBatch, job, url, stdout=None, stderr=None):
     data = {}
     data['complete'] = 1
     data['ok'] = 0
     
-    if stdout is not None:
-        data['stdout'] = stdout
-    if stderr is not None:
-        data['stderr'] = stderr
-
+    data['stdout'] = stdout
+    data['stderr'] = stderr
+        
     json_cache = os.path.join(parent_dir, 'json_cache')
     open(json_cache, 'wb').write(json.dumps(data))
 
@@ -685,6 +683,11 @@ if __name__ == '__main__':
     stdout = proc.stdout.read()
     stderr = proc.stderr.read()
 
+    #open(os.path.join(parent_dir, 'stdout'), 'w').write(stdout)
+    #open(os.path.join(parent_dir, 'stderr'), 'w').write(stderr)
+    sys.stdout.write(stdout)
+    sys.stderr.write(stderr)
+
     h5 = h5py.File(args.sim, 'a')
     web = h5["web"]
     set_value_enum(web, 'STDOUT', stdout)
@@ -696,36 +699,37 @@ if __name__ == '__main__':
     except KeyError:
         h5.close()
         failure(parent_dir, isBatch, args.job, args.url_fail, stdout, stderr)
+    else:    
 
-    h5.close()
-    #run performance parameters
+        h5.close()
+        #run performance parameters
     
-    #run graphs
-    for key,value in json_data.items():
-        if key.startswith('graph_single') and value == '1':
-            _, name = key.split(':')
-            utils.call_plugin_by_name(name, 'graphing/single', 'run', args.sim)
+        #run graphs
+        for key,value in json_data.items():
+            if key.startswith('graph_single') and value == '1':
+                _, name = key.split(':')
+                utils.call_plugin_by_name(name, 'graphing/single', 'run', args.sim)
 
-        if key.startswith('graph_group') and value == '1':
-            _, name = key.split(':')
-            utils.call_plugin_by_name(name, 'graphing/group', 'run', args.sim)
+            if key.startswith('graph_group') and value == '1':
+                _, name = key.split(':')
+                utils.call_plugin_by_name(name, 'graphing/group', 'run', args.sim)
 
-    for sensitivty_number in range(len(json_data.get("sensitivities", []))):
-        plot_sensitivity.run(args.sim, sensitivty_number)
+        for sensitivty_number in range(len(json_data.get("sensitivities", []))):
+            plot_sensitivity.run(args.sim, sensitivty_number)
 
-    if not isBatch:
-        write_progress(parent_dir, 1, 1)
+        if not isBatch:
+            write_progress(parent_dir, 1, 1)
 
-    processing_time = time.time() - start_processing
+        processing_time = time.time() - start_processing
 
-    h5 = h5py.File(args.sim, 'a')
-    web = h5["web"]
-    set_value(web, 'CADET_SIMULATION_TIME', 'f8', simulation_time)
-    set_value(web, 'TOTAL_RUN_TIME', 'f8', processing_time)
-    h5.close()
+        h5 = h5py.File(args.sim, 'a')
+        web = h5["web"]
+        set_value(web, 'CADET_SIMULATION_TIME', 'f8', simulation_time)
+        set_value(web, 'TOTAL_RUN_TIME', 'f8', processing_time)
+        h5.close()
 
-    if not isBatch:
-        data = urllib.urlencode({'job_id':args.job})
-        urllib2.urlopen(args.url_pass, data)
+        if not isBatch:
+            data = urllib.urlencode({'job_id':args.job})
+            urllib2.urlopen(args.url_pass, data)
 
-    open(os.path.join(parent_dir, 'status'), 'w').write('success')
+        open(os.path.join(parent_dir, 'status'), 'w').write('success')
