@@ -333,7 +333,7 @@ def model(input, data):
     set_value_enum(model, 'ADSORPTION_TYPE', isotherm)
 
     no_change_isotherms = set(['LINEAR', 'MULTI_COMPONENT_LANGMUIR', 'MOBILE_PHASE_MODULATORS', 'EXTERNAL_MOBILE_PHASE_MODULATORS', 'EXTERNAL_LANGMUIR',
-                               'STERIC_MASS_ACTION', 'SELF_ASSOCIATION', 'EXTERNAL_STERIC_MASS_ACTION', ])
+                               'STERIC_MASS_ACTION', 'SELF_ASSOCIATION', 'EXTERNAL_STERIC_MASS_ACTION', 'MOBILE_PHASE_MODULATORS', 'EXTERNAL_MOBILE_PHASE_MODULATORS'])
 
     try:
         numberOfComponents = int(data['numberOfComponents'])

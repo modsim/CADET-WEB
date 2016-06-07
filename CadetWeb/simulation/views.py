@@ -292,7 +292,7 @@ def single_start(request):
     isotherm = data.get('ADSORPTION_TYPE', None)
     numberOfComponents = int(data.get('numberOfComponents', None))
 
-    if isotherm in ('EXTERNAL_STERIC_MASS_ACTION', 'STERIC_MASS_ACTION', 'SELF_ASSOCIATION') and numberOfComponents > 1:
+    if isotherm in settings.first_component_salt and numberOfComponents > 1:
         data['numberOfComponents'] = numberOfComponents - 1
 
 
@@ -315,7 +315,7 @@ def component_and_step_setup(request):
     isotherm = data['ADSORPTION_TYPE']
     comps = []
 
-    if isotherm in ('EXTERNAL_STERIC_MASS_ACTION', 'STERIC_MASS_ACTION', 'SELF_ASSOCIATION'):
+    if isotherm in settings.first_component_salt:
         start = 2
         comps = [(1, 'Salt', 'readonly')]
 

@@ -1,9 +1,9 @@
 from __future__ import division
-import matplotlib
-matplotlib.use('AGG') 
+#import matplotlib
+#matplotlib.use('AGG') 
 
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import h5py
 import os.path
 import shutil
