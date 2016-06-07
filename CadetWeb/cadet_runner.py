@@ -445,7 +445,7 @@ def compress_data(h5):
     for name in ('OUTLET', 'INLET'):
         data = [solution_times,]
         for idx in range(number_of_components):
-            data.append(np.array(h5['/output/solution/SOLUTION_COLUMN_%s_COMP_%03d' % (name, idx)]))
+            data.append(np.around(np.array(h5['/output/solution/SOLUTION_COLUMN_%s_COMP_%03d' % (name, idx)]),6))
         data = np.transpose(np.vstack(data))
         data = compress_series.compress(data)
         set_value(compress, name, 'f8', data)
@@ -683,7 +683,7 @@ if __name__ == '__main__':
         proc.kill()
         return failure(parent_dir, isBatch, args.job, args.url_fail)
 
-    timer = Timer(30, fail)
+    timer = Timer(settings.cpu, fail)
     timer.start()
 
     proc.wait()
@@ -696,8 +696,6 @@ if __name__ == '__main__':
     stdout = open(os.path.join(parent_dir, 'cadet_stdout'), 'r').read()
     stderr = open(os.path.join(parent_dir, 'cadet_stderr'), 'r').read()
 
-    #open(os.path.join(parent_dir, 'stdout'), 'w').write(stdout)
-    #open(os.path.join(parent_dir, 'stderr'), 'w').write(stderr)
     sys.stdout.write(stdout)
     sys.stderr.write(stderr)
 
