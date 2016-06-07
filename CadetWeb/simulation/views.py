@@ -901,6 +901,8 @@ def draw_comparison(request):
     temp = []
     all_graphs = []
 
+    comp_details = []
+
     for item in selected:
         id = item
         tag = request.GET[item]
@@ -911,6 +913,7 @@ def draw_comparison(request):
             
         else:
             job_id = item
+            sim_id = ''
             path = models.Job.objects.get(pk=int(job_id)).uid
             rel_path = ''
 
@@ -920,11 +923,16 @@ def draw_comparison(request):
         hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
         temp.append(  (id, tag, hdf5_path, graphs_available) )
 
+        query = {'path':path}
+        if sim_id:       
+            query['sim_id'] = sim_id
+        comp_details.append([tag, job_id, sim_id, reverse('simulation:run_job_get').encode('ascii') +  '?' + urllib.urlencode(query), hdf5_path])
+
     data = {}
     data['selected'] = temp
 
     data['session_lookup'] = [(i, request.GET[i]) for i in selected]
-
+    data['comp_details'] = comp_details
     data['selected_jobs'] = ','.join(selected)
     data['json_url'] = reverse('simulation:get_data_comparison', None, None)
     data['graphs_common'] = sorted(set.intersection(*all_graphs))
@@ -946,7 +954,7 @@ def generate_batch_choice(json_data, simulation, request, path):
             temp.append(json_data[key])
             temp.append('</td>')
         temp.append('<td></td>')
-        url = url = reverse('simulation:run_job_get', None, None) + "?path=%s" % path
+        url = reverse('simulation:run_job_get', None, None) + "?path=%s" % path
         temp.append('<td><a href="%s" class="btn btn-default">Load Base Case</a></td>' % url)
 
         temp.append('</tr><tr>')
