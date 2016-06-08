@@ -124,9 +124,14 @@
         </div>
     </div>
 
+    
+    <div class="row">
+    <div class="col-md-5">
     <form class="form-inline" role="form" action="{% url 'simulation:process_comparison' %}" method="POST">
         {% csrf_token %}
         <div class="form-group">
+            <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="tooltip" 
+		data-placement="bottom" title="At least two simulations are needed to compare. All common graphs will be compared. A comparison generates a unique URL that can be shared."></span>
             <label class="sr-only" for="comparision_name">Comparison Name</label>
             <input type="text" class="form-control" id="comparision_name" name="comparison_name" placeholder="Comparison Name" required>
             {% if sim_id %}
@@ -136,7 +141,13 @@
             {% endif %}
         </div>
         <button type="submit" class="btn btn-default" name="type" value="add">Add Comparison</button>
-    </form>
+            </form>
+        </div>
+        <div class="col-md-6"><button id="toggle_comparison_button" class="btn btn-default">Comparison Steps</button> <ol style="display:none" id="comparison_steps"><li>Add one or more simulations to compare (including individual runs in a batch simulation)</li>
+        <li>Click Compare Simulations (appears after simulations have been added to compare)</li>
+        <li>Check simulations you want to compare and click compare selected.</li></ol></div>
+        </div>
+
     </div>
 
     <br>
@@ -196,6 +207,10 @@
 <script type="text/javascript">
 
     $("body").addClass("loading");
+    
+    $('#toggle_comparison_button').click(function() {
+      $('#comparison_steps').toggle();
+    });
 
     var colors = ['Black', 'Red', 'Blue', 'Lime', 'Cyan', 'BlueViolet', 'Crimson', 'DeepPink', 'DarkMagenta', 'Green',
         'Indigo', 'Magenta', 'MidnightBlue', 'Orange', 'Purple', 'Silver', 'Tan'];
