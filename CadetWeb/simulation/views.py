@@ -815,6 +815,10 @@ def about_us(request):
     context = {}
     return render(request, 'simulation/about_us.html', context)
 
+def community(request):
+    context = {}
+    return render(request, 'simulation/community.html', context)
+
 @login_required
 def run_job_get(request):
     path = request.GET['path']

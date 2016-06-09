@@ -93,35 +93,57 @@
       <p><a href="/">Return home to start another simulation. Your current simulation will keep running.</a></p></div></div>
 
     <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="navbar navbar-default">
-            <div class="navbar-header">
-              <a class="navbar-brand navbar-logo" href="{% url 'simulation:index' %}"><img src="{% static "simulation/CADET-small.png" %}"></a>
-              <a class="navbar-brand btn btn-default" href="{% url 'simulation:index' %}">Home</a>
-              <a class="navbar-brand btn btn-default" href="{% url 'simulation:single_start' %}" 
-                 data-toggle="tooltip" data-placement="bottom" title="Create a new simulation from scratch">Create New Simulation</a>
-              <a class="navbar-brand btn btn-default" href="{% url 'simulation:create_batch_simulation' %}" 
-                 data-toggle="tooltip" data-placement="bottom" title="Create a Design of Experiments set of simulations based on an already completed simulation.">Create DoE Simulation</a>
-              <a class="navbar-brand btn btn-default" href="{% url 'simulation:choose_search_query' %}" 
-                 data-toggle="tooltip" data-placement="bottom" title="Search through your simulations">Find Simulation</a>
 
-              {% if request.user.is_authenticated %}
-                    <a href="{% url 'account_logout' %}" class="navbar-brand btn btn-default">Logout</a>
-              {% else %}
-                    <a href="{% url 'account_login' %}" class="navbar-brand btn btn-default">Login</a>
-                    <a href="{% url 'account_signup' %}" class="navbar-brand btn btn-default">Sign-Up</a>
-              {% endif %}
-              <a class="navbar-brand btn btn-default" href="{% url 'simulation:about_us' %}">About Us</a>
-              
-              {% if request.user.username  %}
-              <span class="navbar-brand">Welcome {{ request.user.username }}</span>
-              {% endif %}
-              
-            </div>
-          </div>
-        </div>
-      </div>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand navbar-logo" href="{% url 'simulation:index' %}"><img src="{% static "simulation/CADET-small.png" %}"></a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="{% url 'simulation:index' %}">Home</a></li>
+                        <li><a href="{% url 'simulation:single_start' %}"
+                            data-toggle="tooltip" data-placement="bottom" title="Create a new simulation from scratch">Create New Simulation</a></li>
+                        <li><a href="{% url 'simulation:create_batch_simulation' %}"
+                            data-toggle="tooltip" data-placement="bottom" title="Create a Design of Experiments set of simulations based on an already completed simulation.">Create DoE Simulation</a></li>
+                        <li><a href="{% url 'simulation:choose_search_query' %}"
+                            data-toggle="tooltip" data-placement="bottom" title="Search through your simulations">Find Simulation</a></li>
+                        
+                        {% if request.user.is_authenticated %}
+                        <li><a href="{% url 'account_logout' %}" >Logout</a></li>
+                        {% else %}
+                        <li><a href="{% url 'account_login' %}">Login</a></li>
+                        <li><a href="{% url 'account_signup' %}">Sign-Up</a></li>
+                        {% endif %}
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Team <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'simulation:about_us' %}">About Us</a></li>
+                                <li><a href="{% url 'simulation:community' %}">Community</a></li>
+                            </ul>
+                        </li>
+
+                        {% if request.user.username  %}
+                        <li><span class="navbar-brand">Welcome {{ request.user.username }}</span></li>
+                        {% endif %}
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+
+
+
+
     {% block body %}{% endblock %}
 
     </div>
