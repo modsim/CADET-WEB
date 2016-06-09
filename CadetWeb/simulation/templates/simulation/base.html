@@ -67,6 +67,21 @@
     .graph_wide {width:1300px;}
     .text_max {max-width: 50em;}
 
+    .link-unstyled {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.link-unstyled:link {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.link-unstyled:hover {
+  color: inherit;
+  text-decoration: inherit;
+}
+
     </style>
     <script type="text/javascript" src="{% static "simulation/jquery-2.1.3.min.js" %}"></script>
     <script type="text/javascript" src="{% static "simulation/bootstrap-3.3.2-dist/js/bootstrap.min.js" %}"></script>
@@ -126,10 +141,10 @@
                         {% endif %}
 
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Team <span class="caret"></span></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">About<span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="{% url 'simulation:about_us' %}">About Us</a></li>
-                                <li><a href="{% url 'simulation:community' %}">Community</a></li>
+                                <li><a href="{% url 'simulation:about_us' %}">Development Team</a></li>
+                                <li><a href="{% url 'simulation:community' %}">User Community</a></li>
                             </ul>
                         </li>
 
