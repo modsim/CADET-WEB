@@ -13,13 +13,14 @@
             <thead>
               <tr>
                 <th>Job #</th>
+                <th>Username</th>
                 <th>Study Name</th>
                 <th>Model Name</th>
                 <th>Isotherm</th>
                 {% for header in headers %}
                     <th>{{ header }}</th>
                 {% endfor %}
-                <th>Rating</th>
+                <th style="width: 14em;">Rating</th>
                 <th>Choose</th>
               </tr>
             </thead>
@@ -27,6 +28,7 @@
             {% for search_result in search_results %}
               <tr>
                 <td>{{ search_result.0 }}</td>
+                <td>{{ search_result.7 }}</td>
                 <td>{{ search_result.1 }}</td>
                 <td>{{ search_result.2 }}</td>
                 <td>{{ search_result.3 }}</td>
@@ -36,10 +38,10 @@
                 {% endfor %}
 
                 <td>
-                  <input type="number" name="rating" class="star_rating" min=0 max=5 step=0.5 value={{ search_result.5 }} data-readonly="True">
+                    <input id="input-7-xs" class="rating rating-loading" value="{{ search_result.5 }}" data-min="0" data-max="5" data-step="0.5" data-size="xs" data-readonly="True">
                 </td>
                 <td>
-                  <a class="btn btn-primary" href="{{ search_result.6 }}">Simulation Results</a>
+                  <a class="btn btn-primary" href="{{ search_result.6 }}">Results</a>
                 </td>
               </tr>
               {% endfor %}

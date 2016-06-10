@@ -785,6 +785,7 @@ def query_results(request, name=None):
         model_name = job.Model_ID.model
         isotherm = models.Job_String.objects.get(Job_ID=job, Parameter_ID=parameter).Data
         additional = result[1:]
+        username = job.username
 
         try:
             rating = models.Job_Notes.objects.get(Job_ID=job).rating
@@ -792,7 +793,7 @@ def query_results(request, name=None):
             rating = 0
 
         url = reverse('simulation:run_job_get', None, None) + "?path=%s" % job.uid
-        search_results.append([jobid, study_name, model_name, isotherm, additional, rating, url])
+        search_results.append([jobid, study_name, model_name, isotherm.replace('_', ' ').title(), additional, rating, url, job.username])
     if results:
         headers = results[0][1:]
     else:

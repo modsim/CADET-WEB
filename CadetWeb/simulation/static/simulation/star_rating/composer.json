@@ -1,9 +1,17 @@
 {
     "name": "kartik-v/bootstrap-star-rating",
     "description": "A simple yet powerful JQuery star rating plugin for Bootstrap.",
-    "keywords": ["bootstrap", "jquery", "star", "rating"],
+    "keywords": [
+        "bootstrap",
+        "star",
+        "rating",
+        "font",
+        "awesome",
+        "glyphicon",
+        "svg"
+    ],
     "homepage": "https://github.com/kartik-v/bootstrap-star-rating",
-    "license": "BSD 3-Clause",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Kartik Visweswaran",
@@ -11,10 +19,9 @@
             "homepage": "http://www.krajee.com/"
         }
     ],
-	"minimum-stability": "stable",
-    "autoload": {
-        "psr-4": {
-            "kartik\\plugins\\rating\\": ""
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.0.x-dev"
         }
     }
 }

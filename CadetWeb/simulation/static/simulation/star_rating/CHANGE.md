@@ -1,26 +1,139 @@
-version 3.4.0
-=============
+Change Log: `bootstrap-star-rating`
+===================================
+
+## Version 4.0.1
+
+**Date:** 28-Feb-2016
+
+1. (bug #99): Correct documentation for refresh method.
+2. (bug #100): Correct caption and clear rendering methods.
+3. (bug #101): Correct caption setting when `showCaption` is `false`.
+4. (bug #102): Revamp generation of rating via `refresh` method.
+5. (enh #103): Implement method chaining and revamp private methods 
+    - enhance public methods like `create`, `destroy`, `refresh`, `clear`, `reset` to return the rating element jQuery object
+6. Update package.json to include `peerDependencies` instead of `dependencies`.
+
+## Version 4.0.0
+
+**Date:** 16-Feb-2016
+
+1. (enh #91): Add SVG Icon Support
+2. (enh #94): Add Theming Functionality.
+    - New property `theme` will assign a CSS class with the `rating-<theme-name>` to the rating container.
+    - Themes included
+        - The default (blank) theme (for displaying bootstrap glyphicons)
+        - `krajee-svg` (for displaying svg icons)
+        - `krajee-uni` (for displaying unicode symbols as stars)
+        - `krajee-fa` (for displaying font awesome icons)
+    - Add ability to override and add one's own themes
+
+    **Various new features and BC breaking enhancements**
+
+    - **REMOVED**: `symbol`, `glyphicon`, `ratingClass` properties will be removed. 
+    - The requirement for the above will be replaced with the `theme` property (and can also be implemented using the `containerClass` property).
+    - Stars now have a better padding and spacing that can be configured via CSS and themes
+    - New property `filledStar` - will allow one to set the markup for `filledStar` - will default to 
+        - `<i class="glyphicon glyphicon-star"></i>`
+    - New property `emptyStar` - will allow one to set the markup for `emptyStar` - will default to 
+        - `<i class="glyphicon glyphicon-star-empty"></i>`
+    - Exclusive support for SVG (and a prebuilt `krajee-svg` theme that contains two different ready to use SVG icons).
+3. (enh #95): Add display only capability.
+4. (enh #96): Add support for `bootstrap-sass` official repo via `sass` branch.
+5. (enh #97): Add `animate` property to enable / disable animation of star highlight on hover / change.
+
+## Version 3.5.8
+
+**Date:** 16-Feb-2016
+
+1. (enh #88): Add German Translations.
+2. (enh #89): Add Portugese Brazilian Translations.
+3. (bug #90): Rename reserved word used as variable.
+
+## Version 3.5.7
+
+**Date:** 22-Jan-2016
+
+1. (enh #84): Add Ukranian Translations.
+2. (enh #86): Refactor code for listening events and deep extend options correctly.
+
+## Version 3.5.6
+
+**Date:** 29-Dec-2015
+
+1. (enh #76): Add Russian Translations.
+2. (bug #77): Correct `touches` and `changedTouches` validation.
+3. (enh #81): Simplify README docs.
+4. (enh #82): Added "main" key into NPM package.json.
+
+## Version 3.5.5
+
+**Date:** 22-Nov-2015
+
+1. (enh #71): Fix `Error: Cannot read property 'pageX' of undefined` error on touch devices.
+2. (enh #74): Universal Module Definition for use with CommonJS, AMD or browser globals.
+3. (enh #75): Implement Locales and Translations.
+
+## Version 3.5.4
+
+**Date:** 20-Sep-2015
+
+1. (enh #47): Styling enhancements for printed output (better star colors and hide clear button).
+2. (enh #59): Remove `String.prototype.replaceAll` and implement regex replace.
+3. (enh #63): Add `package.json` for npm install.
+4. Update bootstrap bower version to support only 3.x variants.
+
+## Version 3.5.3
+
+**Date:** 18-Jun-2015
+
+1. (enh #58): Remove redundant tooltip title on hover of caption element.
+2. Fixes for composer.json dependencies.
+
+## Version 3.5.2
+
+**Date:** 10-May-2015
+
+1. (enh #45): Validate on `touchstart` for devices that do not support `click` event.
+2. (enh #46): More correct init of `clear` and `caption` elements.
+
+## Version 3.5.1
+
+**Date:** 13-Feb-2015
+
+1. (enh #44): Ability to integrate with other font icon CSS frameworks like Font Awesome.
+    - New property `ratingClass` added to allow configuring other icon framework css classes.
+2. Set copyright year to current.
+
+## Version 3.5.0
+
+**Date:** 31-Jan-2015
+
+1. (enh #39): Prevent invalid star rating for numStars > 5 with default value & hoverChange enabled.
+2. (enh #42): Code cleanup and restructure for JS lint changes (using JSHint Code cleanup library).
+
+## Version 3.4.0
+
 **Date:** 16-Dec-2014
 
 1. (enh #35): Added `destroy` method to destroy the rating plugin.
 2. (enh #36): Added `create` method to create the rating plugin (typically after a destroy).
 
-version 3.3.0
-=============
+## Version 3.3.0
+
 **Date:** 17-Nov-2014
 
 1. (bug #32): Prevent invalid star ratings if cursor is close to left/right edge of star array.
 2. (enh #33): Enhance touch methods for compatibility across more wider mobile device browsers.
 
-version 3.2.0
-=============
+## Version 3.2.0
+
 **Date:** 08-Nov-2014
 
 1. Set release to stable in composer.json.
 2. Updated CHANGE log to reflect user friendly date time formats.
 
-version 3.1.0
-=============
+## Version 3.1.0
+
 **Date:** 27-Oct-2014
 
 1. enh #26: Add touch device support to enable touch and slide across stars.
@@ -28,8 +141,8 @@ version 3.1.0
 3. enh #28: Add rating.refresh event.
 
 
-version 3.0.0
-=============
+## Version 3.0.0
+
 **Date:** 13-Oct-2014
 
 1. enh #20, #21: Included hover validation routine and rating state change on hover. Following new configurable properties added:
@@ -48,14 +161,14 @@ version 3.0.0
 4. enh #24: Set `clearValue` to default to `min` if not set.
 
 
-version 2.6.0
-=============
+## Version 2.6.0
+
 **Date:** 23-Aug-2014
 
 1. enh #17: Dynamic configuration for `starCaptions` and `starCaptionClasses` using a function.
 
-version 2.5.0
-=============
+## Version 2.5.0
+
 **Date:** 27-May-2014
 
 1. Change to entire plugin code to eliminate dependency of HTML5 input. Plugin size reduced to 8KB minified.
@@ -65,14 +178,14 @@ version 2.5.0
 5. Removed cloning of inputs to allow better refreshing of input across ajax and other scenarios.
 6. Caption and Clear elements parameters treated as identifiers rather than JQuery object elements.
 
-version 2.1.0
-=============
+## Version 2.1.0
+
 **Date:** 08-May-2014
 
-1. Bug #8,#9,#10: Correct cloning and conversion of field to a range slider input.
+1. Bug #8,#9,#10: Correct cloning and con## Version of field to a range slider input.
 
-version 2.0.0
-=============
+## Version 2.0.0
+
 
 **Date:** 25-Apr-2014
 
@@ -87,15 +200,15 @@ version 2.0.0
 7. Automatically degrades to a normal SELECT dropdown input for browsers that do not support 
    HTML 5 range input.
 
-version 1.2.0
-=============
+## Version 1.2.0
+
 **Date:** 04-Apr-2014
 
 1. Widget is customizable for using any CSS markup to override Bootstrap styles.
 2. Clear button class customization added.
 
-version 1.1.0
-=============
+## Version 1.1.0
+
 **Date:** 10-Mar-2014
 
 Revamped the methods for usage across wider scenarios:
@@ -103,8 +216,8 @@ Revamped the methods for usage across wider scenarios:
 1. Included `update` method to set a value of a rating via javascript. 
 2. Revamped the `refresh` method to enable refreshing all plugin options at runtime via parameters.
 
-version 1.0.0
-=============
+## Version 1.0.0
+
 **Date:** 01-Oct-2013
 
 Initial release. The following features are included in this release:

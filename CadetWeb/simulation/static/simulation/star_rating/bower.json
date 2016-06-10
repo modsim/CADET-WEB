@@ -1,6 +1,6 @@
 {
     "name": "bootstrap-star-rating",
-    "version": "3.4.0",
+    "version": "4.0.1",
     "homepage": "https://github.com/kartik-v/bootstrap-star-rating",
     "authors": [
         "Kartik Visweswaran <kartikv2@gmail.com>"
@@ -13,13 +13,16 @@
     "keywords": [
         "bootstrap",
         "star",
-        "rating"
+        "rating",
+        "font",
+        "awesome",
+        "glyphicon",
+        "svg"
     ],
     "dependencies": {
         "jquery": ">= 1.9.0",
-        "bootstrap": ">= 3.0.0"
+        "bootstrap": "~3"
     },
-    "license": "BSD-3",
     "ignore": [
         "**/.*",
         "node_modules",
@@ -28,5 +31,6 @@
         "bower_components",
         "test",
         "tests"
-    ]
+    ],
+    "license": "BSD-3-Clause"
 }
