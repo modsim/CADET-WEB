@@ -905,15 +905,21 @@ def format_comparison(seq):
     
 def draw_comparison(request):
     selected = request.GET.getlist('selected')
+    selected.sort()
 
     temp = []
     all_graphs = []
 
     comp_details = []
+    tags = {}
+    all_data = {}
+    file_parts = []
+    base_path = None
 
     for item in selected:
         id = item
         tag = request.GET[item]
+        tags[item] = request.GET[item]
         if '_' in item:
             job_id, sim_id = item.split('_')
             path = models.Job.objects.get(pk=int(job_id)).uid
@@ -924,26 +930,48 @@ def draw_comparison(request):
             sim_id = ''
             path = models.Job.objects.get(pk=int(job_id)).uid
             rel_path = ''
+        
+        file_parts.extend( (job_id, sim_id) )
 
         json_path, hdf5_path, graphs, json_data, alive, complete, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
         graphs_available = set([(name, human_name) for name, human_name, png, csv, csv_excel, filename_csv, filename_xls in graphs])
         all_graphs.append(graphs_available)
+
+
+        parent, hdf5_name = os.path.split(hdf5_path)
+        json_cache = os.path.join(parent, 'json_cache')
+        json_data_graph = open(json_cache, 'rb').read()
+        json_data_graph = json.loads(json_data_graph)
+        json_data_graph = utils.encode_to_ascii(json_data_graph)
+
+        if base_path is None:
+            base_path = hdf5_path.replace('sim.h5', '')
+
         hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
         temp.append(  (id, tag, hdf5_path, graphs_available) )
 
+        all_data[tag] = json_data_graph
         query = {'path':path}
         if sim_id:       
             query['sim_id'] = sim_id
         comp_details.append([tag, job_id, sim_id, reverse('simulation:run_job_get').encode('ascii') +  '?' + urllib.urlencode(query), hdf5_path])
 
+    common_graphs = sorted(set.intersection(*all_graphs))  
+
+    filepath = base_path + '_'.join(file_parts) + '_json'
+    filepath_web = '/static/simulation/sims/' + filepath.replace(utils.storage_path, '')
+
+    if not os.path.exists(filepath):
+        gen_data_comparison(filepath, common_graphs, all_data)    
+        
     data = {}
     data['selected'] = temp
 
     data['session_lookup'] = [(i, request.GET[i]) for i in selected]
     data['comp_details'] = comp_details
     data['selected_jobs'] = ','.join(selected)
-    data['json_url'] = reverse('simulation:get_data_comparison', None, None)
-    data['graphs_common'] = sorted(set.intersection(*all_graphs))
+    data['json_url'] = filepath_web
+    data['graphs_common'] = common_graphs
     return render(request, 'simulation/draw_comparison.html', data)
 
 def generate_batch_choice(json_data, simulation, request, path):
@@ -1446,63 +1474,16 @@ def get_graph_data(path, rel_path, job_id, sim_id):
     json_path, hdf5_path, graphs, data, alive, complete, stdout, stderr = utils.get_graph_data(path, settings.chunk_size, rel_path)
     parent, hdf5_name = os.path.split(hdf5_path)
     json_cache = os.path.join(parent, 'json_cache')
-
-    if job_id and sim_id:
-        prefix = 'Job %s Sim: %s' % (job_id, sim_id)
-    else:
-        prefix = 'Job %s ' % job_id
-
     json_data = open(json_cache, 'rb').read()
     json_data = json.loads(json_data)
     json_data = utils.encode_to_ascii(json_data)
     return json_data
 
-@gzip.gzip_page
-def get_data_comparison(request):
-    """This function has to call an external process because of scipy. DO NOT MERGE that code into here. It causes apache
-    to deadlock and go into some kind of memory allocation loop. I tried many different options but none worked. Instead
-    will pass the needed json to an external process and then read the result back."""
-    selected = request.GET.get('selected').split(',')
-
-    temp = []
-    job_ids = []
-    filename_parts = []
-    for i in selected:
-        tag = request.GET[i]
-        try:
-            (job_id, sim_id) = map(int, i.split('_'))
-            filename_parts.append('%s_%s' % (job_id, sim_id))
-        except ValueError:
-            (job_id, sim_id) = (int(i), None)
-            filename_parts.append(str(job_id))
-        temp.append( (job_id, sim_id, tag) )
-        job_ids.append(job_id)
-    
-    temp.sort()
-
-    JOBS = models.Job.objects.filter(id__in = job_ids)
-
-    job_lookup = {}
-    for job in JOBS:
-        job_lookup[job.id] = job.uid
-
-    all_graphs = []
-    all_data = {}
-    for job_id, sim_id, tag in temp:
-        if sim_id:
-            rel_path = models.Simulation.objects.get(id=int(sim_id)).Rel_Path
-        else:
-            rel_path = ''
-        path = job_lookup[job_id]
-        
-        json_data = get_graph_data(path, rel_path, job_id, sim_id)
-        all_data[tag] = json_data
-        all_graphs.append(set(json_data['data'].keys()))
-
-    common_graphs = set.intersection(*all_graphs)
-
+def gen_data_comparison(filepath, common_graphs, all_data):
+    """Generate the comparison data"""
     #Filter data
     all_components = {}
+    common_graphs = set(id for id,name in common_graphs)
     for key, value in all_data.items():
         local_graphs = set(value['data'].keys())
         to_remove = local_graphs - common_graphs
@@ -1537,17 +1518,10 @@ def get_data_comparison(request):
             comparison_data[graph_name]['data'][tag] = graph_data
             comparison_data[graph_name]['components'] = all_components[graph_name]
 
-
-
-
-
-    path = JOBS[0].uid
-    filename = '__'.join(sorted(filename_parts)) + '.json'
-
     json_data = {}
     json_data['comparison_data'] = comparison_data
 
-    return JsonResponse(json_data, safe=False)
+    open(filepath, 'wb').write(json.dumps(json_data))
 
 @login_required
 @gzip.gzip_page
