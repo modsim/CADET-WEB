@@ -589,6 +589,13 @@ def failure(parent_dir, isBatch, job, url, stdout=None, stderr=None):
     
     data['stdout'] = stdout
     data['stderr'] = stderr
+
+    try:
+        data['cadet_version'] = str(np.array(h5['/meta/CADET_VERSION']))
+        data['cadet_git_version'] = str(np.array(h5['/meta/CADET_COMMIT']))
+    except KeyError:
+        data['cadet_version'] = 'NOT FOUND'
+        data['cadet_git_version'] = 'NOT FOUND'
         
     json_cache = os.path.join(parent_dir, 'json_cache')
     open(json_cache, 'wb').write(json.dumps(data))
@@ -618,6 +625,8 @@ def gen_json_cache_complete(parent_dir, h5, hdf5_path):
     data['stdout'] = str(np.array(h5['/web/STDOUT']))
     data['stderr'] = str(np.array(h5['/web/STDERR']))
     data['prefix'] = ''
+    data['cadet_version'] = str(np.array(h5['/meta/CADET_VERSION']))
+    data['cadet_git_version'] = str(np.array(h5['/meta/CADET_COMMIT']))
         
     data['data'] = {}
 

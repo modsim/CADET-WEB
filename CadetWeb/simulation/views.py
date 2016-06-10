@@ -1172,57 +1172,58 @@ def remove_without_error(path):
 def force_rerun(request):
     "force rerun the simulation"
     check_sum = request.POST['path']
-
-    relative_parts = [storage_path,] + [''.join(i for i in seq if i is not None) for seq in utils.grouper(check_sum, settings.chunk_size)]
-    relative_path = os.path.join(*relative_parts)
-
-    reset_sim = ['progress', 'status', 'stderr', 'json_cache', 'pid', 'sim.h5']
-    reset_sim = [os.path.join(relative_path, i) for i in reset_sim]
-
-    map(remove_without_error, reset_sim)
-
-    reset_sim_wildcards = ['*.csv', '*.xlsx', '*.png']
-    reset_sim_wildcards = [os.path.join(relative_path, i) for i in reset_sim_wildcards]
-
-    for path in reset_sim_wildcards:
-        map(remove_without_error, glob.glob(path))
-        
-    #remove all the batch stuff    
-    shutil.rmtree(os.path.join(relative_path, 'batch'), True)
-
-
-    path = os.path.join(relative_path, 'setup.json')
-    
-    json_data = open(path, 'rb').read()
-    json_data = json.loads(json_data)
-    json_data = utils.encode_to_ascii(json_data)
-
-    simulation_path = cadet_runner.create_simulation_file(relative_path, json_data)
-    
-    out = open(os.path.join(relative_path, 'stdout'), 'w')
-    err = open(os.path.join(relative_path, 'stderr'), 'w')
-
-    data = {}
-    data['complete'] = 0
-    data['ok'] = 0
-
-    json_cache = os.path.join(relative_path, 'json_cache')
-    open(json_cache, 'wb').write(json.dumps(data))
-
     job = job = models.Job.objects.get(uid=check_sum)
-    models.Job_Status.objects.update_or_create(Job_ID = job, defaults={'seen': 0, 'successful':0, 'running':1, 'start':datetime.now(), 'end':None})
+
+    if request.user.groups.filter(name='force_rerun').exists() or job.username == request.user.username:
+        relative_parts = [storage_path,] + [''.join(i for i in seq if i is not None) for seq in utils.grouper(check_sum, settings.chunk_size)]
+        relative_path = os.path.join(*relative_parts)
+
+        reset_sim = ['progress', 'status', 'stderr', 'json_cache', 'pid', 'sim.h5']
+        reset_sim = [os.path.join(relative_path, i) for i in reset_sim]
+
+        map(remove_without_error, reset_sim)
+
+        reset_sim_wildcards = ['*.csv', '*.xlsx', '*.png']
+        reset_sim_wildcards = [os.path.join(relative_path, i) for i in reset_sim_wildcards]
+
+        for path in reset_sim_wildcards:
+            map(remove_without_error, glob.glob(path))
+        
+        #remove all the batch stuff    
+        shutil.rmtree(os.path.join(relative_path, 'batch'), True)
 
 
-    #FIXME
-    #current_site = get_current_site(request).domain 
-    current_site = 'https://ibt761.ibt.kfa-juelich.de'
-    url_pass = current_site + reverse('simulation:job_completed_ok', None, None).encode('ascii')
-    url_fail = current_site + reverse('simulation:job_completed_failure', None, None).encode('ascii')
+        path = os.path.join(relative_path, 'setup.json')
+    
+        json_data = open(path, 'rb').read()
+        json_data = json.loads(json_data)
+        json_data = utils.encode_to_ascii(json_data)
 
-    popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail], stdout=out, stderr=err)
-    open('/tmp/out', 'w').write(str(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail]))
-    with open(os.path.join(relative_path,'pid'), 'w') as pid:
-        pid.write(str(popen.pid))
+        simulation_path = cadet_runner.create_simulation_file(relative_path, json_data)
+    
+        out = open(os.path.join(relative_path, 'stdout'), 'w')
+        err = open(os.path.join(relative_path, 'stderr'), 'w')
+
+        data = {}
+        data['complete'] = 0
+        data['ok'] = 0
+
+        json_cache = os.path.join(relative_path, 'json_cache')
+        open(json_cache, 'wb').write(json.dumps(data))
+
+        models.Job_Status.objects.update_or_create(Job_ID = job, defaults={'seen': 0, 'successful':0, 'running':1, 'start':datetime.now(), 'end':None})
+
+
+        #FIXME
+        #current_site = get_current_site(request).domain 
+        current_site = 'https://ibt761.ibt.kfa-juelich.de'
+        url_pass = current_site + reverse('simulation:job_completed_ok', None, None).encode('ascii')
+        url_fail = current_site + reverse('simulation:job_completed_failure', None, None).encode('ascii')
+
+        popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail], stdout=out, stderr=err)
+        open('/tmp/out', 'w').write(str(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail]))
+        with open(os.path.join(relative_path,'pid'), 'w') as pid:
+            pid.write(str(popen.pid))
 
     query = {}
     query['path'] = check_sum
