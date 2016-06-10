@@ -884,6 +884,8 @@ def run_job_get(request):
     data['sim_id'] = sim_id
     data['job_username'] = job_username
 
+    data['allowed_rerun'] = request.user.groups.filter(name='force_rerun').exists() or job.username == request.user.username
+
     if 'comparison' in request.session:
         data['comparison'] = format_comparison(request.session['comparison'].items())
 
