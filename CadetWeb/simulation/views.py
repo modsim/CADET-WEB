@@ -831,7 +831,9 @@ def run_job_get(request):
         simulation = None
         rel_path = ''
 
-    job_id = models.Job.objects.get(uid=path).id
+    job = models.Job.objects.get(uid=path)
+    job_id = job.id
+    job_username = job.username
 
     if sim_id and job_id:
         prefix = 'job_%s_sim_%s' % (job_id, sim_id)
@@ -880,6 +882,7 @@ def run_job_get(request):
     data['job_id'] = job_id
     data['dropdown'] = generate_batch_choice(json_data, simulation, request, path)
     data['sim_id'] = sim_id
+    data['job_username'] = job_username
 
     if 'comparison' in request.session:
         data['comparison'] = format_comparison(request.session['comparison'].items())
