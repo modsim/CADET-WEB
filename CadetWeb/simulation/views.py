@@ -819,7 +819,6 @@ def community(request):
     context = {}
     return render(request, 'simulation/community.html', context)
 
-@login_required
 def run_job_get(request):
     path = request.GET['path']
     sim_id = request.GET.get('sim_id', '')
@@ -898,7 +897,6 @@ def format_comparison(seq):
         temp.append( (comparison_id, name, job_id, sim_id) )
     return temp
     
-@login_required
 def draw_comparison(request):
     selected = request.GET.getlist('selected')
 
@@ -1452,7 +1450,6 @@ def get_graph_data(path, rel_path, job_id, sim_id):
     json_data = utils.encode_to_ascii(json_data)
     return json_data
 
-@login_required
 @gzip.gzip_page
 def get_data_comparison(request):
     """This function has to call an external process because of scipy. DO NOT MERGE that code into here. It causes apache

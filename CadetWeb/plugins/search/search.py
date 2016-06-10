@@ -4,9 +4,10 @@ form_id = "Search"
 search_name = "Search Now"
 
 from simulation import models
+import settings
 
 def run(request):
-    html_string = '''
+    html = ['''
     <div class="row">
         <div class="col-md-12">
            <div class="form-group">
@@ -14,16 +15,19 @@ def run(request):
               <div class="col-sm-1">
                 <label for="lb" class="control-label">From</label>
               </div>
-              <div class="col-sm-2 date">
+              <div class="col-sm-3 date">
                 <input type="date" class="form-control" name="lb" id="lb">
               </div>
               <div class="col-sm-1">
                 <label for="ub" class="control-label">To</label>
               </div>
-              <div class="col-sm-2 date">
+              <div class="col-sm-3 date">
                 <input type="date" class="form-control" name="ub" id="ub">
               </div>
-            </div>
+            </div>''',]
+
+    if request.user.groups.filter(name='full_search').exists():
+            html.append('''
             <div class="form-group">
               <div class="col-sm-2">
                 <label for="username" class="control-label">Username</label>
@@ -31,7 +35,9 @@ def run(request):
               <div class="col-sm-10">
                 <input type="text" class="form-control" name="username" id="username">
               </div>
-            </div>
+            </div>''',)
+    
+    html.append('''
             <div class="form-group">
               <div class="col-sm-2">
                 <label for="study_name" class="control-label">Study Name</label>
@@ -66,13 +72,16 @@ def run(request):
             </div>
         </div>
       </div>
-      '''
-    return html_string
+      ''')
+    return ''.join(html)
 
 def process_search(request, search_dict):
     lb = search_dict['lb']
     ub = search_dict['ub']
-    username = search_dict['username']
+
+
+    if request.user.groups.filter(name='full_search').exists():
+        username = search_dict['username']
     study_name = search_dict['study_name']
     product_name = search_dict['product_name']
     model_name = search_dict['model_name']
@@ -83,7 +92,12 @@ def process_search(request, search_dict):
     
     search = {}
     search['study_name__icontains'] = study_name
-    search['username__icontains'] = username
+
+    if request.user.groups.filter(name='full_search').exists():
+        search['username__icontains'] = username
+    else:
+        search['username__in'] = [request.user.username] + list(settings.users_keep)
+
     search['Model_ID__model__icontains'] = model_name
     search['Product_ID__product__icontains'] = product_name
     if lb:
