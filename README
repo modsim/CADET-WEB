@@ -1,11 +1,8 @@
 CADET Web Interface
 
-This is the new web interface project for CADET and designed to be extended by 
-research groups and companies for their own specialized uses.
+This is the new web interface project for CADET and designed to be extended by research groups and companies for their own specialized uses.
 
-This interface is part of the CADET (Chromatography Analysis and Design Toolkit) 
-project and is developed as the Institution of Bio and Geosciences 1 (IBG-1) of
-Forschungszentrum Julich (FZJ) under the supervision of Dr. Eric von Lieres.
+This interface is part of the CADET (Chromatography Analysis and Design Toolkit) project and is developed at IBG-1: Biotechnology of Forschungszentrum Jülich (FZJ) under the supervision of Dr. Eric von Lieres.
 
 ## Features
 Create and run single experiements
@@ -26,8 +23,7 @@ Postgresql
 
 This website uses a number of more recent html features that are not available in older browsers
 
-For best results use the current version of Chrome or Firefox. Internet Explorer 11 and Edge work
-with a few speed and graphing limitations. 
+For best results use the current version of Chrome or Firefox. Internet Explorer 11 and Edge work with a few speed and graphing limitations. 
 
 # The main CADET website is located at
 http://www.cadet-web.de/
