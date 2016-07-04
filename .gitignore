@@ -108,3 +108,10 @@ crashlytics-build.properties
 
 ## CADET Simulation files
 sims/
+/.vs/config
+/bin/AzureSetup.cfg
+/bin/Microsoft.PythonTools.AzureSetup.exe.config
+/bin/wfastcgi.py
+/obj/Debug
+/CADET-WEB.pyproj
+/CADET-WEB.sln
