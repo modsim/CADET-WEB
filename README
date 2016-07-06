@@ -2,9 +2,7 @@ CADET Web Interface
 
 This is the new web interface project for CADET and designed to be extended by research groups and companies for their own specialized uses.
 
-This interface is part of the CADET (Chromatography Analysis and Design Toolkit) project and is developed at IBG-1: Biotechnology of Forschungszentrum Jülich (FZJ) under the supervision of Dr. Eric von Lieres. The Chromatography Analysis and  Design Toolkit (CADET) is developed at the
-    Institute of Bio- and Geosciences 1 (IBG-1) under supervision of Dr. Eric von Lieres.
-    Joel Andersson, Sebastian Schnittert, Andreas Püttmann and Samuel Leweke have made major contributions to the CADET simulator. This web-interface has been created by William Heymann.
+This interface is part of the CADET (Chromatography Analysis and Design Toolkit) project and is developed at IBG-1: Biotechnology of Forschungszentrum Jülich (FZJ) under the supervision of Dr. Eric von Lieres. The Chromatography Analysis and  Design Toolkit (CADET) is developed at the     Institute of Bio- and Geosciences 1 (IBG-1) under supervision of Dr. Eric von Lieres. Joel Andersson, Sebastian Schnittert, Andreas Püttmann and Samuel Leweke have made major contributions to the CADET simulator. This web-interface has been created by William Heymann.
 
 ## Features
 Create and run single experiements
