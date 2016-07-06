@@ -1177,7 +1177,7 @@ def run_job(request):
 
         #FIXME
         #current_site = get_current_site(request).domain 
-        current_site = 'https://ibt761.ibt.kfa-juelich.de' 
+        current_site = settings.site_url
         url_pass = current_site + reverse('simulation:job_completed_ok', None, None).encode('ascii')
         url_fail = current_site + reverse('simulation:job_completed_failure', None, None).encode('ascii')
 
