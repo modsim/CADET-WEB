@@ -14,8 +14,9 @@
               <tr>
                 <th>Job #</th>
                 <th>Username</th>
-                <th>Study Name</th>
-                <th>Model Name</th>
+                <th>Study</th>
+                <th>Model</th>
+                <th>Date</th>
                 <th>Isotherm</th>
                 {% for header in headers %}
                     <th>{{ header }}</th>
@@ -31,6 +32,7 @@
                 <td>{{ search_result.7 }}</td>
                 <td>{{ search_result.1 }}</td>
                 <td>{{ search_result.2 }}</td>
+                <td>{{ search_result.8|date:"Y-M-d" }}</td>
                 <td>{{ search_result.3 }}</td>
 
                 {% for additional_column in search_result.4 %}

@@ -786,14 +786,14 @@ def query_results(request, name=None):
         isotherm = models.Job_String.objects.get(Job_ID=job, Parameter_ID=parameter).Data
         additional = result[1:]
         username = job.username
-
+        created = job.created
         try:
             rating = models.Job_Notes.objects.get(Job_ID=job).rating
         except ObjectDoesNotExist:
             rating = 0
 
         url = reverse('simulation:run_job_get', None, None) + "?path=%s" % job.uid
-        search_results.append([jobid, study_name, model_name, isotherm.replace('_', ' ').title(), additional, rating, url, job.username])
+        search_results.append([jobid, study_name, model_name, isotherm.replace('_', ' ').title(), additional, rating, url, job.username, created])
     if results:
         headers = results[0][1:]
     else:

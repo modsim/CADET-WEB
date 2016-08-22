@@ -25,7 +25,7 @@ DEBUG = False
 
 TEMPLATE_DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['ibt761.ibt.kfa-juelich.de', '.cadet-web.de']
 
 
 # Application definition
