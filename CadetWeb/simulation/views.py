@@ -484,13 +484,14 @@ def simulation_setup(request):
                         ('PRINT_STATISTICS','1'),
                         ('PRINT_TIMING','1'),
                         ('USE_ANALYTIC_JACOBIAN','1'),
-                        ('WRITE_AT_USER_TIMES','0'),
+                        #('WRITE_AT_USER_TIMES','0'),
                         ('WRITE_SENS_ALL','0'),
                         ('WRITE_SENS_COLUMN_OUTLET','1'),
                         ('WRITE_SOLUTION_ALL','0'),
-                        ('WRITE_SOLUTION_COLUMN_INLET','1'),
-                        ('WRITE_SOLUTION_COLUMN_OUTLET','1'),
-                        ('WRITE_SOLUTION_TIMES','1')], data)
+                        #('WRITE_SOLUTION_COLUMN_INLET','1'),
+                        #('WRITE_SOLUTION_COLUMN_OUTLET','1'),
+                        #('WRITE_SOLUTION_TIMES','1'),
+                        ], data)
     data['back'] = reverse('simulation:loading_setup', None, None)
     data['back_text'] = 'Loading Setup'
     data.update(utils.name_lookup_template)

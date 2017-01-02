@@ -178,18 +178,19 @@ def solver(input, data):
         times = map(float, times)
         times.sort()
     else:
-        times = []
+        section_times = get_section_times(data)
+        times = np.linspace(section_times[0], section_times[-1], 1000, endpoint=True)
     
-    set_value(solver, 'USER_SOLUTION_TIMES', 'i4', times)
+    set_value(solver, 'USER_SOLUTION_TIMES', 'f8', times)
     
     set_value(solver, 'USE_ANALYTIC_JACOBIAN', 'i4', int(data['USE_ANALYTIC_JACOBIAN']))
-    set_value(solver, 'WRITE_AT_USER_TIMES', 'i4', int(data['WRITE_AT_USER_TIMES']))
+    set_value(solver, 'WRITE_AT_USER_TIMES', 'i4', 1)
     set_value(solver, 'WRITE_SENS_ALL', 'i4', int(data['WRITE_SENS_ALL']))
     set_value(solver, 'WRITE_SENS_COLUMN_OUTLET', 'i4', int(data['WRITE_SENS_COLUMN_OUTLET']))
     set_value(solver, 'WRITE_SOLUTION_ALL', 'i4', int(data['WRITE_SOLUTION_ALL']))
-    set_value(solver, 'WRITE_SOLUTION_COLUMN_INLET', 'i4', int(data['WRITE_SOLUTION_COLUMN_INLET']))
-    set_value(solver, 'WRITE_SOLUTION_COLUMN_OUTLET', 'i4', int(data['WRITE_SOLUTION_COLUMN_OUTLET']))
-    set_value(solver, 'WRITE_SOLUTION_TIMES', 'i4', int(data['WRITE_SOLUTION_TIMES']))
+    set_value(solver, 'WRITE_SOLUTION_COLUMN_INLET', 'i4', 1)
+    set_value(solver, 'WRITE_SOLUTION_COLUMN_OUTLET', 'i4', 1)
+    set_value(solver, 'WRITE_SOLUTION_TIMES', 'i4', 1)
     
     schur_solver(solver, data)
     time_integrator(solver, data)
@@ -427,7 +428,7 @@ def inlet(model, data):
 def compress_data(h5):
     #DO NOT MOVE THIS IMPORT OR IT WILL DEADLOCK WSGI
     #IT CAN'T BE OUTSIDE THIS FUNCTION
-    import compress_series
+    #import compress_series
     #compress the data
     web = h5["web"]
     if web.get("compress", None) is not None:
@@ -442,16 +443,16 @@ def compress_data(h5):
 
     solution_times = np.array(h5['/output/solution/SOLUTION_TIMES'])
 
-    ABSTOL = h5['/input/solver/time_integrator/ABSTOL'].value
+    #ABSTOL = h5['/input/solver/time_integrator/ABSTOL'].value
 
-    digits = int(np.floor(abs(max(np.log10(ABSTOL), -15)) - 2))
+    #digits = int(np.floor(abs(max(np.log10(ABSTOL), -15)) - 2))
 
     for name in ('OUTLET', 'INLET'):
         data = [solution_times,]
         for idx in range(number_of_components):
-            data.append(np.around(np.array(h5['/output/solution/SOLUTION_COLUMN_%s_COMP_%03d' % (name, idx)]),digits))
+            data.append(np.array(h5['/output/solution/SOLUTION_COLUMN_%s_COMP_%03d' % (name, idx)]))
         data = np.transpose(np.vstack(data))
-        data = compress_series.compress(data)
+        #data = compress_series.compress(data)
         set_value(compress, name, 'f8', data)
 
     try:
@@ -464,7 +465,7 @@ def compress_data(h5):
         for idx in range(number_of_components):
             data.append(np.array(h5['/output/sensitivity/%s/SENS_COLUMN_OUTLET_COMP_%03d' % (name, idx)]))
         data = np.transpose(np.vstack(data))
-        data = compress_series.compress(data)
+        #data = compress_series.compress(data)
         set_value(compress, name, 'f8', data)
 
 def gen_bounds(lb, ub, base_value):
@@ -593,7 +594,7 @@ def failure(parent_dir, isBatch, job, url, stdout=None, stderr=None):
     try:
         data['cadet_version'] = str(np.array(h5['/meta/CADET_VERSION']))
         data['cadet_git_version'] = str(np.array(h5['/meta/CADET_COMMIT']))
-    except KeyError:
+    except (KeyError,ValueError):
         data['cadet_version'] = 'NOT FOUND'
         data['cadet_git_version'] = 'NOT FOUND'
         

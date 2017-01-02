@@ -9,7 +9,7 @@ chunk_size = 20
 memory = 500
 
 #cpu time in seconds (total time cadet is allowed to run) analysis takes places after this
-cpu = 500.0
+cpu = 900.0
 
 
 #limit number of combinations
@@ -30,8 +30,12 @@ time_format = '%Y %B %d  %H:%M:%S'
 examples = 10
 
 #allowed isotherms and the order they shoudl be shown in
-isotherms = ('MULTI_COMPONENT_LANGMUIR', 'MULTI_COMPONENT_BILANGMUIR', 'EXTERNAL_LANGMUIR', 'STERIC_MASS_ACTION', 'EXTERNAL_STERIC_MASS_ACTION', 'SELF_ASSOCIATION', 'LINEAR', 
-             'MOBILE_PHASE_MODULATORS', 'EXTERNAL_MOBILE_PHASE_MODULATORS')
+isotherms = ('LINEAR', 
+    'MULTI_COMPONENT_LANGMUIR', 
+    'STERIC_MASS_ACTION',
+    'MULTI_COMPONENT_BILANGMUIR',
+    'MOBILE_PHASE_MODULATORS',
+    'SELF_ASSOCIATION')
 
 first_component_salt = ( 'STERIC_MASS_ACTION', 'EXTERNAL_STERIC_MASS_ACTION', 'SELF_ASSOCIATION', 'MOBILE_PHASE_MODULATORS', 'EXTERNAL_MOBILE_PHASE_MODULATORS')
 
