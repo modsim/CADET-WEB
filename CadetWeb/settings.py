@@ -29,7 +29,7 @@ time_format = '%Y %B %d  %H:%M:%S'
 #how  many examples to show
 examples = 10
 
-#allowed isotherms and the order they shoudl be shown in
+#allowed isotherms and the order they should be shown in
 isotherms = ('LINEAR', 
     'MULTI_COMPONENT_LANGMUIR', 
     'STERIC_MASS_ACTION',

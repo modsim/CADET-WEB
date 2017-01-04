@@ -225,12 +225,15 @@ def get_examples(limit):
     "format is study name, model name, isotherm, results link, create link, create batch link"
     results = models.Job.objects.filter(username='cadet', job_notes__rating=5).select_related('job_notes').order_by('-created')[:limit]
     parameter = models.Parameters.objects.get(name='ADSORPTION_TYPE')
+    
+    isotherms = dict([(name,index) for (index,name) in enumerate(settings.isotherms)])
 
     temp = []
     for result in results:
         study_name= result.study_name
         model_name = result.Model_ID.model
-        isotherm = models.Job_String.objects.get(Job_ID=result, Parameter_ID=parameter).Data.replace('_', ' ').title()
+        isotherm_name = models.Job_String.objects.get(Job_ID=result, Parameter_ID=parameter).Data
+        isotherm = isotherm_name.replace('_', ' ').title()
         results_link = reverse('simulation:run_job_get', None, None) + "?path=%s" % result.uid
         create_single = reverse('simulation:single_start', None, None) + "?path=%s" % result.uid
         create_batch = reverse('simulation:choose_attributes_to_modify', None, None) + "?path=%s" % result.uid
@@ -241,7 +244,9 @@ def get_examples(limit):
             note = result.job_notes.notes
         except models.Job_Notes.DoesNotExist:
             note = ''
-        temp.append([study_name, model_name, isotherm, results_link, create_single, create_batch, created, simulation_path, note])
+        temp.append( (isotherms.get(isotherm_name.encode('ascii'), len(isotherms)+1), [study_name, model_name, isotherm, results_link, create_single, create_batch, created, simulation_path, note]) )
+    temp.sort()
+    temp = [val for sort,val in temp]    
     return temp
 
 def get_most_recent_simulations(username, limit):
