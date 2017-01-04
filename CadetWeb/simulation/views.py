@@ -478,11 +478,12 @@ def simulation_setup(request):
     data['discretizations'] = nice_names(['EQUIDISTANT_PAR', 'EQUIVOLUME_PAR', 'USER_DEFINED_PAR'], data, 'PAR_DISC_TYPE')
     data['reconstructions'] = nice_names(['WENO'], data, 'RECONSTRUCTION')
     data['log_levels'] = nice_names(['ERROR', 'WARNING', 'INFO', 'DEBUG1', 'DEBUG2', 'TRACE1', 'TRACE2'], data, 'LOG_LEVEL')
-    data['radios'] = fix_radio([ ('PRINT_CONFIG','0'),
-                        ('PRINT_PARAMLIST','0'),
-                        ('PRINT_PROGRESS','0'),
-                        ('PRINT_STATISTICS','1'),
-                        ('PRINT_TIMING','1'),
+    data['radios'] = fix_radio([ 
+                        #('PRINT_CONFIG','0'),
+                        #('PRINT_PARAMLIST','0'),
+                        #('PRINT_PROGRESS','0'),
+                        #('PRINT_STATISTICS','1'),
+                        #('PRINT_TIMING','1'),
                         ('USE_ANALYTIC_JACOBIAN','1'),
                         #('WRITE_AT_USER_TIMES','0'),
                         ('WRITE_SENS_ALL','0'),
@@ -582,6 +583,8 @@ def sensitivity_setup(request):
                 value = float(data['%s:%s:%s' % (section, component, name)])
             elif name and component:
                 value = float(data['%s:%s' % (component, name)])
+            elif name:
+                value = float(data['%s' % name])
             else:
                 value = 0
 

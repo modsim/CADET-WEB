@@ -161,11 +161,11 @@ def solver(input, data):
     
     set_value_enum(solver, 'LOG_LEVEL', data['LOG_LEVEL'])
     set_value(solver, 'NTHREADS', 'i4', int(data['NTHREADS']))
-    set_value(solver, 'PRINT_CONFIG', 'i4', int(data['PRINT_CONFIG']))
-    set_value(solver, 'PRINT_PARAMLIST', 'i4', int(data['PRINT_PARAMLIST']))
-    set_value(solver, 'PRINT_PROGRESS', 'i4', int(data['PRINT_PROGRESS']))
-    set_value(solver, 'PRINT_STATISTICS', 'i4', int(data['PRINT_STATISTICS']))
-    set_value(solver, 'PRINT_TIMING', 'i4', int(data['PRINT_TIMING']))
+    set_value(solver, 'PRINT_CONFIG', 'i4', 1)
+    set_value(solver, 'PRINT_PARAMLIST', 'i4', 1)
+    set_value(solver, 'PRINT_PROGRESS', 'i4', 1)
+    set_value(solver, 'PRINT_STATISTICS', 'i4', 1)
+    set_value(solver, 'PRINT_TIMING', 'i4', 1)
     
     #probably use the csv module to make this more generic
     #for now since we only accept numbers and they must be separated by commas this will work
@@ -443,14 +443,14 @@ def compress_data(h5):
 
     solution_times = np.array(h5['/output/solution/SOLUTION_TIMES'])
 
-    #ABSTOL = h5['/input/solver/time_integrator/ABSTOL'].value
+    ABSTOL = h5['/input/solver/time_integrator/ABSTOL'].value
 
-    #digits = int(np.floor(abs(max(np.log10(ABSTOL), -15)) - 2))
+    digits = int(np.floor(abs(max(np.log10(ABSTOL), -15)) - 2))
 
     for name in ('OUTLET', 'INLET'):
         data = [solution_times,]
         for idx in range(number_of_components):
-            data.append(np.array(h5['/output/solution/SOLUTION_COLUMN_%s_COMP_%03d' % (name, idx)]))
+            data.append(np.around(np.array(h5['/output/solution/SOLUTION_COLUMN_%s_COMP_%03d' % (name, idx)]), digits))
         data = np.transpose(np.vstack(data))
         #data = compress_series.compress(data)
         set_value(compress, name, 'f8', data)
