@@ -182,24 +182,25 @@ def index(request):
 
 #@login_required
 def remove_old_simulations():
-    jobs = models.Job.objects.filter(created__lte=datetime.now()-timedelta(days=settings.keep_time))
-    
-    removed = 0
-    for job in jobs:
-        if job.username not in settings.users_keep:
-            delete_job(job.uid)
-            removed = removed + 1
+    if settings.keep_time:
+        jobs = models.Job.objects.filter(created__lte=datetime.now()-timedelta(days=settings.keep_time))
+        
+        removed = 0
+        for job in jobs:
+            if job.username not in settings.users_keep:
+                delete_job(job.uid)
+                removed = removed + 1
 
-    # for root, dirs, files in os.walk(storage_path, topdown=False):
-    #     print root, dirs, files
-    #     # if a directory is empty there will be no sub-directories or files
-    #     if len(dirs) is 0 and len(files) is 0 and len(root) > len(storage_path) and root.startswith(storage_path):
-    #         shutil.rmtree(root)
+        # for root, dirs, files in os.walk(storage_path, topdown=False):
+        #     print root, dirs, files
+        #     # if a directory is empty there will be no sub-directories or files
+        #     if len(dirs) is 0 and len(files) is 0 and len(root) > len(storage_path) and root.startswith(storage_path):
+        #         shutil.rmtree(root)
 
-    #data = {}
-    #data['removed'] = removed
+        #data = {}
+        #data['removed'] = removed
 
-    #return render(request, 'simulation/remove_old.html', data)
+        #return render(request, 'simulation/remove_old.html', data)
 
 def delete_job(uid):
     "delete this job from the system"
