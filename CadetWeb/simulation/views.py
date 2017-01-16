@@ -877,7 +877,8 @@ def run_job_get(request):
     data['graphs'] = sorted(graphs)
 
     hdf5_path = '/static/simulation/sims/' + hdf5_path.replace(utils.storage_path, '')
-    json_cache = hdf5_path.replace('sim.h5', 'json_cache')
+    #json_cache = hdf5_path.replace('sim.h5', 'json_cache')
+    json_cache = os.path.join(os.path.dirname(hdf5_path), 'json_cache')
     progress_path = os.path.join(os.path.dirname(hdf5_path), 'progress')
 
     try:
