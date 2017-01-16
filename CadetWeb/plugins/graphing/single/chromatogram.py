@@ -30,14 +30,21 @@ def generate_csv(hdf5_path):
     data = pd.DataFrame()
     data['Time'] = h5['/output/solution/SOLUTION_TIMES']
     
-    number_of_components = h5['/input/model/NCOMP'].value
-    components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
+    #number_of_components = h5['/input/model/NCOMP'].value
+    #components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
+
+    components = [node.value for key,node in h5['/web/COMPONENTS'].items()]
+
+    number_of_components = len(components)
 
     columns = ['Time']
 
     for idx, comp in enumerate(components):
         columns.append(comp)
-        data[comp] = h5['/output/solution/SOLUTION_COLUMN_OUTLET_COMP_%03d' % idx]
+        try:
+            data[comp] = h5['/output/solution/SOLUTION_COLUMN_OUTLET_COMP_%03d' % idx]
+        except KeyError:
+            data[comp] = h5['/output/solution/unit_001/SOLUTION_COLUMN_OUTLET_COMP_%03d' % idx]
 
     parent, hdf5_name = os.path.split(hdf5_path)
     data.to_csv(os.path.join(parent, file_name_csv), columns=columns, index=False)
@@ -90,9 +97,13 @@ def get_data(hdf5_path):
 
     h5 = h5py.File(hdf5_path, 'r')
 
-    number_of_components = h5['/input/model/NCOMP'].value
+    #number_of_components = h5['/input/model/NCOMP'].value
 
-    components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
+    components = [node.value for key,node in h5['/web/COMPONENTS'].items()]
+
+    number_of_components = len(components)
+
+    #components = [h5['/web/COMPONENTS/COMP_%03d' % i].value for i in  range(number_of_components)]
 
     solution_values = np.array(h5['/web/compress/OUTLET'])
     solution_times = solution_values[:,0]

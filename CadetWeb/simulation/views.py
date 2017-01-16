@@ -22,6 +22,7 @@ import csv
 import h5py
 import plot_sensitivity
 import cadet_runner
+import cadet_runner_3
 import utils
 import numpy as np
 import operator
@@ -31,6 +32,10 @@ from datetime import datetime, timedelta
 import shutil
 from collections import OrderedDict
 import glob
+
+get_runner = {}
+get_runner['2.3'] = cadet_runner
+get_runner['3.0'] = cadet_runner_3
 
 class HttpResponseTemporaryRedirect(HttpResponse):
     status_code = 307
@@ -51,7 +56,7 @@ default_value['MAX_RESTARTS'] = '0'
 default_value['SCHUR_SAFETY'] = '1E-8'
 default_value['ABSTOL'] = '1E-8'
 default_value["INIT_STEP_SIZE"] = '0.0'
-default_value['MAX_STEPS'] = "0"
+default_value['MAX_STEPS'] = "50000"
 default_value['RELTOL'] = "0.0"
 default_value['NCOL'] = '50'
 default_value['NPAR'] = '5'
@@ -70,6 +75,7 @@ default_value['WRITE_SENS_COLUMN_INLET'] = 1
 default_value['WRITE_SOLUTION_TIMES'] = 1
 default_value['graph_single:Chromatogram'] = '1'
 default_value['graph_single:Chromatogram Inlet'] = '1'
+default_value['CADET_VERSION'] = '2.3'
 
 current_path = __file__
 simulation_path, current_file_name = os.path.split(current_path)
@@ -78,6 +84,12 @@ parent_path, _ = simulation_path.rsplit('/', 1)
 storage_path = os.path.join(parent_path, 'sims')
 
 cadet_runner_path = os.path.join(parent_path, 'cadet_runner.py')
+cadet_runner_3_path = os.path.join(parent_path, 'cadet_runner_3.py')
+
+
+get_runner_path = {}
+get_runner_path['2.3'] = cadet_runner_path
+get_runner_path['3.0'] = cadet_runner_3_path
 
 cadet_plugin_path = '..'
 
@@ -303,10 +315,13 @@ def single_start(request):
 
 
     isotherms = utils.isotherm_set.keys()
+    cadets = [('CADET 3', '3.0'), ('CADET 2', '2.3')]
+    cadets = [(cadet_version, cadet_name, 'selected' if cadet_version == data.get('CADET_VERSION', '2.3') else '') for (cadet_name, cadet_version) in cadets]
 
     isotherms = [(isotherm.replace('_', ' ').title(), isotherm, 'selected' if isotherm == data.get('ADSORPTION_TYPE', None) else '') for isotherm in isotherms]
     data['json'] = get_json_string(data)
     data['isotherms'] = isotherms
+    data['cadets'] = cadets
     data.update(utils.name_lookup_template)
     return render(request, 'simulation/single_start.html', data)
 
@@ -512,7 +527,8 @@ def graph_setup(request):
     
 
     if data['job_type'] == 'batch':
-        cadet_runner.generate_ranges(data)
+        
+        get_runner[data['CADET_VERSION']].generate_ranges(data)
 
         length = reduce(operator.mul, [len(b) for c,b in data['batch_distribution']], 1)
         if length > settings.batch_limit:
@@ -1147,6 +1163,7 @@ def simulation_rate(request):
 def run_job(request):
     post = request.POST
     data = get_json(post)
+    cadet_version = data['CADET_VERSION']
 
     json_data = get_json_string(data)
     check_sum = hashlib.sha256(json_data).hexdigest()
@@ -1164,7 +1181,7 @@ def run_job(request):
     json.dump(data, open(path, 'w'))
     out = open(os.path.join(relative_path, 'stdout'), 'w')
     err = open(os.path.join(relative_path, 'stderr'), 'w')
-    simulation_path = cadet_runner.create_simulation_file(relative_path, data)
+    simulation_path = get_runner[data['CADET_VERSION']].create_simulation_file(relative_path, data)
 
     try:
         open(os.path.join(relative_path, 'pid'), 'r')
@@ -1191,7 +1208,7 @@ def run_job(request):
         url_pass = current_site + reverse('simulation:job_completed_ok', None, None).encode('ascii')
         url_fail = current_site + reverse('simulation:job_completed_failure', None, None).encode('ascii')
 
-        popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail], stdout=out, stderr=err)
+        popen = subprocess.Popen(['python', get_runner_path[cadet_version], '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail], stdout=out, stderr=err)
 
         with open(os.path.join(relative_path,'pid'), 'w') as pid:
             pid.write(str(popen.pid))
@@ -1238,8 +1255,9 @@ def force_rerun(request):
         json_data = open(path, 'rb').read()
         json_data = json.loads(json_data)
         json_data = utils.encode_to_ascii(json_data)
+        cadet_version = json_data['CADET_VERSION']
 
-        simulation_path = cadet_runner.create_simulation_file(relative_path, json_data)
+        simulation_path = get_runner[json_data['CADET_VERSION']].create_simulation_file(relative_path, json_data)
     
         out = open(os.path.join(relative_path, 'stdout'), 'w')
         err = open(os.path.join(relative_path, 'stderr'), 'w')
@@ -1260,8 +1278,8 @@ def force_rerun(request):
         url_pass = current_site + reverse('simulation:job_completed_ok', None, None).encode('ascii')
         url_fail = current_site + reverse('simulation:job_completed_failure', None, None).encode('ascii')
 
-        popen = subprocess.Popen(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail], stdout=out, stderr=err)
-        open('/tmp/out', 'w').write(str(['python', cadet_runner_path, '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail]))
+        popen = subprocess.Popen(['python', get_runner_path[cadet_version], '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail], stdout=out, stderr=err)
+        #open('/tmp/out', 'w').write(str(['python', get_runner_path[cadet_version], '--json', path, '--sim', simulation_path, '--job', str(job.id), '--url_pass', url_pass, '--url_fail', url_fail]))
         with open(os.path.join(relative_path,'pid'), 'w') as pid:
             pid.write(str(popen.pid))
 
@@ -1413,7 +1431,7 @@ def serialization_settings():
 
 def insert_simulations(job, data, comps, steps, settings):
     if data['job_type'] == 'batch':
-        keys, combos = cadet_runner.generate_permutations(data)
+        keys, combos = get_runner[data['CADET_VERSION']].generate_permutations(data)
         diffs = [dict(zip(keys, combo)) for combo in combos]
 
         for idx,diff in enumerate(diffs):
@@ -1539,7 +1557,7 @@ def inlet_graph(request):
     post = request.POST
     data = get_json(post)
 
-    section_times = cadet_runner.get_section_times(data)
+    section_times = get_runner[data['CADET_VERSION']].get_section_times(data)
     components = [data.get('component%s' % i) for i in range(1, int(data.get('numberOfComponents', ''))+1)]
     steps = [data.get('step%s' % i) for i in range(1, int(data.get('NSEC', ''))+1)]
 
