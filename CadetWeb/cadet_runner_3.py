@@ -244,7 +244,7 @@ def create_sensitivity(input, data):
         set_value(group, 'SENS_COMP', 'i4', int(sen['SENS_COMP']))
         set_value(group, 'SENS_FACTOR', 'f8', 1.0)
         set_value_enum(group, 'SENS_NAME', sen['SENS_NAME'])
-        set_Value(group, 'SENS_REACTION', 'i4', -1)
+        set_value(group, 'SENS_REACTION', 'i4', -1)
         set_value(group, 'SENS_SECTION', 'i4', int(sen['SENS_SECTION']))
         
         #TODO: need to figure out how to do this one also
@@ -523,7 +523,7 @@ def compress_data(h5):
     for name in sens.keys():
         data = [solution_times,]
         for idx in range(number_of_components):
-            data.append(np.array(h5['/output/sensitivity/unit_001/%s/SENS_COLUMN_OUTLET_COMP_%03d' % (name, idx)]))
+            data.append(np.array(h5['/output/sensitivity/%s/unit_001/SENS_COLUMN_OUTLET_COMP_%03d' % (name, idx)]))
         data = np.transpose(np.vstack(data))
         #data = compress_series.compress(data)
         set_value(compress, name, 'f8', data)

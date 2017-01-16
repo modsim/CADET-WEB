@@ -83,9 +83,11 @@ def get_hdf5_path(path, chunk_size, rel_path):
     relative_path = os.path.join(*relative_parts)
 
     if rel_path:
-        return os.path.join(storage_path, relative_path, 'batch', rel_path, 'sim.h5')
+        hdf5_dir = os.path.join(storage_path, relative_path, 'batch', rel_path)
     else:
-        return os.path.join(storage_path, relative_path, 'sim.h5')
+        hdf5_dir = os.path.join(storage_path, relative_path)
+    hdf5_path = glob.glob(os.path.join(hdf5_dir, '*.h5'))[0]
+    return hdf5_path
 
 def get_graph_data(path, chunk_size, rel_path):
     "return the path to the json_file, path to the hdf5 file, and the list of name,url pairs for images"
@@ -117,9 +119,10 @@ def get_graph_data(path, chunk_size, rel_path):
     json_path = os.path.join(storage_path, relative_path, 'setup.json')
 
     if rel_path:
-        hdf5_path = os.path.join(storage_path, relative_path, 'batch', rel_path, 'sim.h5')
+        hdf5_dir = os.path.join(storage_path, relative_path, 'batch', rel_path)
     else:
-        hdf5_path = os.path.join(storage_path, relative_path, 'sim.h5')
+        hdf5_dir = os.path.join(storage_path, relative_path)
+    hdf5_path = glob.glob(os.path.join(hdf5_dir, '*.h5'))[0]
 
     json_data = open(json_path, 'rb').read()
 
