@@ -77,11 +77,11 @@
 
             {% comment "CADET 3 support" %}
             {% endcomment %}
-            <div class="form-group">
+            <div class="form-group advanced">
               <div class="col-sm-2">
                 <label class="control-label">Choose CADET version</label>
               </div>
-              <div class="col-sm-10 advanced">
+              <div class="col-sm-10">
                 <select class="form-control" name="CADET_VERSION">
                   {% for cadet_version, cadet_name, selected in cadets %}
                       <option {{ selected }} value="{{ cadet_version }}">{{ cadet_name }}</option>

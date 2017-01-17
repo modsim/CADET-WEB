@@ -67,7 +67,7 @@ default_value['BOUNDARY_MODEL'] = '0'
 default_value['WENO_EPS'] = '1E-12'
 default_value['WENO_ORDER'] = '3'
 default_value['NTHREADS'] = '4'
-default_value['LOG_LEVEL'] = '4'
+
 default_value['advanced_ui'] = 'normal'
 default_value['WRITE_SOLUTION_COLUMN_OUTLET'] = 1
 default_value['WRITE_SOLUTION_COLUMN_INLET'] = 1
@@ -494,11 +494,35 @@ def simulation_setup(request):
     data.update(get_json(post))
     
 
+    if 'LOG_LEVEL' not in data:
+        if data['CADET_VERSION'] == '2.3':
+            data['LOG_LEVEL'] = '4'
+        else:
+            data['LOG_LEVEL'] = 'Debug'
+
+    #If the log level was inherted from CADET 2.x but we are running CADET 3.x then change the default log level
+    if data['CADET_VERSION'] != '2.3':
+        try:
+            int(data['LOG_LEVEL'])
+            data['LOG_LEVEL'] = 'Debug'
+        except ValueError:
+            pass
+        if data['LOG_LEVEL'].upper() == data['LOG_LEVEL']:
+            data['LOG_LEVEL'] = 'Debug'
+
+
+
     data['json'] = get_json_string(data)
     data['rate_models'] = nice_names(['GENERAL_RATE_MODEL',], data, 'CHROMATOGRAPHY_TYPE')
     data['discretizations'] = nice_names(['EQUIDISTANT_PAR', 'EQUIVOLUME_PAR', 'USER_DEFINED_PAR'], data, 'PAR_DISC_TYPE')
     data['reconstructions'] = nice_names(['WENO'], data, 'RECONSTRUCTION')
-    data['log_levels'] = nice_names(['ERROR', 'WARNING', 'INFO', 'DEBUG1', 'DEBUG2', 'TRACE1', 'TRACE2'], data, 'LOG_LEVEL')
+    
+    if data['CADET_VERSION'] == '2.3':
+        data['log_levels'] = nice_names(['ERROR', 'WARNING', 'INFO', 'DEBUG1', 'DEBUG2', 'TRACE1', 'TRACE2'], data, 'LOG_LEVEL')
+    else:
+        data['log_levels'] = nice_names(['None', 'Fatal', 'Error', 'Warning', 'Normal', 'Info', 'Debug', 'Trace'], data, 'LOG_LEVEL')
+    
+
     data['radios'] = fix_radio([ 
                         #('PRINT_CONFIG','0'),
                         #('PRINT_PARAMLIST','0'),

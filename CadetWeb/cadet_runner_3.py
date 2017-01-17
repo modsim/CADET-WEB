@@ -35,6 +35,8 @@ env['LD_LIBRARY_PATH'] = library_path
 
 storage_path = os.path.join(parent_path, 'sims')
 
+allowed_log_levels = ['None', 'Fatal', 'Error', 'Warning', 'Normal', 'Info', 'Debug', 'Trace']
+
 def set_value(node, nameH5, dtype, value):
     "merge the values from parms into node of the hdf5 file"
     data = np.array(value, dtype=dtype)
@@ -766,8 +768,13 @@ if __name__ == '__main__':
     cadet_stdout = open(os.path.join(parent_dir, 'cadet_stdout'), 'w')
     cadet_stderr = open(os.path.join(parent_dir, 'cadet_stderr'), 'w')
 
+    log_level = json_data['LOG_LEVEL']
+    if log_level not in allowed_log_levels:
+        log_level = 'Debug'
+
+
     print [cadet_path, args.sim]
-    proc = subprocess.Popen([cadet_path, args.sim], stdout=cadet_stdout, stderr=cadet_stderr, env=env)
+    proc = subprocess.Popen([cadet_path, '-L', log_level, args.sim], stdout=cadet_stdout, stderr=cadet_stderr, env=env)
 
     print "CADET RUNNING"
 
